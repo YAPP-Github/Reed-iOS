@@ -3,7 +3,7 @@
 import UIKit
 
 /// Flow 제어 시, `onFinish`를 참고하고 사용해주세요.
-protocol Coordinator: AnyObject {
+public protocol Coordinator: AnyObject {
     // MARK: - Properties
     var parentCoordinator: (any Coordinator)? { get set }
     var childCoordinators: [any Coordinator] { get set }
@@ -14,7 +14,7 @@ protocol Coordinator: AnyObject {
 }
 
 // MARK: - Default Implementation
-extension Coordinator {
+public extension Coordinator {
     func didFinish() {
         finishAllChildCoordinators()
         parentCoordinator?.removeChildCoordinator(self)

@@ -25,6 +25,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.makeKeyAndVisible()
         
         assembleDependencies()
+        startScene()
     }
     
     func scene(
@@ -40,6 +41,15 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 }
 
 private extension SceneDelegate {
+    func startScene() {
+        @Autowired var authStateUseCase: AuthStateUseCase
+        self.coordinator = AppCoordinator(
+            navigationController: navigationController,
+            authStateUseCase: authStateUseCase
+        )
+        coordinator?.start()
+    }
+    
     func assembleDependencies() {
         DIContainer.shared.assemble([StorageAssembly(), NetworkAssembly(), DataAssembly(), DomainAssembly()])
     }
