@@ -3,7 +3,7 @@
 import Combine
 import Foundation
 
-public protocol SocialLoginService: NSObject {
+public protocol SocialLoginService: AnyObject {
     var provider: AuthProvider { get }
     
     func login() -> AnyPublisher<String, AuthError>
