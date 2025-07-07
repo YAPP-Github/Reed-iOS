@@ -1,22 +1,35 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import BKData
+import OSLog
 
-public struct KeychainTokenProvider: TokenProvider {
+public final class KeychainTokenProvider: TokenProvider {
     private let storage: KeyValueStorage
+    private var cachedAccessToken: String?
     
     public init(storage: KeyValueStorage) {
         self.storage = storage
     }
-    
-    private let accessTokenKey = "accessToken"
-    private let refreshTokenKey = "refreshToken"
-    
     public var accessToken: String? {
-        try? storage.load(for: accessTokenKey)
+        if let cachedAccessToken {
+            return cachedAccessToken
+        }
+        do {
+            let token: String = try storage.load(for: StorageKeys.accessTokenKey)
+            self.cachedAccessToken = token
+            return token
+        } catch {
+            Log.error("Failed to load accessToken: \(error)", logger: AppLogger.storage)
+            return nil
+        }
     }
     
     public func refreshIfNeeded() {
         // TODO: Refresh 기능 구현
+    }
+    
+    public func clearCache() {
+        cachedAccessToken = nil
     }
 }
