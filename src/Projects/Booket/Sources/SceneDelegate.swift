@@ -1,7 +1,12 @@
 // Copyright © 2025 Booket. All rights reserved
 
-import UIKit
+import BKCore
 import BKData
+import BKDomain
+import BKNetwork
+import BKPresentation
+import BKStorage
+import UIKit
 import KakaoSDKAuth
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -19,6 +24,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
         
+        assembleDependencies()
     }
     
     func scene(
@@ -30,5 +36,11 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 _ = AuthController.handleOpenUrl(url: url)
             }
         }
+    }
+}
+
+private extension SceneDelegate {
+    func assembleDependencies() {
+        DIContainer.shared.assemble([StorageAssembly(), NetworkAssembly(), DataAssembly(), DomainAssembly()])
     }
 }
