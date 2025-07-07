@@ -23,7 +23,7 @@ public struct AuthInterceptor {
         _ data: Data
     ) throws {
         let httpResponse = try response.asHTTP
-            .orThrow(NetworkError.internalServerError)
+            .orThrow(NetworkError.invalidResponse)
         if httpResponse.statusCode == 401 {
             tokenProvider.refreshIfNeeded()
             throw RetryTrigger()

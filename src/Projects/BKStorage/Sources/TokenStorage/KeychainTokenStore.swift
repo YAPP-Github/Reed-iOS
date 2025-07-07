@@ -35,7 +35,7 @@ public struct KeychainTokenStore: TokenStore {
                 .setFailureType(to: TokenError.self)
                 .eraseToAnyPublisher()
         } catch {
-            return Fail(error: TokenError.saveFailed(underlying: error))
+            return Fail(error: TokenError.clearFailed(underlying: error))
                 .eraseToAnyPublisher()
         }
     }

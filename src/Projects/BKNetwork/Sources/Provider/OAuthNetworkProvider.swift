@@ -23,7 +23,7 @@ public struct OAuthNetworkProvider: NetworkProvider {
             return requestor.data(for: adaptedRequest)
                 .tryMap { data, response in
                     try response.asHTTP
-                        .orThrow(NetworkError.internalServerError)
+                        .orThrow(NetworkError.invalidResponse)
                         .validate(data)
                     try interceptor.retryIfNeeded(response, data)
                     return try data.decode(to: type)

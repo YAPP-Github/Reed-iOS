@@ -23,7 +23,7 @@ public struct DefaultNetworkProvider: NetworkProvider {
             return requestor.data(for: request)
                 .tryMap { data, response in
                     try response.asHTTP
-                        .orThrow(NetworkError.internalServerError)
+                        .orThrow(NetworkError.invalidResponse)
                         .validate(data)
                     return try data.decode(to: type)
                 }
