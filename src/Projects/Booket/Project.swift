@@ -5,12 +5,10 @@ let appTarget = Target.target(
     name: "Booket",
     product: .app,
     bundleId: Project.bundleID,
-    infoPlist: .file(path: .relativeToRoot("SupportingFiles/Info.plist")),
-//    infoPlist: .default,
+    infoPlist: .file(path: .relativeToRoot("SupportingFiles/Booket/Info.plist")),
     sources: .sources,
     resources: [
-//        .glob(pattern: .relativeToRoot("src/Resources/**")),
-//        .glob(pattern: .relativeToRoot("src/Resources/LaunchScreen.storyboard"))
+        .glob(pattern: .relativeToRoot("Projects/Booket/Resources/LaunchScreen.storyboard"))
     ],
     entitlements: .file(path: .relativeToRoot("SupportingFiles/Booket/Booket.entitlements")),
     scripts: [
@@ -34,10 +32,8 @@ let appTarget = Target.target(
             "PROVISIONING_PROFILE_SPECIFIER": "match Development Booket.26th.yapp"
         ],
         configurations: [
-//            .debug(name: "Debug", xcconfig: "SupportingFiles/Debug.xcconfig"),
-//            .release(name: "Release", xcconfig: "SupportingFiles/Release.xcconfig")
-            .debug(name: "Debug", xcconfig: .relativeToRoot("SupportingFiles/Configs/Debug.xcconfig")),
-            .release(name: "Release", xcconfig: .relativeToRoot("SupportingFiles/Configs/Release.xcconfig"))
+            .debug(name: "Debug", xcconfig: .relativeToRoot("SupportingFiles/Booket/Debug.xcconfig")),
+            .release(name: "Release", xcconfig: .relativeToRoot("SupportingFiles/Booket/Release.xcconfig"))
         ]
     )
 )

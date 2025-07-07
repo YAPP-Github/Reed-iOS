@@ -10,12 +10,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        
         guard let kakaoAPIkey = Bundle.main.object(forInfoDictionaryKey: "KAKAO_NATIVE_APP_KEY") as? String else {
-            print("Error: KAKAO_NATIVE_APP_KEY not found in Info.plist")
-            return true
+            fatalError("Error: KAKAO_NATIVE_APP_KEY not found in Info.plist")
         }
-
         KakaoSDK.initSDK(appKey: kakaoAPIkey)
         return true
     }
