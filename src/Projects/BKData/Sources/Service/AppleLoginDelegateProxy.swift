@@ -1,6 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import AuthenticationServices
+import BKCore
 import BKDomain
 import Combine
 import UIKit
@@ -29,6 +30,7 @@ extension AppleLoginDelegateProxy {
             }, receiveCancel: { [weak self] in
                 self?.cleanup()
             })
+            .debugError(logger: AppLogger.auth)
             .eraseToAnyPublisher()
     }
 }
