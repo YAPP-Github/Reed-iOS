@@ -15,17 +15,17 @@
 /// }
 /// ```
 @propertyWrapper
-struct Autowired<T> {
+public struct Autowired<T> {
     private var service: T
     
-    init() {
-        guard let resolved = DIContainer.shared.resolve(type: T.self) else {
-            fatalError("\(#file) - \(#line): \(#function) - resolved failed for \(T.self)")
+    public init(name: String? = nil) {
+        guard let resolved = DIContainer.shared.resolve(type: T.self, name: name) else {
+            fatalError("\(#file) - \(#line): \(#function) - resolved failed for \(T.self) - with \(name ?? "none")")
         }
         self.service = resolved
     }
     
-    var wrappedValue: T {
+    public var wrappedValue: T {
         return service
     }
 }
