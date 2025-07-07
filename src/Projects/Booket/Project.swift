@@ -12,7 +12,7 @@ let appTarget = Target.target(
 //        .glob(pattern: .relativeToRoot("src/Resources/**")),
 //        .glob(pattern: .relativeToRoot("src/Resources/LaunchScreen.storyboard"))
     ],
-//    entitlements: .file(path: .relativeToRoot("src/SupportingFiles/Booket.entitlements")),
+    entitlements: .file(path: .relativeToRoot("SupportingFiles/Booket/Booket.entitlements")),
     scripts: [
         swiftLintScript
     ],
