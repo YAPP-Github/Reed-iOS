@@ -18,5 +18,7 @@ final class LoginCoordinator: Coordinator, FinishNotifying {
     }
     
     func start() {
+        let viewController = LoginViewController(viewModel: LoginViewModel())
+        navigationController.pushViewController(viewController, animated: true)
     }
 }
