@@ -18,7 +18,7 @@ public enum External: String {
 }
 
 extension TargetDependency {
-    public static func external(dependency: External)-> TargetDependency {
+    public static func external(dependency: External) -> TargetDependency {
         .external(name: dependency.rawValue, condition: .when([.ios]))
     }
 }
