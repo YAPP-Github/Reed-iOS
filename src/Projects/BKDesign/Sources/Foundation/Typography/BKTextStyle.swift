@@ -148,7 +148,6 @@ public enum BKTextStyle {
     }
 }
 
-
 // MARK: - BKFontAttributes: 폰트의 모든 속성을 담는 구조체
 public struct BKFontAttributes {
     public let fontName: BKFontName

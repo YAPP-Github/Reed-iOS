@@ -8,17 +8,17 @@ public extension UIColor {
     convenience init(hex: String) {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
-
+        
         var rgb: UInt64 = 0
         var r: CGFloat = 0.0
         var g: CGFloat = 0.0
         var b: CGFloat = 0.0
         var a: CGFloat = 1.0
-
+        
         let length = hexSanitized.count
-
+        
         Scanner(string: hexSanitized).scanHexInt64(&rgb)
-
+        
         if length == 6 {
             r = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
             g = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
@@ -35,19 +35,7 @@ public extension UIColor {
     // MARK: - UIKit Extension for Dynamic Colors
     // 이 확장을 통해 `BKSemanticColor`를 `UIColor`로 변환합니다.
     
-    static func bkColor(_ semanticColor: BKSemanticColor.Background) -> UIColor {
-        return UIColor { traitCollection in
-            switch traitCollection.userInterfaceStyle {
-            case .dark:
-                // return semanticColor.resolve(for: .dark)
-                return semanticColor.resolve(for: .light) // 현재는 라이트 모드 색상으로 폴백
-            default: // .light, .unspecified
-                return semanticColor.resolve(for: .light)
-            }
-        }
-    }
-    
-    static func bkColor(_ semanticColor: BKSemanticColor.Content) -> UIColor {
+    static func bkBackgroundColor(_ semanticColor: BKSemanticColor.Background) -> UIColor {
         return UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
@@ -59,11 +47,10 @@ public extension UIColor {
         }
     }
     
-    static func bkColor(_ semanticColor: BKSemanticColor.Border) -> UIColor {
+    static func bkContentColor(_ semanticColor: BKSemanticColor.Content) -> UIColor {
         return UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
-                // return semanticColor.resolve(for: .dark)
                 return semanticColor.resolve(for: .light)
             default:
                 return semanticColor.resolve(for: .light)
@@ -71,11 +58,10 @@ public extension UIColor {
         }
     }
     
-    static func bkColor(_ semanticColor: BKSemanticColor.Divider) -> UIColor {
+    static func bkBorderColor(_ semanticColor: BKSemanticColor.Border) -> UIColor {
         return UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
-                // return semanticColor.resolve(for: .dark)
                 return semanticColor.resolve(for: .light)
             default:
                 return semanticColor.resolve(for: .light)
@@ -83,11 +69,10 @@ public extension UIColor {
         }
     }
     
-    static func bkColor(_ semanticColor: BKSemanticColor.Base) -> UIColor {
+    static func bkDividerColor(_ semanticColor: BKSemanticColor.Divider) -> UIColor {
         return UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
-                // return semanticColor.resolve(for: .dark)
                 return semanticColor.resolve(for: .light)
             default:
                 return semanticColor.resolve(for: .light)
@@ -95,4 +80,15 @@ public extension UIColor {
         }
     }
     
+    static func bkBaseColor(_ semanticColor: BKSemanticColor.Base) -> UIColor {
+        return UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark:
+                return semanticColor.resolve(for: .light)
+            default:
+                return semanticColor.resolve(for: .light)
+            }
+        }
+    }
 }
+

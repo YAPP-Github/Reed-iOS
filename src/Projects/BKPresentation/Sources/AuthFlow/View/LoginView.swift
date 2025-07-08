@@ -20,7 +20,7 @@ final class LoginView: BaseView {
     
     private let loginStatusLabel = UILabel().then {
         $0.setBKTextStyle(.body1(weight: .regular), text: "아직 아무 것도 안 함")
-        $0.textColor = .bkColor(.info)
+        $0.textColor = .bkContentColor(.brand)
         $0.numberOfLines = 0
     }
     
@@ -42,13 +42,14 @@ final class LoginView: BaseView {
             return
         }
         $0.image = kakaoLogo.withRenderingMode(.alwaysTemplate)
-        $0.tintColor = .bkColor(BKSemanticColor.Content.primary)
+        $0.tintColor = .bkContentColor(.primary)
+
     }
 
     // ✨ 카카오 버튼 내부에 들어갈 텍스트 레이블
     private let kakaoTitleLabel = UILabel().then {
         $0.setBKTextStyle(.body1(weight: .medium), text: "카카오톡으로 로그인")
-        $0.textColor = .bkColor(BKSemanticColor.Content.primary)
+        $0.textColor = .bkContentColor(.primary)
         $0.textAlignment = .center
     }
     
