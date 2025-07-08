@@ -26,7 +26,7 @@ public struct AuthInterceptor {
             .orThrow(NetworkError.invalidResponse)
         if httpResponse.statusCode == 401 {
             tokenProvider.refreshIfNeeded()
-            throw RetryTrigger()
+            throw NetworkError.retryTrigger
         }
     }
 }

@@ -7,5 +7,5 @@ public protocol NetworkProvider {
     func request<T: Decodable>(
         target: RequestTarget,
         type: T.Type
-    ) -> AnyPublisher<T, Error>
+    ) -> AnyPublisher<T, NetworkError>
 }

@@ -6,4 +6,6 @@ public enum NetworkError: Error {
     case unauthorized
     case internalServerError
     case timeout
+    case retryTrigger
+    case unknown
 }
