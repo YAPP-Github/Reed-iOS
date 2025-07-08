@@ -34,6 +34,7 @@ type_name:
 
 identifier_name:
   min_length: 3
+  allowed_symbols: ["_"]
 
 function_body_length:
   warning: 30

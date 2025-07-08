@@ -1,4 +1,4 @@
-// Copyright © 2025 Booket. All rights reserved
+// Copyright © 2025 Booket. All rights reserved.
 
 import UIKit
 
@@ -20,21 +20,21 @@ public enum BKFontSize: CGFloat {
 
 // MARK: - BKLineHeight: 줄 높이 정의
 public enum BKLineHeight: CGFloat {
-    case percent127_3 = 1.273
-    case percent133_4 = 1.334
-    case percent134_4 = 1.344
-    case percent135_8 = 1.358
-    case percent136_4 = 1.364
-    case percent138_5 = 1.385
-    case percent141_2 = 1.412
-    case percent142_9 = 1.429
-    case percent144_5 = 1.445
-    case percent146_7 = 1.467
-    case percent157_1 = 1.571
-    case percent162_5 = 1.625
-    case percent140 = 1.400
-    case percent150 = 1.500
-    case percent160 = 1.600
+    case p127_3 = 1.273
+    case p133_4 = 1.334
+    case p134_4 = 1.344
+    case p135_8 = 1.358
+    case p136_4 = 1.364
+    case p138_5 = 1.385
+    case p141_2 = 1.412
+    case p142_9 = 1.429
+    case p144_5 = 1.445
+    case p146_7 = 1.467
+    case p157_1 = 1.571
+    case p162_5 = 1.625
+    case p140 = 1.400
+    case p150 = 1.500
+    case p160 = 1.600
     
     public func calculateAbsoluteLineHeight(for fontSize: CGFloat) -> CGFloat {
         return fontSize * self.rawValue
@@ -43,10 +43,10 @@ public enum BKLineHeight: CGFloat {
 
 // MARK: - BKLetterSpacing: 자간 정의
 public enum BKLetterSpacing: CGFloat {
-    case percentNegative2_36 = -0.0236
-    case percentNegative2_3 = -0.023
-    case percentNegative1_2 = -0.012
-    case percentNegative1 = -0.01
+    case pNegative2_36 = -0.0236
+    case pNegative2_3 = -0.023
+    case pNegative1_2 = -0.012
+    case pNegative1 = -0.01
     
     public func calculateAbsoluteLetterSpacing(for fontSize: CGFloat) -> CGFloat {
         return fontSize * self.rawValue
