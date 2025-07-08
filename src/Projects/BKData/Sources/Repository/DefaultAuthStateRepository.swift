@@ -5,9 +5,14 @@ import Combine
 import Foundation
 
 public struct DefaultAuthStateRepository: AuthStateRepository {
+    private let networkProvider: NetworkProvider
     private let tokenProvider: TokenProvider
     
-    public init(tokenProvider: TokenProvider) {
+    public init(
+        networkProvider: NetworkProvider,
+        tokenProvider: TokenProvider
+    ) {
+        self.networkProvider = networkProvider
         self.tokenProvider = tokenProvider
     }
     
@@ -16,8 +21,13 @@ public struct DefaultAuthStateRepository: AuthStateRepository {
             .eraseToAnyPublisher()
     }
     
-    public func accessToken() -> AnyPublisher<String?, Never> {
-        return Just(tokenProvider.accessToken)
-            .eraseToAnyPublisher()
+    public func validate() -> AnyPublisher<Void, AuthError> {
+        networkProvider.request(
+            target: AuthAPI.me,
+            type: EmptyResponse.self
+        )
+        .mapError { _ in AuthError.missingToken }
+        .map { _ in }
+        .eraseToAnyPublisher()
     }
 }

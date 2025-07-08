@@ -4,7 +4,7 @@ import Combine
 import Foundation
 
 /// 인증 상태를 체크합니다.
-/// 단순히 AccessToken 여부를 체크하는 간단한 UseCase로 에러는 방출하지 않습니다.
+/// 내부에 AccessToken이 있는지 확인하고, 서버로 보내 검증합니다.
 public protocol AuthStateUseCase {
-    func execute() -> AnyPublisher<Bool, Never>
+    func execute() -> AnyPublisher<Void, AuthError>
 }

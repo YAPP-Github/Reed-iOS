@@ -22,8 +22,10 @@ public struct DataAssembly: Assembly {
         container.register(
             type: AuthStateRepository.self
         ) { _ in
+            @Autowired(name: "oauth") var networkProvider: NetworkProvider
             @Autowired var tokenProvider: TokenProvider
             return DefaultAuthStateRepository(
+                networkProvider: networkProvider,
                 tokenProvider: tokenProvider
             )
         }

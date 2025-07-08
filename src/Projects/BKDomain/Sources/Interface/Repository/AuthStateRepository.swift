@@ -4,5 +4,5 @@ import Combine
 
 public protocol AuthStateRepository {
     func isLoggedIn() -> AnyPublisher<Bool, Never>
-    func accessToken() -> AnyPublisher<String?, Never>
+    func validate() -> AnyPublisher<Void, AuthError>
 }

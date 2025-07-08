@@ -23,13 +23,15 @@ public final class AppCoordinator: Coordinator {
     
     public func start() {
         authStateUseCase.execute()
-            .sink { [weak self] isLoggedIn in
-                if isLoggedIn {
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { [weak self] completion in
+                switch completion {
+                case .finished:
                     self?.startMainFlow()
-                } else {
+                case .failure:
                     self?.startAuthFlow()
                 }
-            }
+            }, receiveValue: { _ in })
             .store(in: &cancellable)
     }
     
