@@ -17,20 +17,19 @@ public struct DefaultNetworkProvider: NetworkProvider {
     public func request<T: Decodable>(
         target: RequestTarget,
         type: T.Type
-    ) -> AnyPublisher<T, Error> {
-        do {
-            let request = try target.makeURLRequest()
-            return requestor.data(for: request)
-                .tryMap { data, response in
-                    try response.asHTTP
-                        .orThrow(NetworkError.invalidResponse)
-                        .validate(data)
-                    return try data.decode(to: type)
-                }
-                .eraseToAnyPublisher()
-        } catch {
-            return Fail(error: error)
-                .eraseToAnyPublisher()
-        }
+    ) -> AnyPublisher<T, NetworkError> {
+        return target.makeURLRequest()
+            .flatMap { request in
+                requestor.data(for: request)
+                    .tryMap { data, response in
+                        try response.asHTTP
+                            .orThrow(NetworkError.invalidResponse)
+                            .validate(data)
+                        return try data.decode(to: type)
+                    }
+                    .debugError("Decoding Failed", logger: AppLogger.network)
+                    .mapError { $0 as? NetworkError ?? .invalidResponse }
+            }
+            .eraseToAnyPublisher()
     }
 }

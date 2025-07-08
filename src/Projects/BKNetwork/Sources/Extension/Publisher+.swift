@@ -1,8 +1,9 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKData
 import Combine
 
-extension Publisher {
+extension Publisher where Failure == NetworkError {
     func retryIf(
         _ shouldRetry: @escaping (Failure) -> Bool,
         maxRetries: Int
