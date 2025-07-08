@@ -2,84 +2,8 @@
 
 import UIKit
 
-// MARK: - BKFontName
-enum BKFontName: String {
-    case pretendardRegular = "Pretendard-Regular"
-    case pretendardMedium = "Pretendard-Medium"
-    case pretendardSemiBold = "Pretendard-SemiBold"
-    case pretendardBold = "Pretendard-Bold"
-    
-    // 나중에 추가되면 여기에 네이밍 추가
-}
-
-// MARK: - BKFontSize: 폰트 크기 정의
-enum BKFontSize: CGFloat {
-    case pt11 = 11.0
-    case pt12 = 12.0
-    case pt13 = 13.0
-    case pt14 = 14.0
-    case pt15 = 15.0
-    case pt16 = 16.0
-    case pt17 = 17.0
-    case pt18 = 18.0
-    case pt20 = 20.0
-    case pt22 = 22.0
-    case pt24 = 24.0
-    case pt28 = 28.0
-}
-
-// MARK: - BKFontWeight: 폰트 두께 정의
-enum BKFontWeight: String {
-    case regular = "Regular"
-    case medium = "Medium"
-    case semiBold = "SemiBold"
-    case bold = "Bold"
-
-    func toFontName() -> BKFontName? {
-        switch self {
-        case .regular: return .pretendardRegular
-        case .medium: return .pretendardMedium
-        case .semiBold: return .pretendardSemiBold
-        case .bold: return .pretendardBold
-        }
-    }
-}
-
-enum BKLineHeight: CGFloat {
-    case percent127_3 = 1.273
-    case percent133_4 = 1.334
-    case percent134_4 = 1.344
-    case percent135_8 = 1.358
-    case percent136_4 = 1.364
-    case percent138_5 = 1.385
-    case percent141_2 = 1.412
-    case percent142_9 = 1.429
-    case percent144_5 = 1.445
-    case percent146_7 = 1.467
-    case percent157_1 = 1.571
-    case percent162_5 = 1.625
-    case percent140 = 1.400
-    case percent150 = 1.500
-    case percent160 = 1.600
-    
-    func calculateAbsoluteLineHeight(for fontSize: CGFloat) -> CGFloat {
-        return fontSize * self.rawValue
-    }
-}
-
-enum BKLetterSpacing: CGFloat {
-    case percentNegative2_36 = -0.0236
-    case percentNegative2_3 = -0.023
-    case percentNegative1_2 = -0.012
-    case percentNegative1 = -0.01
-    
-    func calculateAbsoluteLetterSpacing(for fontSize: CGFloat) -> CGFloat {
-        return fontSize * self.rawValue
-    }
-}
-
 // MARK: - BKTextStyle: 타이포그래피 스타일 정의
-enum BKTextStyle {
+public enum BKTextStyle {
     // Title 그룹
     case title1(weight: BKFontWeight)
     case title2(weight: BKFontWeight)
@@ -105,7 +29,7 @@ enum BKTextStyle {
     case caption2(weight: BKFontWeight)
     
     // 각 스타일의 실제 속성을 정의합니다.
-    var fontAttributes: (fontName: BKFontName, fontSize: BKFontSize, lineHeight: BKLineHeight, letterSpacing: BKLetterSpacing?) {
+    public var fontAttributes: (fontName: BKFontName, fontSize: BKFontSize, lineHeight: BKLineHeight, letterSpacing: BKLetterSpacing?) {
         switch self {
             
         case .title1(let weight):
@@ -190,12 +114,12 @@ enum BKTextStyle {
         }
     }
     
-    var uiFont: UIFont? {
+    public var uiFont: UIFont? {
         let (fontName, fontSize, _, _) = fontAttributes
         return UIFont(name: fontName.rawValue, size: fontSize.rawValue)
     }
     
-    var paragraphStyle: NSMutableParagraphStyle {
+    public var paragraphStyle: NSMutableParagraphStyle {
         let (_, fontSize, lineHeight, _) = fontAttributes
         let paragraphStyle = NSMutableParagraphStyle()
         
@@ -206,7 +130,7 @@ enum BKTextStyle {
         return paragraphStyle
     }
     
-    func attributedString(from text: String, color: UIColor = .label) -> NSAttributedString {
+    public func attributedString(from text: String, color: UIColor = .label) -> NSAttributedString {
         let (_, fontSize, _, letterSpacing) = fontAttributes
         
         var attributes: [NSAttributedString.Key: Any] = [

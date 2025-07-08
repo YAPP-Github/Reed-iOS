@@ -2,7 +2,7 @@
 
 import UIKit
 
-extension UIButton {
+public extension UIButton {
     func setBKTextStyle(_ style: BKTextStyle, title: String? = nil, color: UIColor? = nil, for state: UIControl.State = .normal) {
         let actualColor = color ?? self.titleColor(for: state) ?? .label
         if let title = title {
