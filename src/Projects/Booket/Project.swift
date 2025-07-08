@@ -8,7 +8,8 @@ let appTarget = Target.target(
     infoPlist: .file(path: .relativeToRoot("SupportingFiles/Booket/Info.plist")),
     sources: .sources,
     resources: [
-        .glob(pattern: .relativeToRoot("Projects/Booket/Resources/LaunchScreen.storyboard"))
+        .glob(pattern: .relativeToRoot("Projects/Booket/Resources/LaunchScreen.storyboard")),
+        .glob(pattern: .relativeToRoot("Projects/BKDesign/Resources/Font/**"))
     ],
     entitlements: .file(path: .relativeToRoot("SupportingFiles/Booket/Booket.entitlements")),
     scripts: [
