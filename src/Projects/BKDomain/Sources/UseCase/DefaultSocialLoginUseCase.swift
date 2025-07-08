@@ -1,5 +1,6 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import Combine
 import Foundation
 
@@ -10,14 +11,9 @@ public struct DefaultSocialLoginUseCase: SocialLoginUseCase {
         self.loginService = loginService
     }
     
-    public func execute() -> AnyPublisher<SocialLoginResult, AuthError> {
-        loginService.login()
-            .map { token in
-                SocialLoginResult(
-                    provider: self.loginService.provider,
-                    token: token
-                )
-            }
+    public func execute() -> AnyPublisher<String, AuthError> {
+        return loginService
+            .login()
             .eraseToAnyPublisher()
     }
 }

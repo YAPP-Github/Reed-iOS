@@ -5,16 +5,15 @@ import BKDomain
 import Combine
 import Foundation
 
-public final class AppleLoginService: NSObject, SocialLoginService {
+public final class AppleLoginService: AnyObject, SocialLoginService {
     public let provider: AuthProvider = .apple
     private let delegateProxy: AppleLoginDelegateProxy
     
-    public override init() {
+    public init() {
         self.delegateProxy = AppleLoginDelegateProxy()
-        super.init()
     }
     
     public func login() -> AnyPublisher<String, AuthError> {
-        delegateProxy.startAuthorization()
+        return delegateProxy.startAuthorization()
     }
 }

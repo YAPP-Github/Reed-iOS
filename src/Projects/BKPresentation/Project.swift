@@ -13,7 +13,9 @@ let project = Project.project(
                 swiftLintScript
             ],
             dependencies: [
-                .core()
+                .core(),
+                .domain(),
+                .external(dependency: .SnapKit)
             ]
         ),
         Target.target(

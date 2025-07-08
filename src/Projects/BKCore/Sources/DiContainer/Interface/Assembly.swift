@@ -5,8 +5,8 @@
 /// ### Example
 /// ```swift
 /// // 각 계층에서
-/// final class DataAssembly: Assembly { ... }
-/// final class DomainAssembly: Assembly { ... }
+/// public struct DataAssembly: Assembly { ... }
+/// public struct DomainAssembly: Assembly { ... }
 /// // SceneDelegate에서
 /// DIContainer.shared.assemble([DataAssembly(), DomainAssembly()])
 /// ```

@@ -39,7 +39,7 @@ done
 echo ""
 echo "🔧 Config 파일 확인 중..."
 
-CONFIG_DIR="SupportingFiles/Configs"
+CONFIG_DIR="SupportingFiles/Booket"
 DEBUG_XCCONFIG="$CONFIG_DIR/Debug.xcconfig"
 RELEASE_XCCONFIG="$CONFIG_DIR/Release.xcconfig"
 

@@ -1,8 +1,10 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import BKData
 import Combine
 import Foundation
+import OSLog
 
 public struct DefaultNetworkProvider: NetworkProvider {
     private let requestor: NetworkRequestable
@@ -22,7 +24,7 @@ public struct DefaultNetworkProvider: NetworkProvider {
                 .tryMap { data, response in
                     try response.asHTTP
                         .orThrow(NetworkError.invalidResponse)
-                        .validate()
+                        .validate(data)
                     return try data.decode(to: type)
                 }
                 .eraseToAnyPublisher()

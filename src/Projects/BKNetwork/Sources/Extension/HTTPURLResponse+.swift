@@ -1,9 +1,11 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import Foundation
+import OSLog
 
 extension HTTPURLResponse {
-    func validate() throws {
+    func validate(_ data: Data) throws {
         switch statusCode {
         case 200...299:
             return
@@ -12,6 +14,13 @@ extension HTTPURLResponse {
         case 500...599:
             throw NetworkError.internalServerError
         default:
+            Log.error(
+                """
+                status code: \(statusCode)
+                body: \(String(data: data, encoding: .utf8) ?? "none")"
+                """,
+                logger: AppLogger.network
+            )
             throw NetworkError.invalidResponse
         }
     }

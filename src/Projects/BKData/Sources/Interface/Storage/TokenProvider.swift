@@ -3,4 +3,5 @@
 public protocol TokenProvider {
     var accessToken: String? { get }
     func refreshIfNeeded()
+    func clearCache()
 }
