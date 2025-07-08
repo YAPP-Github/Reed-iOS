@@ -1,5 +1,6 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import BKData
 import Combine
 import Foundation
@@ -17,22 +18,21 @@ public struct OAuthNetworkProvider: NetworkProvider {
     public func request<T: Decodable>(
         target: RequestTarget,
         type: T.Type
-    ) -> AnyPublisher<T, Error> {
-        do {
-            let adaptedRequest = try interceptor.adapt(target.makeURLRequest())
-            return requestor.data(for: adaptedRequest)
-                .tryMap { data, response in
-                    try response.asHTTP
-                        .orThrow(NetworkError.invalidResponse)
-                        .validate(data)
-                    try interceptor.retryIfNeeded(response, data)
-                    return try data.decode(to: type)
-                }
-                .retryIf({ $0 is RetryTrigger }, maxRetries: 1)
-                .eraseToAnyPublisher()
-        } catch {
-            return Fail(error: error)
-                .eraseToAnyPublisher()
-        }
+    ) -> AnyPublisher<T, NetworkError> {
+        return target.makeURLRequest()
+            .flatMap { request in
+                let adaptedRequest = interceptor.adapt(request)
+                return requestor.data(for: adaptedRequest)
+                    .tryMap { data, response in
+                        try response.asHTTP
+                            .orThrow(NetworkError.invalidResponse)
+                            .validate(data)
+                        try interceptor.retryIfNeeded(response, data)
+                        return try data.decode(to: type)
+                    }
+                    .mapError { $0 as? NetworkError ?? .invalidResponse }
+            }
+            .retryIf({ $0 == NetworkError.retryTrigger }, maxRetries: 1)
+            .eraseToAnyPublisher()
     }
 }
