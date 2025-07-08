@@ -29,8 +29,13 @@ public enum BKIcon: String {
     case star = "star"
     case xmark = "x"
 
+    private static var bundle: Bundle {
+        return Bundle.module // Swift Package일 경우
+        // return Bundle(for: SomeClassInBKDesign.self) // Framework일 경우
+    }
+    
     /// 해당 아이콘 이름을 가진 UIImage를 반환합니다.
     public var image: UIImage? {
-        return UIImage(named: self.rawValue)
+        return UIImage(named: self.rawValue, in: BKIcon.bundle, with: nil)
     }
 }
