@@ -100,7 +100,7 @@ public enum BKAtomicColor {
         case b800 = "#1269ec"
         case b900 = "#1f47cd"
         
-        public svar color: UIColor {
+        public var color: UIColor {
             return UIColor(hex: self.rawValue)
         }
     }
