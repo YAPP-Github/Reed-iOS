@@ -7,13 +7,17 @@
 ///
 /// ### Example
 /// ```swift
-/// /// In Coordinator
-/// func createMyViewController() -> MYViewController {
-///     @Autowired var usecase: MyUseCase
-///     let viewmodel = MyViewModel(usecase: usecase)
-///     return MyViewController(viewmodel: viewmodel)
-/// }
+/// /// In ViewModel
+/// @Autowired(name: "apple") private var appleLoginUseCase: SocialLoginUseCase
+/// @Autowired(name: "kakao") private var kakaoLoginUseCase: SocialLoginUseCase
+/// @Autowired private var socialTokenAuthUseCase: SocialTokenAuthUseCase
 /// ```
+///
+/// ### 활용 방법
+/// ViewModel을 제외한 모든 계층에서는 `Assembly`에서 `@Autowired`로 주입합니다.
+/// Data, Domain 등의 계층에서는 테스트가 필수불가결적이므로 생성자 주입을 통한 DI를 활용해주세요.
+/// 단, ViewModel의 경우에는 편리하게 `@Autowired` 주입을 추천드립니다.
+/// `Coordinator`에서의 불필요한 라인을 줄일 수 있습니다.
 @propertyWrapper
 public struct Autowired<T> {
     private var service: T
