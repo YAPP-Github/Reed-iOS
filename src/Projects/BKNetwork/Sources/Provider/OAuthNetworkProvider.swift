@@ -24,10 +24,10 @@ public struct OAuthNetworkProvider: NetworkProvider {
                 let adaptedRequest = interceptor.adapt(request)
                 return requestor.data(for: adaptedRequest)
                     .tryMap { data, response in
+                        try interceptor.retryIfNeeded(response, data)
                         try response.asHTTP
                             .orThrow(NetworkError.invalidResponse)
                             .validate(data)
-                        try interceptor.retryIfNeeded(response, data)
                         return try data.decode(to: type)
                     }
                     .mapError { $0 as? NetworkError ?? .invalidResponse }
