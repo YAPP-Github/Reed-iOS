@@ -2,7 +2,7 @@
 
 import UIKit
 
-public enum BKIcon: String{
+public enum BKIcon: String {
     case alert = "alert-circle"
     case appleLogo = "apple"
     case bellOff = "bell-off"
