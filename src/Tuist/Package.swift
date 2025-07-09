@@ -12,8 +12,7 @@
             "KakaoSDK": .staticLibrary,
             "Nimble": .framework,
             "Quick": .framework,
-            "SnapKit": .staticLibrary,
-            "Then" : .framework
+            "SnapKit": .staticLibrary
         ]
     )
 #endif
@@ -26,7 +25,6 @@ let package = Package(
         .package(url: "https://github.com/Quick/Nimble.git", from: "13.7.1"),
         .package(url: "https://github.com/Quick/Quick.git", from: "7.6.2"),
         
-        .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.7.1"),
-        .package(url: "https://github.com/devxoul/Then.git", from: "3.0.0")
+        .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.7.1")
     ]
 )
