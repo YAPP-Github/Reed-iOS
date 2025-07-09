@@ -18,8 +18,8 @@ public enum BKFontWeight: String {
     case medium = "Medium"
     case semiBold = "SemiBold"
     case bold = "Bold"
-
-    public func toFontName() -> BKFontName? {
+    
+    public func toFontName() -> BKFontName {
         switch self {
         case .regular: return .pretendardRegular
         case .medium: return .pretendardMedium

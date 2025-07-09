@@ -88,15 +88,15 @@ public enum BKSemanticColor {
     
     // Divider Colors
     public enum Divider {
-        case sm
-        case md
+        case small
+        case medium
         
         public func resolve(for mode: BKColorMode) -> UIColor {
             switch mode {
             case .light:
                 switch self {
-                case .sm: return BKAtomicColor.Neutral.n200.color
-                case .md: return BKAtomicColor.Neutral.n100.color
+                case .small: return BKAtomicColor.Neutral.n200.color
+                case .medium: return BKAtomicColor.Neutral.n100.color
                 }
             // case .dark:
                 // switch self { /* dark mode colors */ }

@@ -10,32 +10,34 @@ public extension UIColor {
         hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
         
         var rgb: UInt64 = 0
-        var r: CGFloat = 0.0
-        var g: CGFloat = 0.0
-        var b: CGFloat = 0.0
-        var a: CGFloat = 1.0
+        var red: CGFloat = 0.0
+        var green: CGFloat = 0.0
+        var blue: CGFloat = 0.0
+        var alpha: CGFloat = 1.0
         
         let length = hexSanitized.count
         
         Scanner(string: hexSanitized).scanHexInt64(&rgb)
         
         if length == 6 {
-            r = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
-            g = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
-            b = CGFloat(rgb & 0x0000FF) / 255.0
+            red = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
+            green = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
+            blue = CGFloat(rgb & 0x0000FF) / 255.0
         } else if length == 8 {
-            r = CGFloat((rgb & 0xFF000000) >> 24) / 255.0
-            g = CGFloat((rgb & 0x00FF0000) >> 16) / 255.0
-            b = CGFloat((rgb & 0x0000FF00) >> 8) / 255.0
-            a = CGFloat(rgb & 0x000000FF) / 255.0
+            red = CGFloat((rgb & 0xFF000000) >> 24) / 255.0
+            green = CGFloat((rgb & 0x00FF0000) >> 16) / 255.0
+            blue = CGFloat((rgb & 0x0000FF00) >> 8) / 255.0
+            alpha = CGFloat(rgb & 0x000000FF) / 255.0
         }
-        self.init(red: r, green: g, blue: b, alpha: a)
+        self.init(red: red, green: green, blue: blue, alpha: alpha)
     }
     
     // MARK: - UIKit Extension for Dynamic Colors
     // 이 확장을 통해 `BKSemanticColor`를 `UIColor`로 변환합니다.
     
-    static func bkBackgroundColor(_ semanticColor: BKSemanticColor.Background) -> UIColor {
+    static func bkBackgroundColor(
+        _ semanticColor: BKSemanticColor.Background
+    ) -> UIColor {
         return UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
@@ -47,7 +49,9 @@ public extension UIColor {
         }
     }
     
-    static func bkContentColor(_ semanticColor: BKSemanticColor.Content) -> UIColor {
+    static func bkContentColor(
+        _ semanticColor: BKSemanticColor.Content
+    ) -> UIColor {
         return UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
@@ -58,7 +62,9 @@ public extension UIColor {
         }
     }
     
-    static func bkBorderColor(_ semanticColor: BKSemanticColor.Border) -> UIColor {
+    static func bkBorderColor(
+        _ semanticColor: BKSemanticColor.Border
+    ) -> UIColor {
         return UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
@@ -69,7 +75,9 @@ public extension UIColor {
         }
     }
     
-    static func bkDividerColor(_ semanticColor: BKSemanticColor.Divider) -> UIColor {
+    static func bkDividerColor(
+        _ semanticColor: BKSemanticColor.Divider
+    ) -> UIColor {
         return UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
@@ -80,7 +88,9 @@ public extension UIColor {
         }
     }
     
-    static func bkBaseColor(_ semanticColor: BKSemanticColor.Base) -> UIColor {
+    static func bkBaseColor(
+        _ semanticColor: BKSemanticColor.Base
+    ) -> UIColor {
         return UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
@@ -91,4 +101,3 @@ public extension UIColor {
         }
     }
 }
-
