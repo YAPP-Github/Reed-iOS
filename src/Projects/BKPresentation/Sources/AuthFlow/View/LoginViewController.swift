@@ -15,8 +15,21 @@ final class LoginViewController: BaseViewController<LoginView> {
         super.init()
     }
     
-    override func configure() {
-        contentView.delegate = self
+    override func bindAction() {
+        contentView.eventPublisher
+            .sink { event in
+                switch event {
+                case .loginButtonTapped(let provider):
+                    if provider == .apple {
+                        self.viewModel.send(.appleLoginButtonTapped)
+                    } else if provider == .kakao {
+                        self.viewModel.send(.kakaoLoginButtonTapped)
+                    }
+                case .logoutButtonTapped:
+                    self.viewModel.send(.logoutButtonTapped)
+                }
+            }
+            .store(in: &cancellable)
     }
     
     override func bindState() {
@@ -48,15 +61,6 @@ final class LoginViewController: BaseViewController<LoginView> {
             .store(in: &cancellable)
         
         viewModel.statePublisher
-            .map { $0.isLoading }
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { isLoading in
-                print("loading status: \(isLoading)")
-            }
-            .store(in: &cancellable)
-        
-        viewModel.statePublisher
             .map { $0.isLoggedIn }
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
@@ -64,19 +68,5 @@ final class LoginViewController: BaseViewController<LoginView> {
                 print("authentication status: \(isLoggedIn)")
             }
             .store(in: &cancellable)
-    }
-}
-
-extension LoginViewController: LoginViewDelegate {
-    func loginViewDidTapLoginButton(
-        _ view: LoginView,
-        provider: AuthProvider
-    ) {
-        switch provider {
-        case .apple:
-            viewModel.send(.appleLoginButtonTapped)
-        case .kakao:
-            viewModel.send(.kakaoLoginButtonTapped)
-        }
     }
 }

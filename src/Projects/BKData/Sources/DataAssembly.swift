@@ -9,13 +9,16 @@ public struct DataAssembly: Assembly {
     
     public func assemble(container: DIContainer) {
         container.register(
-            type: AuthRepository.self
+            type: DefaultAuthRepository.self,
+            scope: .singleton
         ) { _ in
             @Autowired(name: "oauth") var networkProvider: NetworkProvider
             @Autowired var tokenStore: TokenStore
+            @Autowired var tokenProvider: TokenProvider
             return DefaultAuthRepository(
                 networkProvider: networkProvider,
-                tokenStore: tokenStore
+                tokenStore: tokenStore,
+                tokenProvider: tokenProvider
             )
         }
         
@@ -42,6 +45,20 @@ public struct DataAssembly: Assembly {
             name: "kakao"
         ) { _ in
             return KakaoLoginService()
+        }
+        
+        container.register(
+            type: AuthRepository.self
+        ) { _ in
+            @Autowired var repository: DefaultAuthRepository
+            return repository
+        }
+        
+        container.register(
+            type: RefreshHandler.self
+        ) { _ in
+            @Autowired var repository: DefaultAuthRepository
+            return repository
         }
     }
 }

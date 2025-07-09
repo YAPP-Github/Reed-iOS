@@ -8,7 +8,6 @@ import Foundation
 final class LoginViewModel: BaseViewModel {
     struct State {
         var isLoggedIn: Bool = false
-        var isLoading: Bool = false
         var latestProvider: String?
         var errorMessage: String?
     }
@@ -17,13 +16,15 @@ final class LoginViewModel: BaseViewModel {
         case appleLoginButtonTapped
         case kakaoLoginButtonTapped
         case loginSuccessed
-        case loginFailed(message: String)
+        case authFailed(message: String)
+        case logoutButtonTapped
+        case logoutSuccessed
     }
     
     enum SideEffect {
         case signInApple
         case signInKakao
-        case authenticateWithToken(String)
+        case logout
     }
     
     @Published private var state = State()
@@ -33,6 +34,7 @@ final class LoginViewModel: BaseViewModel {
     @Autowired(name: "apple") private var appleLoginUseCase: SocialLoginUseCase
     @Autowired(name: "kakao") private var kakaoLoginUseCase: SocialLoginUseCase
     @Autowired private var socialTokenAuthUseCase: SocialTokenAuthUseCase
+    @Autowired private var logoutUseCase: LogoutUseCase
     
     var statePublisher: AnyPublisher<State, Never> {
         $state.eraseToAnyPublisher()
@@ -54,22 +56,24 @@ final class LoginViewModel: BaseViewModel {
 
         switch action {
         case .appleLoginButtonTapped:
-            newState.isLoading = true
             newState.errorMessage = nil
             newState.latestProvider = "apple"
             effects.append(.signInApple)
         case .kakaoLoginButtonTapped:
-            newState.isLoading = true
             newState.errorMessage = nil
             newState.latestProvider = "kakao"
             effects.append(.signInKakao)
         case .loginSuccessed:
             newState.isLoggedIn = true
-            newState.isLoading = false
             newState.errorMessage = nil
-        case .loginFailed(let message):
-            newState.isLoading = false
+        case .authFailed(let message):
             newState.errorMessage = message
+        case .logoutButtonTapped:
+            newState.errorMessage = nil
+            effects.append(.logout)
+        case .logoutSuccessed:
+            newState.isLoggedIn = false
+            newState.errorMessage = nil
         }
 
         return (newState, effects)
@@ -86,12 +90,11 @@ final class LoginViewModel: BaseViewModel {
                         token: token
                     )
                         .map { Action.loginSuccessed }
-                        .catch { Just(Action.loginFailed(message: $0.localizedDescription)) }
+                        .catch { Just(Action.authFailed(message: $0.localizedDescription)) }
                         .eraseToAnyPublisher()
                 }
-                .catch { Just(Action.loginFailed(message: $0.localizedDescription)) }
+                .catch { Just(Action.authFailed(message: $0.localizedDescription)) }
                 .eraseToAnyPublisher()
-
         case .signInKakao:
             return kakaoLoginUseCase.execute()
                 .flatMap { [weak self] token in
@@ -101,13 +104,16 @@ final class LoginViewModel: BaseViewModel {
                         token: token
                     )
                         .map { Action.loginSuccessed }
-                        .catch { Just(Action.loginFailed(message: $0.localizedDescription)) }
+                        .catch { Just(Action.authFailed(message: $0.localizedDescription)) }
                         .eraseToAnyPublisher()
                 }
-                .catch { Just(Action.loginFailed(message: $0.localizedDescription)) }
+                .catch { Just(Action.authFailed(message: $0.localizedDescription)) }
                 .eraseToAnyPublisher()
-        case .authenticateWithToken:
-            return Empty().eraseToAnyPublisher()
+        case .logout:
+            return logoutUseCase.execute()
+                .map { Action.logoutSuccessed }
+                .catch { Just(Action.authFailed(message: $0.localizedDescription)) }
+                .eraseToAnyPublisher()
         }
     }
     

@@ -20,7 +20,7 @@ extension RequestTarget {
                 if let body { request.setBody(body) }
                 return request
             }
-            .mapError { error in error as? NetworkError ?? NetworkError.invalidURL }
+            .mapError { error in error as? NetworkError ?? .invalidURL }
             .eraseToAnyPublisher()
     }
 }

@@ -7,6 +7,7 @@ import OSLog
 public final class KeychainTokenProvider: TokenProvider {
     private let storage: KeyValueStorage
     private var cachedAccessToken: String?
+    private var cachedRefreshToken: String?
     
     public init(storage: KeyValueStorage) {
         self.storage = storage
@@ -25,11 +26,22 @@ public final class KeychainTokenProvider: TokenProvider {
         }
     }
     
-    public func refreshIfNeeded() {
-        // TODO: Refresh 기능 구현
+    public var refreshToken: String? {
+        if let cachedRefreshToken {
+            return cachedRefreshToken
+        }
+        do {
+            let token: String = try storage.load(for: StorageKeys.refreshTokenKey)
+            self.cachedRefreshToken = token
+            return token
+        } catch {
+            Log.error("Failed to load refreshToken: \(error)", logger: AppLogger.storage)
+            return nil
+        }
     }
     
     public func clearCache() {
         cachedAccessToken = nil
+        cachedRefreshToken = nil
     }
 }

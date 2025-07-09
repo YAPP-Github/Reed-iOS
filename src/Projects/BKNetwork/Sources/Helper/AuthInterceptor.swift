@@ -17,16 +17,4 @@ public struct AuthInterceptor {
         adapted.addAuthorization(token)
         return adapted
     }
-    
-    func retryIfNeeded(
-        _ response: URLResponse,
-        _ data: Data
-    ) throws {
-        let httpResponse = try response.asHTTP
-            .orThrow(NetworkError.invalidResponse)
-        if httpResponse.statusCode == 401 {
-            tokenProvider.refreshIfNeeded()
-            throw NetworkError.retryTrigger
-        }
-    }
 }

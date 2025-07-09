@@ -10,6 +10,8 @@ extension HTTPURLResponse {
         switch statusCode {
         case 200...299:
             return
+        case 400:
+            throw NetworkError.badRequest
         case 401:
             throw NetworkError.unauthorized
         case 500...599:

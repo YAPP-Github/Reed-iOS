@@ -2,6 +2,6 @@
 
 public protocol TokenProvider {
     var accessToken: String? { get }
-    func refreshIfNeeded()
+    var refreshToken: String? { get }
     func clearCache()
 }

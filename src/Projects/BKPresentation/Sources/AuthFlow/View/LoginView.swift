@@ -3,19 +3,18 @@
 import AuthenticationServices
 import BKDesign
 import BKDomain
+import Combine
 import Foundation
 import SnapKit
 import UIKit
 
-protocol LoginViewDelegate: AnyObject {
-    func loginViewDidTapLoginButton(
-        _ view: LoginView,
-        provider: AuthProvider
-    )
+enum LoginViewEvent {
+    case loginButtonTapped(AuthProvider)
+    case logoutButtonTapped
 }
 
 final class LoginView: BaseView {
-    weak var delegate: LoginViewDelegate?
+    let eventPublisher = PassthroughSubject<LoginViewEvent, Never>()
     
     private let loginStatusLabel: UILabel = {
         let label = UILabel()
@@ -23,6 +22,15 @@ final class LoginView: BaseView {
         label.textColor = .bkContentColor(.brand)
         label.numberOfLines = 0
         return label
+    }()
+    
+    private let logoutButton: UIButton = {
+        let button = UIButton(type: .roundedRect)
+        button.backgroundColor = .red
+        button.setTitle("로그아웃", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.layer.cornerRadius = LayoutConstants.buttonCornerRadius
+        return button
     }()
     
     private let appleSignInButton = ASAuthorizationAppleIDButton(
@@ -65,6 +73,7 @@ final class LoginView: BaseView {
         
         [
             loginStatusLabel,
+            logoutButton,
             appleSignInButton,
             kakaoSignInButton
         ].forEach(addSubview)
@@ -80,6 +89,12 @@ final class LoginView: BaseView {
         kakaoSignInButton.addTarget(
             self,
             action: #selector(handleKakaoSignInButtonTap),
+            for: .touchUpInside
+        )
+        
+        logoutButton.addTarget(
+            self,
+            action: #selector(handleLogoutButtonTap),
             for: .touchUpInside
         )
     }
@@ -117,6 +132,14 @@ final class LoginView: BaseView {
             $0.bottom.equalTo(kakaoSignInButton.snp.top)
                 .offset(-LayoutConstants.buttonSpacing)
         }
+        
+        logoutButton.snp.makeConstraints {
+            $0.height.equalTo(LayoutConstants.buttonHeight)
+            $0.leading.trailing.equalToSuperview()
+                .inset(LayoutConstants.horizontalInset)
+            $0.bottom.equalTo(appleSignInButton.snp.top)
+                .offset(-LayoutConstants.buttonSpacing)
+        }
     }
     
     func updateStatusView(
@@ -132,11 +155,15 @@ final class LoginView: BaseView {
 
 private extension LoginView {
     @objc func handleAppleSignInButtonTap() {
-        delegate?.loginViewDidTapLoginButton(self, provider: .apple)
+        eventPublisher.send(.loginButtonTapped(.apple))
     }
     
     @objc func handleKakaoSignInButtonTap() {
-        delegate?.loginViewDidTapLoginButton(self, provider: .kakao)
+        eventPublisher.send(.loginButtonTapped(.kakao))
+    }
+    
+    @objc func handleLogoutButtonTap() {
+        eventPublisher.send(.logoutButtonTapped)
     }
 }
 
