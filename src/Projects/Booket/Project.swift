@@ -16,7 +16,6 @@ let appTarget = Target.target(
         swiftLintScript
     ],
     dependencies: [
-        // Module
         .data(),
         .presentation(),
         .core(),

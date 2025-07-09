@@ -83,7 +83,7 @@ jobs:
         shell: bash
 
       - name: 🧱 Initialize Tuist module structure
-        working-directory: src
+        working-directory: src/SupportingFiles/Scripts
         run: |
           chmod +x tuist_module_init.sh
           ./tuist_module_init.sh
