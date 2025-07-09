@@ -4,7 +4,7 @@ import Foundation
 import UIKit
 
 @propertyWrapper
-struct SetNeeds<Value: Equatable> {
+public struct SetNeeds<Value: Equatable> {
     enum Need {
         case layout
         case display
@@ -22,7 +22,7 @@ struct SetNeeds<Value: Equatable> {
     }
     
     // 실제 값에 접근할 때 사용되는 프로퍼티
-    var wrappedValue: Value {
+    public var wrappedValue: Value {
         get { value }
         set {
             let oldValue = value
