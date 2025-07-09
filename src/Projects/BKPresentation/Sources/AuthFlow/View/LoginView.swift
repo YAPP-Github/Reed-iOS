@@ -5,7 +5,6 @@ import BKDesign
 import BKDomain
 import Foundation
 import SnapKit
-import Then
 import UIKit
 
 protocol LoginViewDelegate: AnyObject {
@@ -18,40 +17,47 @@ protocol LoginViewDelegate: AnyObject {
 final class LoginView: BaseView {
     weak var delegate: LoginViewDelegate?
     
-    private let loginStatusLabel = UILabel().then {
-        $0.setBKTextStyle(.body1(weight: .regular), text: "아직 아무 것도 안 함")
-        $0.textColor = .bkContentColor(.brand)
-        $0.numberOfLines = 0
-    }
+    private let loginStatusLabel: UILabel = {
+        let label = UILabel()
+        label.setBKTextStyle(.body1(weight: .regular), text: "아직 아무 것도 안 함")
+        label.textColor = .bkContentColor(.brand)
+        label.numberOfLines = 0
+        return label
+    }()
     
     private let appleSignInButton = ASAuthorizationAppleIDButton(
         authorizationButtonType: .signIn,
         authorizationButtonStyle: .black
     )
     
-    private let kakaoSignInButton = UIButton(type: .custom).then {
-        $0.backgroundColor = UIColor(hex: "FFEB00")
-        $0.layer.cornerRadius = LayoutConstants.buttonCornerRadius
-        $0.clipsToBounds = true
-    }
+    private let kakaoSignInButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.backgroundColor = UIColor(hex: "FFEB00")
+        button.layer.cornerRadius = LayoutConstants.buttonCornerRadius
+        button.clipsToBounds = true
+        return button
+    }()
 
     // ✨ 카카오 버튼 내부에 들어갈 아이콘 이미지 뷰
-    private let kakaoIconImageView = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
+    private let kakaoIconImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
         guard let kakaoLogo = BKIcon.kakaoLogo.image else {
-            return
+            return UIImageView()
         }
-        $0.image = kakaoLogo.withRenderingMode(.alwaysTemplate)
-        $0.tintColor = .bkContentColor(.primary)
-
-    }
+        imageView.image = kakaoLogo.withRenderingMode(.alwaysTemplate)
+        imageView.tintColor = .bkContentColor(.primary)
+        return imageView
+    }()
 
     // ✨ 카카오 버튼 내부에 들어갈 텍스트 레이블
-    private let kakaoTitleLabel = UILabel().then {
-        $0.setBKTextStyle(.body1(weight: .medium), text: "카카오톡으로 로그인")
-        $0.textColor = .bkContentColor(.primary)
-        $0.textAlignment = .center
-    }
+    private let kakaoTitleLabel: UILabel = {
+        let label = UILabel()
+        label.setBKTextStyle(.body1(weight: .medium), text: "카카오톡으로 로그인")
+        label.textColor = .bkContentColor(.primary)
+        label.textAlignment = .center
+        return label
+    }()
     
     override func setupView() {
         kakaoSignInButton.addSubview(kakaoIconImageView)
