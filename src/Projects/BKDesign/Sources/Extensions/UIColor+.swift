@@ -101,3 +101,10 @@ public extension UIColor {
         }
     }
 }
+
+// UIColor 비교를 위한 확장
+extension UIColor {
+    func isEqual(to color: UIColor) -> Bool {
+        return self.cgColor.__equalTo(color.cgColor)
+    }
+}

@@ -6,7 +6,7 @@ import UIKit
 ///
 /// 각 스타일은 고유한 배경색 및 텍스트 색상을 가지며,
 /// 버튼의 목적과 사용 맥락에 따라 적절한 시각적 표현을 제공합니다.
-public enum BKButtonStyle {
+public enum BKButtonStyle: Equatable {
     /// 강한 강조의 기본 버튼 스타일
     case primary
     
@@ -108,5 +108,13 @@ public struct BKButtonColorSet {
     /// 단일 색상을 모든 상태에 적용하는 간단 생성자
     public static func solid(_ color: UIColor) -> BKButtonColorSet {
         BKButtonColorSet(normal: color, pressed: color, disabled: color)
+    }
+}
+
+extension BKButtonColorSet: Equatable {
+    public static func == (lhs: BKButtonColorSet, rhs: BKButtonColorSet) -> Bool {
+        return lhs.normal.isEqual(to: rhs.normal) &&
+               lhs.pressed.isEqual(to: rhs.pressed) &&
+               lhs.disabled.isEqual(to: rhs.disabled)
     }
 }
