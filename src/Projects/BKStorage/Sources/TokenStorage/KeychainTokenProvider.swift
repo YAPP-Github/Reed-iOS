@@ -25,10 +25,6 @@ public final class KeychainTokenProvider: TokenProvider {
         }
     }
     
-    public func refreshIfNeeded() {
-        // TODO: Refresh 기능 구현
-    }
-    
     public func clearCache() {
         cachedAccessToken = nil
     }

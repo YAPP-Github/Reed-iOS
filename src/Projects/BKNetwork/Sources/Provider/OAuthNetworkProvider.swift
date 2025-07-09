@@ -8,10 +8,16 @@ import Foundation
 public struct OAuthNetworkProvider: NetworkProvider {
     private let requestor: NetworkRequestable
     private let interceptor: AuthInterceptor
+    private let authRetrier: AuthRetrier
     
-    public init(requestor: NetworkRequestable, interceptor: AuthInterceptor) {
+    public init(
+        requestor: NetworkRequestable,
+        interceptor: AuthInterceptor,
+        authRetrier: AuthRetrier
+    ) {
         self.requestor = requestor
         self.interceptor = interceptor
+        self.authRetrier = authRetrier
     }
     
     @discardableResult
@@ -23,16 +29,46 @@ public struct OAuthNetworkProvider: NetworkProvider {
             .flatMap { request in
                 let adaptedRequest = interceptor.adapt(request)
                 return requestor.data(for: adaptedRequest)
+                    .mapError { $0 as? NetworkError ?? .invalidResponse }
+                    .flatMap { data, response in
+                        self.handleRetryIfNeeded(data: data, response: response)
+                    }
                     .tryMap { data, response in
-                        try interceptor.retryIfNeeded(response, data)
-                        try response.asHTTP
+                        let httpResponse = try response.asHTTP
                             .orThrow(NetworkError.invalidResponse)
-                            .validate(data)
+                        
+                        if httpResponse.statusCode == 204 {
+                            if let empty = EmptyResponse() as? T {
+                                return empty
+                            } else {
+                                throw NetworkError.invalidResponse
+                            }
+                        }
+                        try httpResponse.validate(data)
+                        
                         return try data.decode(to: type)
                     }
+                    .debugError("Decoding Failed", logger: AppLogger.network)
                     .mapError { $0 as? NetworkError ?? .invalidResponse }
             }
-            .retryIf({ $0 == NetworkError.retryTrigger }, maxRetries: 1)
+            .eraseToAnyPublisher()
+    }
+}
+
+private extension OAuthNetworkProvider {
+    func handleRetryIfNeeded(
+        data: Data,
+        response: URLResponse
+    ) -> AnyPublisher<(Data, URLResponse), NetworkError> {
+        authRetrier.retryIfNeeded(response, data)
+            .catch { error -> AnyPublisher<Void, NetworkError> in
+                if case .retryFailed = error {
+                    return Just(()).setFailureType(to: NetworkError.self).eraseToAnyPublisher()
+                }
+                return Fail(error: error).eraseToAnyPublisher()
+            }
+            .map { (data, response) }
+            .map { _ in (data, response) }
             .eraseToAnyPublisher()
     }
 }

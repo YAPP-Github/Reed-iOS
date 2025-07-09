@@ -9,13 +9,16 @@ import Foundation
 public struct DefaultAuthRepository: AuthRepository {
     private let networkProvider: NetworkProvider
     private let tokenStore: TokenStore
+    private let tokenProvider: TokenProvider
     
     public init(
         networkProvider: NetworkProvider,
-        tokenStore: TokenStore
+        tokenStore: TokenStore,
+        tokenProvider: TokenProvider
     ) {
         self.networkProvider = networkProvider
         self.tokenStore = tokenStore
+        self.tokenProvider = tokenProvider
     }
     
     public func login(
@@ -30,7 +33,7 @@ public struct DefaultAuthRepository: AuthRepository {
             type: AuthLoginResponseDTO.self
         )
         .mapError { AuthError.serverError(message: "\($0)") }
-        .debugError(logger: AppLogger.network)
+        .debugError("[Login]", logger: AppLogger.network)
         .flatMap { tokens in
             return tokenStore.save(
                 accessToken: tokens.accessToken,
@@ -38,7 +41,7 @@ public struct DefaultAuthRepository: AuthRepository {
             )
             .mapError { _ in AuthError.missingToken }
         }
-        .debugError(logger: AppLogger.storage)
+        .debugError("[Login]", logger: AppLogger.storage)
         .eraseToAnyPublisher()
     }
     
@@ -48,11 +51,14 @@ public struct DefaultAuthRepository: AuthRepository {
             type: EmptyResponse.self
         )
         .mapError { AuthError.serverError(message: "\($0)") }
+        .debugError("[Logout]", logger: AppLogger.network)
         .flatMap { _ in
-            tokenStore
+            tokenProvider.clearCache()
+            return tokenStore
                 .clear()
                 .mapError { _ in AuthError.missingToken }
         }
+        .debugError("[Logout]", logger: AppLogger.storage)
         .eraseToAnyPublisher()
     }
     
@@ -67,10 +73,33 @@ public struct DefaultAuthRepository: AuthRepository {
         )
         .mapError { AuthError.serverError(message: "\($0)") }
         .flatMap { _ in
-            tokenStore
+            tokenProvider.clearCache()
+            return tokenStore
                 .clear()
                 .mapError { _ in AuthError.missingToken }
         }
+        .eraseToAnyPublisher()
+    }
+}
+
+extension DefaultAuthRepository: RefreshHandler {
+    public func refresh(token accessToken: String) -> AnyPublisher<Void, AuthError> {
+        return networkProvider.request(
+            target: AuthAPI.refresh(
+                token: accessToken
+            ),
+            type: AuthLoginResponseDTO.self
+        )
+        .mapError { AuthError.serverError(message: "\($0)") }
+        .debugError("[Refresh]", logger: AppLogger.network)
+        .flatMap { tokens in
+            return tokenStore.save(
+                accessToken: tokens.accessToken,
+                refreshToken: tokens.refreshToken
+            )
+            .mapError { _ in AuthError.missingToken }
+        }
+        .debugError("[Refresh]", logger: AppLogger.storage)
         .eraseToAnyPublisher()
     }
 }

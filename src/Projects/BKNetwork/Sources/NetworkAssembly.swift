@@ -21,11 +21,19 @@ public struct NetworkAssembly: Assembly {
             type: NetworkProvider.self,
             name: "oauth"
         ) { _ in
-            // TODO: - TokenProvider <-> AuthInterceptor 순환 참조 해결
             @Autowired var tokenProvider: TokenProvider
             return OAuthNetworkProvider(
                 requestor: URLSessionRequestor(),
                 interceptor: AuthInterceptor(
+                    tokenProvider: tokenProvider
+                ),
+                authRetrier: AuthRetrier(
+                    refreshHandler: { token in
+                        @Autowired var handler: RefreshHandler
+                        return handler.refresh(token: token)
+                            .mapError { _ in NetworkError.retryFailed }
+                            .eraseToAnyPublisher()
+                    },
                     tokenProvider: tokenProvider
                 )
             )
