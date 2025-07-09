@@ -10,15 +10,3 @@ protocol BKButtonProtocol: AnyObject {
     var leftIcon: UIImage? { get set }
     var rightIcon: UIImage? { get set }
 }
-
-struct ButtonState {
-    let normal: UIColor
-    let pressed: UIColor
-    let disabled: UIColor
-    
-    init(normal: UIColor, pressed: UIColor, disabled: UIColor) {
-        self.normal = normal
-        self.pressed = pressed
-        self.disabled = disabled
-    }
-}
