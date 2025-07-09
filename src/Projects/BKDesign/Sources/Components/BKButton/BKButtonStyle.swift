@@ -7,24 +7,24 @@ enum BKButtonStyle {
     case secondary
     case tertiary
     
-    var backgroundColor: ButtonState {
+    var backgroundColor: BKButtonColorSet {
         switch self {
         case .primary:
-            return ButtonState(
+            return BKButtonColorSet(
                 normal: .bkBackgroundColor(.primary),
                 pressed: .bkBackgroundColor(.primaryPressed),
                 disabled: .bkBackgroundColor(.disable)
             )
             
         case .secondary:
-            return ButtonState(
+            return BKButtonColorSet(
                 normal: .bkBackgroundColor(.secondary),
                 pressed: .bkBackgroundColor(.secondaryPressed),
                 disabled: .bkBackgroundColor(.disable)
             )
         
         case .tertiary:
-            return ButtonState(
+            return BKButtonColorSet(
                 normal: .bkBackgroundColor(.tertiary),
                 pressed: .bkBackgroundColor(.tertiaryPressed),
                 disabled: .bkBackgroundColor(.disable)
@@ -32,24 +32,24 @@ enum BKButtonStyle {
         }
     }
     
-    var foregroundColor: ButtonState {
+    var foregroundColor: BKButtonColorSet {
         switch self {
         case .primary:
-            return ButtonState(
+            return BKButtonColorSet(
                 normal: .bkContentColor(.inverse),
                 pressed: .bkContentColor(.inverse),
                 disabled: .bkContentColor(.disable)
             )
             
         case .secondary:
-            return ButtonState(
+            return BKButtonColorSet(
                 normal: .bkContentColor(.primary),
                 pressed: .bkContentColor(.primary),
                 disabled: .bkContentColor(.disable)
             )
         
         case .tertiary:
-            return ButtonState(
+            return BKButtonColorSet(
                 normal: .bkContentColor(.brand),
                 pressed: .bkContentColor(.brand),
                 disabled: .bkContentColor(.disable)
@@ -57,4 +57,24 @@ enum BKButtonStyle {
         }
     }
     
+}
+
+struct BKButtonColorSet {
+    let normal: UIColor
+    let pressed: UIColor
+    let disabled: UIColor
+    
+    init(normal: UIColor, pressed: UIColor, disabled: UIColor) {
+        self.normal = normal
+        self.pressed = pressed
+        self.disabled = disabled
+    }
+    
+    public func color(for state: BKButtonState) -> UIColor {
+        switch state {
+        case .normal: return normal
+        case .pressed: return pressed
+        case .disabled: return disabled
+        }
+    }
 }
