@@ -44,5 +44,14 @@ public struct DomainAssembly: Assembly {
                 loginService: kakaoLoginService
             )
         }
+        
+        container.register(
+            type: LogoutUseCase.self
+        ) { _ in
+            @Autowired var repository: AuthRepository
+            return DefaultLogoutUseCase(
+                authRepository: repository
+            )
+        }
     }
 }
