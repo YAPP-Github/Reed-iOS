@@ -83,10 +83,10 @@ public struct DefaultAuthRepository: AuthRepository {
 }
 
 extension DefaultAuthRepository: RefreshHandler {
-    public func refresh(token accessToken: String) -> AnyPublisher<Void, AuthError> {
+    public func refresh(token refreshToken: String) -> AnyPublisher<Void, AuthError> {
         return networkProvider.request(
             target: AuthAPI.refresh(
-                token: accessToken
+                token: refreshToken
             ),
             type: AuthLoginResponseDTO.self
         )

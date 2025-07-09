@@ -27,16 +27,16 @@ public struct AuthRetrier {
         }
         
         guard httpResponse.statusCode == 401 else {
+            return Fail(error: .retryTrigger)
+                .eraseToAnyPublisher()
+        }
+
+        guard let refreshToken = tokenProvider.refreshToken else {
             return Fail(error: .retryFailed)
                 .eraseToAnyPublisher()
         }
 
-        guard let accessToken = tokenProvider.accessToken else {
-            return Fail(error: .retryFailed)
-                .eraseToAnyPublisher()
-        }
-
-        Log.debug("[Refresh] AccessToken: \(accessToken)", logger: AppLogger.auth)
-        return refreshHandler(accessToken)
+        Log.debug("[Refresh] RefreshToken: \(refreshToken.prefix(10))", logger: AppLogger.auth)
+        return refreshHandler(refreshToken)
     }
 }

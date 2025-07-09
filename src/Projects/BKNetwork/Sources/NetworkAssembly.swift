@@ -28,9 +28,9 @@ public struct NetworkAssembly: Assembly {
                     tokenProvider: tokenProvider
                 ),
                 authRetrier: AuthRetrier(
-                    refreshHandler: { token in
+                    refreshHandler: { refreshToken in
                         @Autowired var handler: RefreshHandler
-                        return handler.refresh(token: token)
+                        return handler.refresh(token: refreshToken)
                             .mapError { _ in NetworkError.retryFailed }
                             .eraseToAnyPublisher()
                     },

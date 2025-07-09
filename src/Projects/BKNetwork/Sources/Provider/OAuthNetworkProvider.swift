@@ -68,7 +68,6 @@ private extension OAuthNetworkProvider {
                 return Fail(error: error).eraseToAnyPublisher()
             }
             .map { (data, response) }
-            .map { _ in (data, response) }
             .eraseToAnyPublisher()
     }
 }
