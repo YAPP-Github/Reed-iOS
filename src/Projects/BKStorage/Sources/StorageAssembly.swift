@@ -15,7 +15,8 @@ public struct StorageAssembly: Assembly {
         }
         
         container.register(
-            type: TokenProvider.self
+            type: TokenProvider.self,
+            scope: .singleton
         ) { _ in
             @Autowired var keyValueStorage: KeyValueStorage
             return KeychainTokenProvider(
