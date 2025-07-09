@@ -9,12 +9,15 @@ import UIKit
 public enum BKButtonStyle {
     /// 강한 강조의 기본 버튼 스타일
     case primary
-
+    
     /// 중간 강조의 보조 버튼 스타일
     case secondary
-
+    
     /// 가장 낮은 강조의 텍스트 중심 스타일
     case tertiary
+    
+    /// 직접 색상을 정의하는 커스텀 스타일
+    case custom(background: BKButtonColorSet, foreground: BKButtonColorSet)
     
     /// 스타일에 따른 배경색 세트입니다.
     ///
@@ -34,13 +37,16 @@ public enum BKButtonStyle {
                 pressed: .bkBackgroundColor(.secondaryPressed),
                 disabled: .bkBackgroundColor(.disable)
             )
-        
+            
         case .tertiary:
             return BKButtonColorSet(
                 normal: .bkBackgroundColor(.tertiary),
                 pressed: .bkBackgroundColor(.tertiaryPressed),
                 disabled: .bkBackgroundColor(.disable)
             )
+            
+        case .custom(let background, _):
+            return background
         }
     }
     
@@ -62,29 +68,31 @@ public enum BKButtonStyle {
                 pressed: .bkContentColor(.primary),
                 disabled: .bkContentColor(.disable)
             )
-        
+            
         case .tertiary:
             return BKButtonColorSet(
                 normal: .bkContentColor(.brand),
                 pressed: .bkContentColor(.brand),
                 disabled: .bkContentColor(.disable)
             )
+            
+        case .custom(_, let foreground):
+            return foreground
         }
     }
-    
 }
 
 /// 버튼의 상태별 색상 세트를 정의하는 구조체입니다.
 public struct BKButtonColorSet {
     /// 기본(normal) 상태에서의 색상
     let normal: UIColor
-
+    
     /// 눌림(pressed) 상태에서의 색상
     let pressed: UIColor
-
+    
     /// 비활성화(disabled) 상태에서의 색상
     let disabled: UIColor
-
+    
     /// 버튼의 상태에 맞는 색상을 반환합니다.
     ///
     /// - Parameter state: 버튼의 현재 상태
@@ -95,5 +103,10 @@ public struct BKButtonColorSet {
         case .pressed: return pressed
         case .disabled: return disabled
         }
+    }
+    
+    /// 단일 색상을 모든 상태에 적용하는 간단 생성자
+    public static func solid(_ color: UIColor) -> BKButtonColorSet {
+        BKButtonColorSet(normal: color, pressed: color, disabled: color)
     }
 }
