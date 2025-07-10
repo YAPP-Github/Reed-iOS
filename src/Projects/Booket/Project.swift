@@ -9,7 +9,7 @@ let appTarget = Target.target(
     sources: .sources,
     resources: [
         .glob(pattern: .relativeToRoot("Projects/Booket/Resources/LaunchScreen.storyboard")),
-        .glob(pattern: .relativeToRoot("Projects/BKDesign/Resources/Font/**"))
+        .glob(pattern: .relativeToRoot("Projects/BKDesign/Resources/**"))
     ],
     entitlements: .file(path: .relativeToRoot("SupportingFiles/Booket/Booket.entitlements")),
     scripts: [
