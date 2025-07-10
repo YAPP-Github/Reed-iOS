@@ -4,7 +4,6 @@ import SnapKit
 import UIKit
 
 public class BKButton: UIButton, BKButtonProtocol {
-    
     @SetNeeds(.layout, .display)
     public var style: BKButtonStyle = .primary {
         didSet {
