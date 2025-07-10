@@ -186,6 +186,8 @@ extension BKButtonGroup {
     }
     
     /// 수직 버튼 그룹
+    ///
+    /// - Warning: 입력된 버튼들의 isFullWidth 속성이 true로 변경됩니다.
     public static func verticalButtonGroup(
         buttons: [BKButton],
         spacing: CGFloat = BKSpacing.spacing2

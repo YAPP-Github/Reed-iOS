@@ -36,7 +36,7 @@ public struct SetNeeds<Value: Equatable> {
     }
     
     // 뷰를 설정하는 메서드
-    mutating func configure(with view: UIView) {
+    public mutating func configure(with view: UIView) {
         self.view = view
     }
     
