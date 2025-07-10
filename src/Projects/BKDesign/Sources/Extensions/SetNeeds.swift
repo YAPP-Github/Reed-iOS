@@ -15,7 +15,10 @@ public struct SetNeeds<Value: Equatable> {
     private weak var view: UIView?
     
     // 초기화
-    init(wrappedValue: Value, _ needs: Need...) {
+    init(
+        wrappedValue: Value,
+        _ needs: Need...
+    ) {
         self.value = wrappedValue
         self.needs = Set(needs)
         self.view = nil

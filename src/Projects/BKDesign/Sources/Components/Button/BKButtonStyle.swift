@@ -112,7 +112,10 @@ public struct BKButtonColorSet {
 }
 
 extension BKButtonColorSet: Equatable {
-    public static func == (lhs: BKButtonColorSet, rhs: BKButtonColorSet) -> Bool {
+    public static func == (
+        lhs: BKButtonColorSet,
+        rhs: BKButtonColorSet
+    ) -> Bool {
         return lhs.normal.isEqual(to: rhs.normal) &&
                lhs.pressed.isEqual(to: rhs.pressed) &&
                lhs.disabled.isEqual(to: rhs.disabled)
