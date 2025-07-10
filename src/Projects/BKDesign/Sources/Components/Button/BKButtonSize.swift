@@ -42,6 +42,16 @@ public enum BKButtonSize {
         }
     }
     
+    /// 버튼 상하 패딩 값
+    var verticalPadding: CGFloat {
+        switch self {
+        case .small, .rounded:
+            BKSpacing.spacing2
+        case .medium, .large:
+            BKSpacing.spacing3
+        }
+    }
+    
     /// 버튼 텍스트에 사용할 폰트
     var font: UIFont {
         switch self {

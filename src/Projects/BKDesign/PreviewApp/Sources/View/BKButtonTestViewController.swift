@@ -16,13 +16,13 @@ public final class BKButtonTestViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupScrollView()
-        setupIndependentButtons()
-//        setupStackView()
+//        setupIndependentButtons()
+        setupStackView()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        setupAllTestButtons()
+        setupAllTestButtons()
     }
     
     // MARK: - Setup Scroll & Stack

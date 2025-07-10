@@ -137,20 +137,25 @@ public class BKButton: UIButton, BKButtonProtocol {
         customContainerView.addSubview(stackView)
         stackView.axis = .horizontal
         stackView.alignment = .center
-        stackView.distribution = .fill
+        stackView.distribution = .equalCentering
         stackView.isUserInteractionEnabled = false
-        
+
         stackView.addArrangedSubview(leftIconView)
         stackView.addArrangedSubview(customTitleLabel)
         stackView.addArrangedSubview(rightIconView)
         
         stackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.centerX.equalToSuperview()
+            make.left.greaterThanOrEqualToSuperview().offset(size.horizontalPadding)
+            make.right.lessThanOrEqualToSuperview().offset(-size.horizontalPadding)
+
+            make.centerY.equalToSuperview()
+            make.top.greaterThanOrEqualToSuperview().offset(size.verticalPadding)
+            make.bottom.lessThanOrEqualToSuperview().offset(-size.verticalPadding)
         }
         
         setupIconViews()
         setupTitleLabel()
-        updatePadding()
     }
     
     private func setupIconViews() {
@@ -192,7 +197,6 @@ public class BKButton: UIButton, BKButtonProtocol {
         customTitleLabel.font = size.font
         updateCornerRadius()
         updateIconSizes()
-        updatePadding()
         invalidateIntrinsicContentSize()
     }
     
@@ -223,16 +227,6 @@ public class BKButton: UIButton, BKButtonProtocol {
         rightIconView.snp.updateConstraints { make in
             make.width.height.equalTo(iconSize)
         }
-    }
-    
-    private func updatePadding() {
-        stackView.isLayoutMarginsRelativeArrangement = true
-        stackView.layoutMargins = UIEdgeInsets(
-            top: 0,
-            left: size.horizontalPadding,
-            bottom: 0,
-            right: size.horizontalPadding
-        )
     }
  
     private func updateLayout() {
@@ -297,6 +291,7 @@ public class BKButton: UIButton, BKButtonProtocol {
             )
         }
     }
+
     
     // MARK: - Layout
     override public func layoutSubviews() {
@@ -312,23 +307,26 @@ public class BKButton: UIButton, BKButtonProtocol {
 
             layer.cornerRadius = min(minimumRadius, dynamicRadius)
         }
+        
     }
 
     public override var intrinsicContentSize: CGSize {
+        let stackSize = stackView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+
+        let minimumTotalPadding = size.horizontalPadding * 2
+        
+        let currentButtonWidth = bounds.width
+        let calculatedPadding = max((currentButtonWidth - stackSize.width), minimumTotalPadding)
+        
+        let intrinsicWidth = stackSize.width + calculatedPadding
+        
         if isFullWidth {
             return CGSize(width: UIView.noIntrinsicMetric, height: size.height)
         }
         
-        let stackSize = stackView.systemLayoutSizeFitting(
-            UIView.layoutFittingCompressedSize
-        )
-        let totalPadding = size.horizontalPadding * 2
-        
-        return CGSize(
-            width: stackSize.width + totalPadding,
-            height: size.height
-        )
+        return CGSize(width: intrinsicWidth, height: size.height)
     }
+
 }
 
 // MARK: - Factory Methods
