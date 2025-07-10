@@ -15,6 +15,11 @@ public final class BKButtonGroupDemoViewController: UIViewController {
         setupScrollView()
         setupDemoGroups()
     }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationItem.title = "Button"
+    }
 
     private func setupScrollView() {
         view.addSubview(scrollView)
