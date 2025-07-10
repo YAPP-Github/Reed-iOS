@@ -319,7 +319,11 @@ public enum BKTextStyle {
         return paragraphStyle
     }
     
-    public func attributedString(from text: String, color: UIColor = .label) -> NSAttributedString {
+    public func attributedString(
+        from text: String,
+        color: UIColor = .label,
+        extraAttributes: [NSAttributedString.Key: Any] = [:]
+    ) -> NSAttributedString {
         var attributes: [NSAttributedString.Key: Any] = [
             .font: uiFont ?? UIFont.systemFont(ofSize: fontAttributes.fontSize.rawValue),
             .foregroundColor: color,
@@ -333,6 +337,7 @@ public enum BKTextStyle {
             attributes[.kern] = actualLetterSpacing
         }
         
+        attributes.merge(extraAttributes) { $1 }
         return NSAttributedString(string: text, attributes: attributes)
     }
 }
