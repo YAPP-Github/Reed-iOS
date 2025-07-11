@@ -20,7 +20,7 @@ class BaseViewController<T: BaseView>: UIViewController {
     // MARK: - Life Cycle
     override func loadView() {
         if contentView.backgroundColor == nil {
-            contentView.backgroundColor = .white
+            contentView.backgroundColor = .bkBaseColor(.primary)
         }
         view = contentView
     }

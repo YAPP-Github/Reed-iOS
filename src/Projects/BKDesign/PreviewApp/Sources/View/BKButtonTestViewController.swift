@@ -16,12 +16,12 @@ public final class BKButtonTestViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupScrollView()
-//        setupIndependentButtons()
         setupStackView()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationItem.title = "Button Tests"
         setupAllTestButtons()
     }
     
@@ -59,9 +59,9 @@ public final class BKButtonTestViewController: UIViewController {
         addButton("Secondary", style: .secondary, size: size)
         addButton("Tertiary", style: .tertiary, size: size)
 
-        addIconButton("Apple 로그인", style: .primary, size: size, left: .appleLogo)
-        addIconButton("카카오 로그인", style: .primary, size: size, right: .kakaoLogo)
-        addIconButton("양쪽 아이콘", style: .primary, size: size, left: .appleLogo, right: .kakaoLogo)
+        addIconButton("Apple 로그인", style: .primary, size: size, left: BKImage.Icon.apple)
+        addIconButton("카카오 로그인", style: .primary, size: size, right: BKImage.Icon.kakao)
+        addIconButton("양쪽 아이콘", style: .primary, size: size, left: BKImage.Icon.apple, right: BKImage.Icon.kakao)
     }
     
     // MARK: - Button Builders
@@ -76,13 +76,13 @@ public final class BKButtonTestViewController: UIViewController {
         _ title: String,
         style: BKButtonStyle,
         size: BKButtonSize,
-        left: BKIcon? = nil,
-        right: BKIcon? = nil
+        left: UIImage? = nil,
+        right: UIImage? = nil
     ) {
         let button = BKButton(style: style, size: size)
         button.title = "[\(size.label)] \(title)"
-        button.leftIcon = left?.image
-        button.rightIcon = right?.image
+        button.leftIcon = left
+        button.rightIcon = right
         containerView.addArrangedSubview(button)
     }
     
@@ -104,8 +104,8 @@ public final class BKButtonTestViewController: UIViewController {
             .tertiary(title: "[Free] Tertiary", size: .rounded)
         ]
 
-        buttons[0].leftIcon = BKIcon.appleLogo.image
-        buttons[2].rightIcon = BKIcon.kakaoLogo.image
+        buttons[0].leftIcon = BKImage.Icon.apple
+        buttons[2].rightIcon = BKImage.Icon.kakao
 
         var last: UIView?
         for button in buttons {

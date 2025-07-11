@@ -11,6 +11,8 @@ MODULES=(
   "Booket"
 )
 
+cd ../../
+
 echo "모듈 디렉토리 확인 및 생성 중..."
 
 for MODULE in "${MODULES[@]}"; do

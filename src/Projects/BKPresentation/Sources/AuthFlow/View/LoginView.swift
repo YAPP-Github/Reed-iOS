@@ -50,9 +50,7 @@ final class LoginView: BaseView {
     private let kakaoIconImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        guard let kakaoLogo = BKIcon.kakaoLogo.image else {
-            return UIImageView()
-        }
+        let kakaoLogo = BKImage.Icon.kakao
         imageView.image = kakaoLogo.withRenderingMode(.alwaysTemplate)
         imageView.tintColor = .bkContentColor(.primary)
         return imageView
