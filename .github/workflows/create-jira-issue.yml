@@ -11,9 +11,10 @@ jobs:
       - name: Determine Issue Type
         id: type
         run: |
-          read -r -d '' LABELS_JSON <<'JSON'
+          LABELS_JSON=$(cat <<'JSON'
           ${{ toJson(github.event.issue.labels) }}
           JSON
+          )
 
           label_names=$(echo "$LABELS_JSON" | jq -r '.[].name')
 
