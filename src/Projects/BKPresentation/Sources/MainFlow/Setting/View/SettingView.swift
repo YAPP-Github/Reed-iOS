@@ -26,21 +26,7 @@ final class SettingView: BaseView {
     }
     
     override func configure() {
-        collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        collectionView.backgroundColor = .systemBackground
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.isScrollEnabled = true
-        collectionView.alwaysBounceVertical = true
-        collectionView.register(
-            SettingCell.self,
-            forCellWithReuseIdentifier: SettingCell.identifier
-        )
-        collectionView.register(
-            BKDividerFooterView.self,
-            forSupplementaryViewOfKind: BKDividerFooterView.kind,
-            withReuseIdentifier: BKDividerFooterView.identifier
-        )
+        configureCollectionView()
     }
     
     override func setupLayout() {
@@ -60,6 +46,7 @@ final class SettingView: BaseView {
     
     func setAppVersion(_ appVersion: String) {
         self.appVersion = appVersion
+        collectionView.reloadData()
     }
 }
 
@@ -90,11 +77,12 @@ private extension SettingView {
     }
 
     func configureCollectionView() {
+        collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         collectionView.backgroundColor = .systemBackground
-        collectionView.dataSource      = self
-        collectionView.delegate        = self
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.isScrollEnabled = true
         collectionView.alwaysBounceVertical = true
-
         collectionView.register(
             SettingCell.self,
             forCellWithReuseIdentifier: SettingCell.identifier
@@ -112,10 +100,10 @@ extension SettingView: UICollectionViewDelegate {
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
-        if indexPath.section == 1 {
-            if indexPath.item == 0 {
+        if indexPath.section == Section.bottom.rawValue {
+            if indexPath.item == Section.top.rawValue {
                 eventPublisher.send(.logoutButtonTapped)
-            } else if indexPath.item == 1 {
+            } else if indexPath.item == Section.bottom.rawValue {
                 eventPublisher.send(.withdrawalButtonTapped)
             }
         }
@@ -144,7 +132,9 @@ extension SettingView: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        return section == 0 ? firstMenus.count : secondMenus.count
+        return section == Section.top.rawValue
+            ? firstMenus.count
+            : secondMenus.count
     }
 
     func collectionView(
@@ -158,14 +148,14 @@ extension SettingView: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
 
-        let title: String = indexPath.section == 0
+        let title: String = indexPath.section == Section.top.rawValue
             ? firstMenus[indexPath.item].title
             : secondMenus[indexPath.item].title
         
         switch (indexPath.section, indexPath.item) {
-        case (0, 3):
+        case (Section.top.rawValue, FirstMenuItem.allCases.count - 1):
             cell.configure(title: title, style: .label, appVersion: appVersion)
-        case (1, _):
+        case (Section.bottom.rawValue, _):
             cell.configure(title: title, style: .none)
         default:
             cell.configure(title: title, style: .chevron)

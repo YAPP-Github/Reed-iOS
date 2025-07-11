@@ -8,7 +8,7 @@ import Foundation
 enum FirstMenuItem: String, CaseIterable {
     case privacy = "개인정보 처리방침"
     case term = "이용약관"
-    case lisence = "오픈소스 라이선스"
+    case license = "오픈소스 라이선스"
     case version = "앱 버전"
     
     var title: String { rawValue }

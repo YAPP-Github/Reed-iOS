@@ -37,10 +37,10 @@ final class HomeViewController: UIViewController {
     }
 
     private func bindActions() {
-        settingButton.addTarget(self, action: #selector(openInputCatalog), for: .touchUpInside)
+        settingButton.addTarget(self, action: #selector(openSettings), for: .touchUpInside)
     }
 
-    @objc private func openInputCatalog() {
+    @objc private func openSettings() {
         coordinator?.didTapSettingButton()
     }
 }
