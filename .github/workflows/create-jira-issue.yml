@@ -13,6 +13,15 @@ jobs:
         run: |
           # 디버그: 라벨 JSON 전체 출력
           LABELS_JSON='${{ toJson(github.event.issue.labels) }}'
+          label_names=$(echo "$LABELS_JSON" | jq -r '.[].name')
+
+          # Debug
+          if echo "$label_names" | grep -Fxq '🐞 fix'; then
+            echo "type=fix" >> $GITHUB_OUTPUT
+            echo "template=fix-task.yml" >> $GITHUB_OUTPUT
+          fi
+          echo "=== 라벨 목록 확인 ==="
+          echo "$label_names" | cat -vet
           
           if echo "$LABELS_JSON" | grep -q '✨ feat'; then
             echo "type=feature"    >> $GITHUB_OUTPUT
