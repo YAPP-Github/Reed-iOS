@@ -21,19 +21,27 @@ public struct AuthRetrier {
         _ response: URLResponse,
         _ data: Data
     ) -> AnyPublisher<Void, NetworkError> {
-        guard let httpResponse = response as? HTTPURLResponse else {
-            return Fail(error: .invalidResponse)
-                .eraseToAnyPublisher()
-        }
-        
-        guard httpResponse.statusCode == 401 else {
-            return Fail(error: .retryTrigger)
+        guard shouldRetry(response: response) else {
+            return Just(())
+                .setFailureType(to: NetworkError.self)
                 .eraseToAnyPublisher()
         }
 
+        return performRefresh()
+    }
+}
+
+private extension AuthRetrier {
+    func shouldRetry(response: URLResponse) -> Bool {
+        guard let httpResponse = response as? HTTPURLResponse else {
+            return false
+        }
+        return httpResponse.statusCode == 401
+    }
+    
+    func performRefresh() -> AnyPublisher<Void, NetworkError> {
         guard let refreshToken = tokenProvider.refreshToken else {
-            return Fail(error: .retryFailed)
-                .eraseToAnyPublisher()
+            return Fail(error: .retryFailed).eraseToAnyPublisher()
         }
 
         Log.debug("[Refresh] RefreshToken: \(refreshToken.prefix(10))", logger: AppLogger.auth)
