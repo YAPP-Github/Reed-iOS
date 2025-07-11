@@ -54,7 +54,7 @@ public final class AppCoordinator: Coordinator {
             parentCoordinator: self,
             navigationController: navigationController
         )
-        // addChildCoordinator(mainFlowCoordinator)
+        addChildCoordinator(mainFlowCoordinator)
         mainFlowCoordinator.start()
     }
 }
