@@ -19,25 +19,15 @@ public final class BKSearchTextField: BKBaseTextField {
     }()
     
     override public func textRect(forBounds bounds: CGRect) -> CGRect {
-        return bounds.inset(
-            by: UIEdgeInsets(
-                top: BKInset.inset2,
-                left: BKInset.inset3,
-                bottom: BKInset.inset2,
-                right: BKInset.inset4
-            )
-        )
+        return bounds.inset(by: textInsets())
     }
     
     override public func editingRect(forBounds bounds: CGRect) -> CGRect {
-        return bounds.inset(
-            by: UIEdgeInsets(
-                top: BKInset.inset2,
-                left: BKInset.inset3,
-                bottom: BKInset.inset2,
-                right: BKInset.inset4
-            )
-        )
+        return bounds.inset(by: textInsets())
+    }
+    
+    public override func placeholderRect(forBounds bounds: CGRect) -> CGRect {
+        return bounds.inset(by: textInsets())
     }
     
     public override init(
@@ -78,5 +68,14 @@ private extension BKSearchTextField {
                 .inset(BKInset.inset3)
             $0.centerY.equalToSuperview()
         }
+    }
+    
+    func textInsets() -> UIEdgeInsets {
+        return UIEdgeInsets(
+            top: BKInset.inset2,
+            left: BKInset.inset3,
+            bottom: BKInset.inset2,
+            right: BKInset.inset4
+        )
     }
 }

@@ -11,7 +11,6 @@ public final class BKLabel: UILabel {
         case error
     }
     
-    private let type: LabelType? = nil
     private var labelText: String
     private var fontStyle: BKTextStyle
     private var labelColor: UIColor
@@ -45,7 +44,7 @@ public final class BKLabel: UILabel {
         self.labelText = text
         self.fontStyle = fontStyle
         self.labelColor = color
-        self.alignment = .justified
+        self.alignment = alignment
         super.init(frame: frame)
         apply()
     }

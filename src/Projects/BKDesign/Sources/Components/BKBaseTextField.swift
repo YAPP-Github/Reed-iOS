@@ -98,7 +98,7 @@ private extension BKBaseTextField {
         backgroundColor = .bkBackgroundColor(.secondary)
         font = BKTextStyle.body2(weight: .medium).uiFont
         textColor = .bkContentColor(.primary)
-        textAlignment = .justified
+        textAlignment = .natural
         applyPlaceholderStyle()
     }
     

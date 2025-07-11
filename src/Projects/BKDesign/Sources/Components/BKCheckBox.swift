@@ -6,7 +6,9 @@ import UIKit
 public final class BKCheckBox: UIControl {
     public enum CheckboxType {
         case round
+        case roundStroke
         case rectangle
+        case rectangleStroke
     }
     
     private let imageView = UIImageView()
@@ -52,18 +54,17 @@ public final class BKCheckBox: UIControl {
         }
         imageView.image = type.defaultImage
         addTarget(self, action: #selector(toggleCheck), for: .touchUpInside)
-    }
-
-    @objc private func toggleCheck() {
-        isChecked.toggle()
-        sendActions(for: .valueChanged)
+        
+        isAccessibilityElement = true
+        accessibilityTraits = .button
+        updateAccessibilityValue()
     }
 
     private func updateImage() {
         if isEnabled {
             imageView.image = isChecked
                 ? type.checkedImage
-                : type.unCheckedImage
+                : type.defaultImage
         } else {
             imageView.image = type.disabledImage
         }
@@ -71,6 +72,15 @@ public final class BKCheckBox: UIControl {
 }
 
 private extension BKCheckBox {
+    @objc private func toggleCheck() {
+        isChecked.toggle()
+        sendActions(for: .valueChanged)
+    }
+    
+    func updateAccessibilityValue() {
+        accessibilityValue = isChecked ? "선택됨" : "선택 안됨"
+    }
+    
     enum LayoutConstants {
         static let size: CGFloat = 24
     }
@@ -79,9 +89,9 @@ private extension BKCheckBox {
 extension BKCheckBox.CheckboxType {
     var defaultImage: UIImage {
         switch self {
-        case .round:
+        case .round, .roundStroke:
             return BKImage.Checkbox.defaultRound
-        case .rectangle:
+        case .rectangle, .rectangleStroke:
             return BKImage.Checkbox.defaultRectangle
         }
     }
@@ -90,25 +100,20 @@ extension BKCheckBox.CheckboxType {
         switch self {
         case .round:
             return BKImage.Checkbox.filled
-        case .rectangle:
-            return BKImage.Checkbox.filledRectangle
-        }
-    }
-    
-    var unCheckedImage: UIImage {
-        switch self {
-        case .round:
+        case .roundStroke:
             return BKImage.Checkbox.strokeRound
         case .rectangle:
+            return BKImage.Checkbox.filledRectangle
+        case .rectangleStroke:
             return BKImage.Checkbox.strokeRectangle
         }
     }
     
     var disabledImage: UIImage {
         switch self {
-        case .round:
+        case .round, .roundStroke:
             return BKImage.Checkbox.disabledRound
-        case .rectangle:
+        case .rectangle, .rectangleStroke:
             return BKImage.Checkbox.disabledRectangle
         }
     }
