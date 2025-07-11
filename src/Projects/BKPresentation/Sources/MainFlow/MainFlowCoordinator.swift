@@ -3,7 +3,6 @@
 import Foundation
 import UIKit
 
-// TODO: - Placeholder 대신 넣은 파일입니다. 실제 MainFlow 개발 시작 시 삭제하세요.
 final class MainFlowCoordinator: Coordinator {
     weak var parentCoordinator: Coordinator?
     var childCoordinators = [Coordinator]()
@@ -17,5 +16,20 @@ final class MainFlowCoordinator: Coordinator {
         self.navigationController = navigationController
     }
     
-    func start() { }
+    func start() {
+        let homeViewController = HomeViewController()
+        homeViewController.coordinator = self
+        navigationController.pushViewController(homeViewController, animated: true)
+    }
+}
+
+extension MainFlowCoordinator {
+    func didTapSettingButton() {
+        let settingCoordinator = SettingCoordinator(
+            parentCoordinator: self,
+            navigationController: navigationController
+        )
+        childCoordinators.append(settingCoordinator)
+        settingCoordinator.start()
+    }
 }
