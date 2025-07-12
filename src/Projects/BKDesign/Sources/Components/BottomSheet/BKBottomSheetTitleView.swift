@@ -8,12 +8,16 @@ public final class BKBottomSheetTitleView: UIView {
     private let subtitleLabel = UILabel()
     private let closeButton = UIButton()
     
-    private let hStack = UIStackView()
+    private let titleView = UIView()
     private let vStack = UIStackView()
+    
+    public var onClose: (() -> Void)?
     
     public init(style: BKBottomSheetTitleStyle) {
         super.init(frame: .zero)
         setupBaseUI()
+        setAction()
+        
         apply(style)
     }
     
@@ -22,26 +26,34 @@ public final class BKBottomSheetTitleView: UIView {
     }
     
     private func setupBaseUI() {
+        closeButton.tintColor = .bkContentColor(.primary)
         closeButton.snp.makeConstraints { make in
             make.height.width.equalTo(24)
         }
+        
+        titleLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        closeButton.setContentHuggingPriority(.required, for: .horizontal)
         
         vStack.axis = .vertical
         vStack.spacing = BKSpacing.spacing05
         vStack.alignment = .leading
         
-        hStack.axis = .horizontal
-        hStack.alignment = .center
-        hStack.distribution = .fill
-        hStack.spacing = BKSpacing.spacing4
-        
         setupFontStyle()
-        closeButton.setImage(BKIcon.xmark.image, for: .normal)
+        closeButton.setImage(BKImage.Icon.x, for: .normal)
         
         addSubview(vStack)
-        vStack.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(BKSpacing.spacing5)
+        titleView.snp.makeConstraints {
+            $0.height.greaterThanOrEqualTo(24)
         }
+        
+        vStack.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(BKSpacing.spacing5)
+            $0.height.lessThanOrEqualTo(54)
+        }
+    }
+    
+    private func setAction() {
+        closeButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
     }
     
     private func setupFontStyle() {
@@ -61,37 +73,64 @@ public final class BKBottomSheetTitleView: UIView {
     }
     
     public func apply(_ style: BKBottomSheetTitleStyle) {
-        hStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        titleView.subviews.forEach { $0.removeFromSuperview() }
         vStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
         switch style {
         case .none:
-            break
+            vStack.snp.makeConstraints { make in
+                make.height.equalTo(0)
+            }
+            
         case let .title(title):
-            titleLabel.text = title
-            hStack.addArrangedSubview(titleLabel)
-            vStack.addArrangedSubview(hStack)
+            setupTitleLabel(title)
             
         case let .titleWithCloseButton(title):
-            titleLabel.text = title
-            hStack.addArrangedSubview(titleLabel)
-            hStack.addArrangedSubview(closeButton)
-            vStack.addArrangedSubview(hStack)
+            setupTitleView(title)
             
         case let .titleWithSubtitle(title, subtitle):
-            titleLabel.text = title
-            subtitleLabel.text = subtitle
-            hStack.addArrangedSubview(titleLabel)
-            vStack.addArrangedSubview(hStack)
-            vStack.addArrangedSubview(subtitleLabel)
+            setupTitleLabel(title)
+            setupSubTitleLabel(subtitle)
             
         case let .titleWithSubtitleAndCloseButton(title, subtitle):
-            titleLabel.text = title
-            subtitleLabel.text = subtitle
-            hStack.addArrangedSubview(titleLabel)
-            hStack.addArrangedSubview(closeButton)
-            vStack.addArrangedSubview(hStack)
-            vStack.addArrangedSubview(subtitleLabel)
+            setupTitleView(title)
+            setupSubTitleLabel(subtitle)
         }
+    }
+    
+    private func setupTitleView(_ title: String) {
+        titleLabel.text = title
+        
+        [titleLabel, closeButton].forEach { titleView.addSubview($0) }
+        titleLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview()
+            make.top.bottom.equalToSuperview()
+        }
+
+        closeButton.snp.makeConstraints { make in
+            make.leading.greaterThanOrEqualTo(titleLabel.snp.trailing).offset(BKSpacing.spacing4)
+            make.trailing.equalToSuperview()
+            make.centerY.equalTo(titleLabel.snp.centerY)
+        }
+        
+        vStack.addArrangedSubview(titleView)
+        titleView.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview()
+        }
+    }
+    
+    private func setupTitleLabel(_ title: String) {
+        titleLabel.text = title
+        vStack.addArrangedSubview(titleLabel)
+    }
+    
+    private func setupSubTitleLabel(_ subtitle: String) {
+        subtitleLabel.text = subtitle
+        vStack.addArrangedSubview(subtitleLabel)
+    }
+    
+    @objc
+    private func didTapClose() {
+        onClose?()
     }
 }

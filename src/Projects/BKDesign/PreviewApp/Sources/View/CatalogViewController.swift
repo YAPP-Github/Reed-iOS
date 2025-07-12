@@ -4,6 +4,12 @@ import SnapKit
 import UIKit
 
 final class CatalogViewController: UIViewController {
+    private let bottomSheetButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("BottomSheetTitleViewController", for: .normal)
+        return button
+    }()
+    
     private let inputCatalogButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("BKInputCatalogViewController", for: .normal)
@@ -34,7 +40,8 @@ final class CatalogViewController: UIViewController {
         let stack = UIStackView(arrangedSubviews: [
             inputCatalogButton,
             buttonTestButton,
-            buttonGroupDemoButton
+            buttonGroupDemoButton,
+            bottomSheetButton
         ])
         stack.axis = .vertical
         stack.spacing = 16
@@ -52,6 +59,12 @@ final class CatalogViewController: UIViewController {
         inputCatalogButton.addTarget(self, action: #selector(openInputCatalog), for: .touchUpInside)
         buttonTestButton.addTarget(self, action: #selector(openButtonTest), for: .touchUpInside)
         buttonGroupDemoButton.addTarget(self, action: #selector(openButtonGroupDemo), for: .touchUpInside)
+        bottomSheetButton.addTarget(self, action: #selector(openBottomSheetTitle), for: .touchUpInside)
+    }
+    
+    @objc private func openBottomSheetTitle() {
+        let vc = BottomSheetTitleViewController()
+        navigationController?.pushViewController(vc, animated: true)
     }
 
     @objc private func openInputCatalog() {
