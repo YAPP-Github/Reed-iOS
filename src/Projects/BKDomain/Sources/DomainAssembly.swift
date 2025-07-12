@@ -53,5 +53,11 @@ public struct DomainAssembly: Assembly {
                 authRepository: repository
             )
         }
+        
+        container.register(
+            type: AppVersionUseCase.self
+        ) { _ in
+            return DefaultAppVersionUseCase()
+        }
     }
 }

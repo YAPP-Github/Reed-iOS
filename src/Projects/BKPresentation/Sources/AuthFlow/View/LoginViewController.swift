@@ -8,7 +8,6 @@ import UIKit
 final class LoginViewController: BaseViewController<LoginView> {
     var cancellable: Set<AnyCancellable> = []
     let viewModel: AnyViewBindableViewModel<LoginViewModel.State, LoginViewModel.Action>
-    weak var coordinator: LoginCoordinator?
     
     init(viewModel: LoginViewModel) {
         self.viewModel = AnyViewBindableViewModel(viewModel)
