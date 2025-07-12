@@ -105,7 +105,7 @@ public final class BKBottomSheetTitleView: UIView {
             make.leading.equalToSuperview()
             make.top.bottom.equalToSuperview()
         }
-
+        
         closeButton.snp.makeConstraints { make in
             make.leading.greaterThanOrEqualTo(titleLabel.snp.trailing).offset(BKSpacing.spacing4)
             make.trailing.equalToSuperview()
