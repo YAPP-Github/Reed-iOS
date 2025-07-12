@@ -48,7 +48,10 @@ public final class BKBottomSheetTitleView: UIView {
         addSubview(vStack)
         vStack.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(BKSpacing.spacing5)
+            $0.top.equalToSuperview()
         }
+        
+        vStack.backgroundColor = .red
     }
     
     private func setAction() {
@@ -95,6 +98,8 @@ public final class BKBottomSheetTitleView: UIView {
             setupTitleView(title)
             setupSubTitleLabel(subtitle)
         }
+        
+        vStack.sizeToFit()
     }
     
     private func setupTitleView(_ title: String) {
