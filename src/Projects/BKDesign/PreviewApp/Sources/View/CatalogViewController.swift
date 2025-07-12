@@ -108,19 +108,19 @@ final class CatalogViewController: UIViewController {
             make.height.equalTo(200)
         }
         
-//        let examplebottomSheet = BKBottomSheetViewController(
-//            titleStyle: .titleWithSubtitleAndCloseButton(title: "Title", subtitle: "subtitle"),
-//            contentView: image,
-//            buttonConfiguration: BKButtonGroup.singleFullButton(),
-//            preferredHeight: .automatic
-//        )
-        
         let examplebottomSheet = BKBottomSheetViewController(
-            titleStyle: .titleWithCloseButton(title: "sid"),
+            titleStyle: .titleWithSubtitleAndCloseButton(title: "Title", subtitle: "subtitle"),
             contentView: image,
             buttonConfiguration: BKButtonGroup.singleFullButton(),
             preferredHeight: .automatic
         )
+        
+//        let examplebottomSheet = BKBottomSheetViewController(
+//            titleStyle: .titleWithCloseButton(title: "sid"),
+//            contentView: image,
+//            buttonConfiguration: BKButtonGroup.singleFullButton(),
+//            preferredHeight: .automatic
+//        )
         
         examplebottomSheet.show(from: self, animated: true)
     }
