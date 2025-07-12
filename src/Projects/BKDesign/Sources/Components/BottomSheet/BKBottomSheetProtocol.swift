@@ -5,7 +5,7 @@ import UIKit
 // MARK: - Bottom Sheet Protocol
 public protocol BKBottomSheetProtocol: AnyObject {
     var titleStyle: BKBottomSheetTitleStyle { get set }
-    var contentView: UIView? { get set }
+    var contentView: UIView { get set }
     var buttonConfiguration: BKButtonGroup? { get set }
     var isDismissible: Bool { get set }
     var cornerRadius: CGFloat { get set }
@@ -17,4 +17,5 @@ public protocol BKBottomSheetProtocol: AnyObject {
 
 public enum BKBottomSheetHeight {
     case automatic
+    case fixed(CGFloat)
 }
