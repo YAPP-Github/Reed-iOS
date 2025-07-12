@@ -18,10 +18,4 @@ public enum BKBottomSheetTitleStyle {
 
     /// leading 정렬 - 타이틀 + 서브타이틀 + X 버튼
     case titleWithSubtitleAndCloseButton(title: String, subtitle: String)
-
-    /// center 정렬 - 타이틀만
-    case centerTitle(_ title: String)
-
-    /// center 정렬 - 타이틀 + 서브타이틀
-    case centerTitleWithSubtitle(title: String, subtitle: String)
 }

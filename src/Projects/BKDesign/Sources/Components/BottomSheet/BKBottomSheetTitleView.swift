@@ -22,8 +22,9 @@ public final class BKBottomSheetTitleView: UIView {
     }
     
     private func setupBaseUI() {
-        titleLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        closeButton.setContentHuggingPriority(.required, for: .horizontal)
+        closeButton.snp.makeConstraints { make in
+            make.height.width.equalTo(24)
+        }
         
         vStack.axis = .vertical
         vStack.spacing = BKSpacing.spacing05
@@ -89,23 +90,6 @@ public final class BKBottomSheetTitleView: UIView {
             subtitleLabel.text = subtitle
             hStack.addArrangedSubview(titleLabel)
             hStack.addArrangedSubview(closeButton)
-            vStack.addArrangedSubview(hStack)
-            vStack.addArrangedSubview(subtitleLabel)
-            
-        case let .centerTitle(title):
-            titleLabel.textAlignment = .center
-            titleLabel.text = title
-            vStack.alignment = .center
-            hStack.addArrangedSubview(titleLabel)
-            vStack.addArrangedSubview(hStack)
-            
-        case let .centerTitleWithSubtitle(title, subtitle):
-            titleLabel.textAlignment = .center
-            subtitleLabel.textAlignment = .center
-            titleLabel.text = title
-            subtitleLabel.text = subtitle
-            vStack.alignment = .center
-            hStack.addArrangedSubview(titleLabel)
             vStack.addArrangedSubview(hStack)
             vStack.addArrangedSubview(subtitleLabel)
         }
