@@ -27,8 +27,12 @@ public final class BKBottomSheetTitleView: UIView {
     
     private func setupBaseUI() {
         closeButton.tintColor = .bkContentColor(.primary)
-        closeButton.snp.makeConstraints { make in
-            make.height.width.equalTo(24)
+        closeButton.snp.makeConstraints {
+            $0.height.width.equalTo(24)
+        }
+        
+        titleLabel.snp.makeConstraints {
+            $0.height.greaterThanOrEqualTo(28)
         }
         
         titleLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -42,13 +46,8 @@ public final class BKBottomSheetTitleView: UIView {
         closeButton.setImage(BKImage.Icon.x, for: .normal)
         
         addSubview(vStack)
-        titleView.snp.makeConstraints {
-            $0.height.greaterThanOrEqualTo(24)
-        }
-        
         vStack.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(BKSpacing.spacing5)
-            $0.height.lessThanOrEqualTo(54)
         }
     }
     
@@ -114,8 +113,9 @@ public final class BKBottomSheetTitleView: UIView {
         }
         
         vStack.addArrangedSubview(titleView)
-        titleView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview()
+        titleView.snp.makeConstraints {
+            $0.height.greaterThanOrEqualTo(28)
+            $0.leading.trailing.equalToSuperview()
         }
     }
     
