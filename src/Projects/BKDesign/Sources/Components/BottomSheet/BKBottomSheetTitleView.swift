@@ -22,6 +22,9 @@ public final class BKBottomSheetTitleView: UIView {
     }
     
     private func setupBaseUI() {
+        titleLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        closeButton.setContentHuggingPriority(.required, for: .horizontal)
+        
         vStack.axis = .vertical
         vStack.spacing = BKSpacing.spacing05
         vStack.alignment = .leading
@@ -34,8 +37,8 @@ public final class BKBottomSheetTitleView: UIView {
         setupFontStyle()
         closeButton.setImage(BKIcon.xmark.image, for: .normal)
         
-        addSubview(hStack)
-        hStack.snp.makeConstraints {
+        addSubview(vStack)
+        vStack.snp.makeConstraints {
             $0.edges.equalToSuperview().inset(BKSpacing.spacing5)
         }
     }
@@ -60,6 +63,51 @@ public final class BKBottomSheetTitleView: UIView {
         hStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         vStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
-        // case 별 분류..
+        switch style {
+        case .none:
+            break
+        case let .title(title):
+            titleLabel.text = title
+            hStack.addArrangedSubview(titleLabel)
+            vStack.addArrangedSubview(hStack)
+            
+        case let .titleWithCloseButton(title):
+            titleLabel.text = title
+            hStack.addArrangedSubview(titleLabel)
+            hStack.addArrangedSubview(closeButton)
+            vStack.addArrangedSubview(hStack)
+            
+        case let .titleWithSubtitle(title, subtitle):
+            titleLabel.text = title
+            subtitleLabel.text = subtitle
+            hStack.addArrangedSubview(titleLabel)
+            vStack.addArrangedSubview(hStack)
+            vStack.addArrangedSubview(subtitleLabel)
+            
+        case let .titleWithSubtitleAndCloseButton(title, subtitle):
+            titleLabel.text = title
+            subtitleLabel.text = subtitle
+            hStack.addArrangedSubview(titleLabel)
+            hStack.addArrangedSubview(closeButton)
+            vStack.addArrangedSubview(hStack)
+            vStack.addArrangedSubview(subtitleLabel)
+            
+        case let .centerTitle(title):
+            titleLabel.textAlignment = .center
+            titleLabel.text = title
+            vStack.alignment = .center
+            hStack.addArrangedSubview(titleLabel)
+            vStack.addArrangedSubview(hStack)
+            
+        case let .centerTitleWithSubtitle(title, subtitle):
+            titleLabel.textAlignment = .center
+            subtitleLabel.textAlignment = .center
+            titleLabel.text = title
+            subtitleLabel.text = subtitle
+            vStack.alignment = .center
+            hStack.addArrangedSubview(titleLabel)
+            vStack.addArrangedSubview(hStack)
+            vStack.addArrangedSubview(subtitleLabel)
+        }
     }
 }
