@@ -50,8 +50,9 @@ public class BKButtonGroup: UIView {
     // MARK: - Setup
     private func setupView() {
         addSubview(stackView)
-        stackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        stackView.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(BKSpacing.spacing5)
+            $0.verticalEdges.equalToSuperview().inset(BKSpacing.spacing4)
         }
         
         updateLayout()
