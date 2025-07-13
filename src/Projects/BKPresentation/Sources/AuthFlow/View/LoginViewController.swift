@@ -24,8 +24,6 @@ final class LoginViewController: BaseViewController<LoginView> {
                     } else if provider == .kakao {
                         self.viewModel.send(.kakaoLoginButtonTapped)
                     }
-                case .logoutButtonTapped:
-                    self.viewModel.send(.logoutButtonTapped)
                 }
             }
             .store(in: &cancellable)
@@ -47,15 +45,6 @@ final class LoginViewController: BaseViewController<LoginView> {
             .receive(on: DispatchQueue.main)
             .sink { provider in
                 print("latestProvider: \(String(describing: provider))")
-            }
-            .store(in: &cancellable)
-        
-        viewModel.statePublisher
-            .map { ($0.latestProvider, $0.isLoggedIn) }
-            .removeDuplicates { $0 == $1 }
-            .receive(on: DispatchQueue.main)
-            .sink { (provider, isLoggedIn) in
-                self.contentView.updateStatusView(provider: provider ?? "No Provider", status: isLoggedIn)
             }
             .store(in: &cancellable)
         

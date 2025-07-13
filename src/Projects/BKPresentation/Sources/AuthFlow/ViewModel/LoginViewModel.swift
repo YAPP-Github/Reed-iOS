@@ -17,24 +17,22 @@ final class LoginViewModel: BaseViewModel {
         case kakaoLoginButtonTapped
         case loginSuccessed
         case authFailed(message: String)
-        case logoutButtonTapped
-        case logoutSuccessed
     }
     
     enum SideEffect {
         case signInApple
         case signInKakao
-        case logout
     }
     
     @Published private var state = State()
     private var cancellables = Set<AnyCancellable>()
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
     
-    @Autowired(name: "apple") private var appleLoginUseCase: SocialLoginUseCase
-    @Autowired(name: "kakao") private var kakaoLoginUseCase: SocialLoginUseCase
+    @Autowired(name: "apple")
+    private var appleLoginUseCase: SocialLoginUseCase
+    @Autowired(name: "kakao")
+    private var kakaoLoginUseCase: SocialLoginUseCase
     @Autowired private var socialTokenAuthUseCase: SocialTokenAuthUseCase
-    @Autowired private var logoutUseCase: LogoutUseCase
     
     var statePublisher: AnyPublisher<State, Never> {
         $state.eraseToAnyPublisher()
@@ -59,21 +57,18 @@ final class LoginViewModel: BaseViewModel {
             newState.errorMessage = nil
             newState.latestProvider = "apple"
             effects.append(.signInApple)
+            
         case .kakaoLoginButtonTapped:
             newState.errorMessage = nil
             newState.latestProvider = "kakao"
             effects.append(.signInKakao)
+            
         case .loginSuccessed:
             newState.isLoggedIn = true
             newState.errorMessage = nil
+            
         case .authFailed(let message):
             newState.errorMessage = message
-        case .logoutButtonTapped:
-            newState.errorMessage = nil
-            effects.append(.logout)
-        case .logoutSuccessed:
-            newState.isLoggedIn = false
-            newState.errorMessage = nil
         }
 
         return (newState, effects)
@@ -95,6 +90,7 @@ final class LoginViewModel: BaseViewModel {
                 }
                 .catch { Just(Action.authFailed(message: $0.localizedDescription)) }
                 .eraseToAnyPublisher()
+            
         case .signInKakao:
             return kakaoLoginUseCase.execute()
                 .flatMap { [weak self] token in
@@ -107,11 +103,6 @@ final class LoginViewModel: BaseViewModel {
                         .catch { Just(Action.authFailed(message: $0.localizedDescription)) }
                         .eraseToAnyPublisher()
                 }
-                .catch { Just(Action.authFailed(message: $0.localizedDescription)) }
-                .eraseToAnyPublisher()
-        case .logout:
-            return logoutUseCase.execute()
-                .map { Action.logoutSuccessed }
                 .catch { Just(Action.authFailed(message: $0.localizedDescription)) }
                 .eraseToAnyPublisher()
         }
