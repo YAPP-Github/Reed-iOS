@@ -1,5 +1,6 @@
 //  Copyright © 2025 Booket. All rights reserved
 
+import BKDesign
 import SnapKit
 import UIKit
 
@@ -22,6 +23,18 @@ final class CatalogViewController: UIViewController {
         return button
     }()
     
+    private let bottomSheetButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("BottomSheetTitleViewController", for: .normal)
+        return button
+    }()
+    
+    private let showBottomSheetButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("BottomSheetTestMenuViewController", for: .normal)
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Test Menu"
@@ -34,7 +47,9 @@ final class CatalogViewController: UIViewController {
         let stack = UIStackView(arrangedSubviews: [
             inputCatalogButton,
             buttonTestButton,
-            buttonGroupDemoButton
+            buttonGroupDemoButton,
+            bottomSheetButton,
+            showBottomSheetButton
         ])
         stack.axis = .vertical
         stack.spacing = 16
@@ -52,6 +67,14 @@ final class CatalogViewController: UIViewController {
         inputCatalogButton.addTarget(self, action: #selector(openInputCatalog), for: .touchUpInside)
         buttonTestButton.addTarget(self, action: #selector(openButtonTest), for: .touchUpInside)
         buttonGroupDemoButton.addTarget(self, action: #selector(openButtonGroupDemo), for: .touchUpInside)
+        bottomSheetButton.addTarget(self, action: #selector(openBottomSheetTitle), for: .touchUpInside)
+        showBottomSheetButton.addTarget(self, action: #selector(presentExampleBottomSheet), for: .touchUpInside)
+    }
+
+    
+    @objc private func openBottomSheetTitle() {
+        let vc = BKBottomSheetTitleViewController()
+        navigationController?.pushViewController(vc, animated: true)
     }
 
     @objc private func openInputCatalog() {
@@ -66,6 +89,11 @@ final class CatalogViewController: UIViewController {
 
     @objc private func openButtonGroupDemo() {
         let vc = BKButtonGroupDemoViewController()
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc private func presentExampleBottomSheet() {
+        let vc = BKBottomSheetTestMenuViewController()
         navigationController?.pushViewController(vc, animated: true)
     }
 }

@@ -37,13 +37,13 @@ final class SettingCell: UICollectionViewListCell {
         }
 
         iconView.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(BKInset.inset3)
+            $0.trailing.equalToSuperview().inset(BKInset.inset4)
             $0.centerY.equalToSuperview()
             $0.width.height.equalTo(BKLayoutSize.icon)
         }
 
         versionLabel.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(BKInset.inset3)
+            $0.trailing.equalToSuperview().inset(BKInset.inset4)
             $0.centerY.equalToSuperview()
         }
     }

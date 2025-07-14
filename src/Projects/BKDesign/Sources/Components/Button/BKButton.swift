@@ -143,14 +143,14 @@ public class BKButton: UIButton, BKButtonProtocol {
         stackView.addArrangedSubview(customTitleLabel)
         stackView.addArrangedSubview(rightIconView)
         
-        stackView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.left.greaterThanOrEqualToSuperview().offset(size.horizontalPadding)
-            make.right.lessThanOrEqualToSuperview().offset(-size.horizontalPadding)
+        stackView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.left.greaterThanOrEqualToSuperview().offset(size.horizontalPadding)
+            $0.right.lessThanOrEqualToSuperview().offset(-size.horizontalPadding)
 
-            make.centerY.equalToSuperview()
-            make.top.greaterThanOrEqualToSuperview().offset(size.verticalPadding)
-            make.bottom.lessThanOrEqualToSuperview().offset(-size.verticalPadding)
+            $0.centerY.equalToSuperview()
+            $0.top.greaterThanOrEqualToSuperview().offset(size.verticalPadding)
+            $0.bottom.lessThanOrEqualToSuperview().offset(-size.verticalPadding)
         }
         
         setupIconViews()
@@ -166,12 +166,12 @@ public class BKButton: UIButton, BKButtonProtocol {
             iconView.setContentCompressionResistancePriority(.required, for: .horizontal)
         }
 
-        leftIconView.snp.makeConstraints { make in
-            make.width.height.equalTo(size.iconSize.width)
+        leftIconView.snp.makeConstraints {
+            $0.width.height.equalTo(size.iconSize.width)
         }
 
-        rightIconView.snp.makeConstraints { make in
-            make.width.height.equalTo(size.iconSize.width)
+        rightIconView.snp.makeConstraints {
+            $0.width.height.equalTo(size.iconSize.width)
         }
     }
 
@@ -220,11 +220,11 @@ public class BKButton: UIButton, BKButtonProtocol {
     
     private func updateIconSizes() {
         let iconSize = size.iconSize.width
-        leftIconView.snp.updateConstraints { make in
-            make.width.height.equalTo(iconSize)
+        leftIconView.snp.updateConstraints {
+            $0.width.height.equalTo(iconSize)
         }
-        rightIconView.snp.updateConstraints { make in
-            make.width.height.equalTo(iconSize)
+        rightIconView.snp.updateConstraints {
+            $0.width.height.equalTo(iconSize)
         }
     }
  

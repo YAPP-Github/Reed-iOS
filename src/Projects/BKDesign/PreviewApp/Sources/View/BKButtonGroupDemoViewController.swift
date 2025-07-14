@@ -92,19 +92,12 @@ public final class BKButtonGroupDemoViewController: UIViewController {
     }
 
     private func addSection(title: String) {
-        let label = UILabel()
-        label.text = title
-        label.font = UIFont.systemFont(ofSize: 14, weight: .bold)
-        label.textColor = .darkGray
+        let label = BKLabel(text: title, type: .small, alignment: .left)
         containerView.addArrangedSubview(label)
     }
 
     private func addDivider() {
-        let divider = UIView()
-        divider.backgroundColor = UIColor.lightGray.withAlphaComponent(0.4)
-        divider.snp.makeConstraints { make in
-            make.height.equalTo(1)
-        }
+        let divider = BKDivider(type: .small)
         containerView.addArrangedSubview(divider)
     }
 }

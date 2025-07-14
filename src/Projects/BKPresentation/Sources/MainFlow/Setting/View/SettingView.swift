@@ -58,9 +58,9 @@ private extension SettingView {
             cfg.showsSeparators = false
             let section = NSCollectionLayoutSection.list(using: cfg, layoutEnvironment: env)
             section.contentInsets = .init(
-                top: BKInset.inset3,
+                top: BKInset.inset4,
                 leading: 0,
-                bottom: BKInset.inset3,
+                bottom: BKInset.inset4,
                 trailing: 0
             )
             return section
