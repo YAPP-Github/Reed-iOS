@@ -12,4 +12,5 @@ public enum BKRadius {
     public static let x2large: CGFloat = 32
     public static let x3large: CGFloat = 48
     public static let full: CGFloat = 999
+    public static let sheet: CGFloat = 20
 }

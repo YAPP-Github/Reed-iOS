@@ -65,7 +65,7 @@ private extension BKSearchTextField {
     func layout() {
         searchButton.snp.makeConstraints {
             $0.trailing.equalToSuperview()
-                .inset(BKInset.inset3)
+                .inset(BKInset.inset4)
             $0.centerY.equalToSuperview()
         }
     }
@@ -73,9 +73,9 @@ private extension BKSearchTextField {
     func textInsets() -> UIEdgeInsets {
         return UIEdgeInsets(
             top: BKInset.inset2,
-            left: BKInset.inset3,
+            left: BKInset.inset4,
             bottom: BKInset.inset2,
-            right: BKInset.inset4
+            right: BKInset.inset11
         )
     }
 }
