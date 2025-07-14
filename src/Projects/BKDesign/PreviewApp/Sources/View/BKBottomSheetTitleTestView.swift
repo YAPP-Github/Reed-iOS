@@ -5,40 +5,46 @@ import SnapKit
 import UIKit
 
 final class BKBottomSheetTitleTestView: BaseView {
-
     private let stackView = UIStackView()
 
     override func setupView() {
         addSubview(stackView)
         stackView.axis = .vertical
         stackView.spacing = 16
-        stackView.alignment = .fill
+        stackView.alignment = .leading
     }
 
     override func setupLayout() {
         stackView.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(20)
+            $0.top.equalToSuperview().offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
         }
     }
 
     override func configure() {
-        let styles: [BKBottomSheetTitleStyle] = [
-            .none,
-            .title("타이틀만"),
-            .titleWithCloseButton(title: "타이틀 + 닫기"),
-            .titleWithSubtitle(title: "타이틀", subtitle: "서브타이틀만"),
-            .titleWithSubtitleAndCloseButton(title: "타이틀", subtitle: "서브타이틀 + 닫기")
-        ]
-
-        styles.forEach { style in
-            let titleView = BKBottomSheetTitleView(style: style)
-            titleView.backgroundColor = UIColor.white
-            
-            titleView.snp.makeConstraints { make in
-                make.height.lessThanOrEqualTo(54)
-            }
+        [
+            BKBottomSheetTitleView(
+                style: .centered,
+                title: "Centered with subtitle",
+                subtitle: "subtitle"
+            ),
+            BKBottomSheetTitleView(
+                style: .centered,
+                title: "Centered without subtitle",
+                subtitle: nil
+            ),
+            BKBottomSheetTitleView(
+                style: .leadingCloseButton,
+                title: "Leading with subtitle",
+                subtitle: "subtitle"
+            ),
+            BKBottomSheetTitleView(
+                style: .leadingCloseButton,
+                title: "Leading without subtitle",
+                subtitle: nil
+            )
+        ].forEach { titleView in
             stackView.addArrangedSubview(titleView)
-        
         }
     }
 }

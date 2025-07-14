@@ -5,12 +5,6 @@ import SnapKit
 import UIKit
 
 final class CatalogViewController: UIViewController {
-    private let bottomSheetButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("BottomSheetTitleViewController", for: .normal)
-        return button
-    }()
-    
     private let inputCatalogButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("BKInputCatalogViewController", for: .normal)
@@ -29,20 +23,17 @@ final class CatalogViewController: UIViewController {
         return button
     }()
     
-    private let showBottomSheetButton: UIButton = {
+    private let bottomSheetButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("바텀시트 띄우기", for: .normal)
+        button.setTitle("BottomSheetTitleViewController", for: .normal)
         return button
     }()
     
-    
-    private let examplebottomSheet = BKBottomSheetViewController(
-        titleStyle: .titleWithCloseButton(title: "예시 바텀시트에요"),
-        contentView: UIImageView(image: BKImage.Icon.search),
-        buttonConfiguration: BKButtonGroup.singleFullButton(),
-        preferredHeight: .fixed(200)
-    )
-    
+    private let showBottomSheetButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("BottomSheetTestMenuViewController", for: .normal)
+        return button
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,7 +73,7 @@ final class CatalogViewController: UIViewController {
 
     
     @objc private func openBottomSheetTitle() {
-        let vc = BottomSheetTitleViewController()
+        let vc = BKBottomSheetTitleViewController()
         navigationController?.pushViewController(vc, animated: true)
     }
 
@@ -102,27 +93,7 @@ final class CatalogViewController: UIViewController {
     }
     
     @objc private func presentExampleBottomSheet() {
-        let image = UIImageView(image: BKImage.Icon.search)
-        image.contentMode = .scaleAspectFit
-        image.snp.makeConstraints { make in
-            make.height.equalTo(200)
-        }
-        
-        let examplebottomSheet = BKBottomSheetViewController(
-            titleStyle: .titleWithSubtitleAndCloseButton(title: "Title", subtitle: "subtitle"),
-            contentView: image,
-            buttonConfiguration: BKButtonGroup.singleFullButton(),
-            preferredHeight: .automatic
-        )
-        
-//        let examplebottomSheet = BKBottomSheetViewController(
-//            titleStyle: .titleWithCloseButton(title: "sid"),
-//            contentView: image,
-//            buttonConfiguration: BKButtonGroup.singleFullButton(),
-//            preferredHeight: .automatic
-//        )
-        
-        examplebottomSheet.show(from: self, animated: true)
+        let vc = BKBottomSheetTestMenuViewController()
+        navigationController?.pushViewController(vc, animated: true)
     }
-
 }

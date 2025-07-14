@@ -2,7 +2,7 @@
 
 import UIKit
 
-final class BottomSheetTitleViewController: BaseViewController<BKBottomSheetTitleTestView> {
+final class BKBottomSheetTitleViewController: BaseViewController<BKBottomSheetTitleTestView> {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationItem.title = "BottomSheet title"
