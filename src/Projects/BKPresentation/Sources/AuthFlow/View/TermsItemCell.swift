@@ -1,0 +1,59 @@
+// Copyright © 2025 Booket. All rights reserved
+
+import BKDesign
+import SnapKit
+import UIKit
+
+final class TermsItemCell: UICollectionViewListCell {
+    static let identifier: String = "TermsItemCell"
+    
+    // MARK: - UI Components
+    private let checkBoxInteractionView = UIView()
+    private let checkBox = BKCheckBox()
+    
+    private let titleLabel = BKLabel(fontStyle: .body1(weight: .medium))
+    
+    private let chevronIconView: UIImageView = {
+        let view = UIImageView(image: BKImage.Icon.chevronRight)
+        view.contentMode = .scaleAspectFit
+        view.tintColor = .bkContentColor(.secondary)
+        view.isHidden = true
+        return view
+    }()
+    
+    // MARK: - Inits
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        checkBoxInteractionView.addSubview(checkBox)
+        
+        checkBox.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.width.height.equalTo(LayoutGuide.checkBoxSize)
+        }
+        
+        addSubviews(checkBoxInteractionView, titleLabel, chevronIconView)
+        
+        checkBoxInteractionView.snp.makeConstraints {
+            $0.leading.top.bottom.equalToSuperview()
+            $0.height.width.equalTo(LayoutGuide.checkBoxInteractionSize)
+        }
+        
+        titleLabel.snp.makeConstraints {
+            $0.leading.equalTo(checkBoxInteractionView.snp.trailing).offset(LayoutGuide.horizontalPadding)
+            
+        }
+        
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
+    struct LayoutGuide {
+        static let checkBoxSize: CGFloat = 24
+        static let checkBoxInteractionSize: CGFloat = 44
+        static let horizontalPadding: CGFloat = BKSpacing.spacing1
+    }
+}
+
