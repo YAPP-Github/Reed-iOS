@@ -4,138 +4,107 @@ import SnapKit
 import UIKit
 
 public final class BKBottomSheetTitleView: UIView {
+    private let style: BKBottomSheetStyle
     private let titleLabel = UILabel()
     private let subtitleLabel = UILabel()
-    private let closeButton = UIButton()
+    private let closeButton = UIButton(type: .system)
     
-    private let titleView = UIView()
-    private let vStack = UIStackView()
+    private let title: String
+    private let subtitle: String?
     
     public var onClose: (() -> Void)?
     
-    public init(style: BKBottomSheetTitleStyle) {
+    public init(
+        style: BKBottomSheetStyle,
+        title: String,
+        subtitle: String?
+    ) {
+        self.style = style
+        self.title = title
+        self.subtitle = subtitle
         super.init(frame: .zero)
-        setupBaseUI()
-        setAction()
-        
-        apply(style)
+        configure()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    private func setupBaseUI() {
-        closeButton.tintColor = .bkContentColor(.primary)
-        closeButton.snp.makeConstraints {
-            $0.height.width.equalTo(24)
-        }
-        
-        titleLabel.snp.makeConstraints {
-            $0.height.greaterThanOrEqualTo(28)
-        }
-        
-        titleLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        closeButton.setContentHuggingPriority(.required, for: .horizontal)
-        
-        vStack.axis = .vertical
-        vStack.spacing = BKSpacing.spacing05
-        vStack.alignment = .leading
-        
-        setupFontStyle()
-        closeButton.setImage(BKImage.Icon.x, for: .normal)
-        
-        addSubview(vStack)
-        vStack.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(BKSpacing.spacing5)
-            $0.top.equalToSuperview()
-        }
-        
-        vStack.backgroundColor = .red
-    }
-    
-    private func setAction() {
-        closeButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
-    }
-    
-    private func setupFontStyle() {
-        titleLabel.font = BKTextStyle.heading2(weight: .semiBold).uiFont ??
-            .systemFont(
-                ofSize: BKTextStyle.heading2(weight: .semiBold).fontAttributes.fontSize.rawValue,
-                weight: .semibold
-            )
+}
+
+private extension BKBottomSheetTitleView {
+    func configure() {
+        titleLabel.text = title
+        titleLabel.numberOfLines = 0
+        titleLabel.font = BKTextStyle.heading2(weight: .semiBold).uiFont
         titleLabel.textColor = .bkContentColor(.primary)
-        
-        subtitleLabel.font = BKTextStyle.label2(weight: .regular).uiFont ??
-            .systemFont(
-                ofSize: BKTextStyle.label2(weight: .regular).fontAttributes.fontSize.rawValue,
-                weight: .regular
-            )
         subtitleLabel.textColor = .bkContentColor(.secondary)
-    }
-    
-    public func apply(_ style: BKBottomSheetTitleStyle) {
-        titleView.subviews.forEach { $0.removeFromSuperview() }
-        vStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        
+
         switch style {
-        case .none:
-            vStack.snp.makeConstraints { make in
-                make.height.equalTo(0)
+        case .leadingCloseButton:
+            subtitleLabel.font = BKTextStyle.label2(weight: .regular).uiFont
+            closeButton.setImage(BKImage.Icon.x, for: .normal)
+            closeButton.tintColor = .bkContentColor(.primary)
+            addLeadingLayout(subtitle: subtitle)
+        case .centered:
+            subtitleLabel.font = BKTextStyle.body1(weight: .medium).uiFont
+            addCenteredLayout(subtitle: subtitle)
+        }
+        
+        closeButton.addTarget(
+            self,
+            action: #selector(didTapCloseButton),
+            for: .touchUpInside
+        )
+    }
+
+    func addLeadingLayout(subtitle: String?) {
+        addSubview(titleLabel)
+        titleLabel.snp.makeConstraints {
+            $0.leading.top.equalToSuperview()
+            $0.height.equalTo(24)
+        }
+
+        if let subtitle {
+            subtitleLabel.text = subtitle
+            subtitleLabel.numberOfLines = 0
+            addSubview(subtitleLabel)
+            subtitleLabel.snp.makeConstraints {
+                $0.leading.equalTo(titleLabel)
+                $0.top.equalTo(titleLabel.snp.bottom).offset(2)
+                $0.height.equalTo(24)
+                $0.bottom.equalToSuperview()
             }
-            
-        case let .title(title):
-            setupTitleLabel(title)
-            
-        case let .titleWithCloseButton(title):
-            setupTitleView(title)
-            
-        case let .titleWithSubtitle(title, subtitle):
-            setupTitleLabel(title)
-            setupSubTitleLabel(subtitle)
-            
-        case let .titleWithSubtitleAndCloseButton(title, subtitle):
-            setupTitleView(title)
-            setupSubTitleLabel(subtitle)
+        } else {
+            titleLabel.snp.makeConstraints {
+                $0.bottom.equalToSuperview()
+            }
         }
-        
-        vStack.sizeToFit()
+
+        addSubview(closeButton)
+        closeButton.snp.makeConstraints {
+            $0.centerY.equalTo(titleLabel)
+            $0.trailing.equalToSuperview()
+        }
     }
-    
-    private func setupTitleView(_ title: String) {
-        titleLabel.text = title
-        
-        [titleLabel, closeButton].forEach { titleView.addSubview($0) }
-        titleLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview()
-            make.top.bottom.equalToSuperview()
-        }
-        
-        closeButton.snp.makeConstraints { make in
-            make.leading.greaterThanOrEqualTo(titleLabel.snp.trailing).offset(BKSpacing.spacing4)
-            make.trailing.equalToSuperview()
-            make.centerY.equalTo(titleLabel.snp.centerY)
-        }
-        
-        vStack.addArrangedSubview(titleView)
-        titleView.snp.makeConstraints {
-            $0.height.greaterThanOrEqualTo(28)
-            $0.leading.trailing.equalToSuperview()
+
+    func addCenteredLayout(subtitle: String?) {
+        let vStack = UIStackView(arrangedSubviews: [titleLabel])
+        vStack.axis = .vertical
+        vStack.alignment = .center
+        vStack.spacing = 4
+        addSubview(vStack)
+        vStack.snp.makeConstraints { $0.edges.equalToSuperview() }
+        titleLabel.snp.makeConstraints { $0.height.equalTo(24) }
+
+        if let subtitle {
+            subtitleLabel.text = subtitle
+            subtitleLabel.numberOfLines = 0
+            vStack.addArrangedSubview(subtitleLabel)
+            subtitleLabel.snp.makeConstraints { $0.height.equalTo(24) }
         }
     }
     
-    private func setupTitleLabel(_ title: String) {
-        titleLabel.text = title
-        vStack.addArrangedSubview(titleLabel)
-    }
-    
-    private func setupSubTitleLabel(_ subtitle: String) {
-        subtitleLabel.text = subtitle
-        vStack.addArrangedSubview(subtitleLabel)
-    }
-    
-    @objc
-    private func didTapClose() {
+    @objc func didTapCloseButton() {
         onClose?()
     }
 }
