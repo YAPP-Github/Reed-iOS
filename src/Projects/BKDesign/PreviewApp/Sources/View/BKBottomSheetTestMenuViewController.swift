@@ -102,7 +102,6 @@ final class BKBottomSheetTestMenuViewController: UIViewController {
     }
 
     @objc private func openCentered() {
-        let image = UIImageView(image: BKImage.Icon.search)
         let sheet = BKBottomSheetViewController(
             title: "타이틀틀",
             style: .centered,
@@ -112,7 +111,6 @@ final class BKBottomSheetTestMenuViewController: UIViewController {
     }
     
     @objc private func openCenteredWithSubtitle() {
-        let image = UIImageView(image: BKImage.Icon.search)
         let sheet = BKBottomSheetViewController(
             title: "타이틀틀",
             subtitle: "서브타이틀틀",
@@ -135,7 +133,6 @@ final class BKBottomSheetTestMenuViewController: UIViewController {
     }
     
     @objc private func openLeading() {
-        let image = UIImageView(image: BKImage.Icon.search)
         let sheet = BKBottomSheetViewController(
             title: "타이틀틀",
             style: .leadingCloseButton,
@@ -145,7 +142,6 @@ final class BKBottomSheetTestMenuViewController: UIViewController {
     }
     
     @objc private func openLeadingWithSubtitle() {
-        let image = UIImageView(image: BKImage.Icon.search)
         let sheet = BKBottomSheetViewController(
             title: "타이틀틀",
             subtitle: "서브타이틀틀",

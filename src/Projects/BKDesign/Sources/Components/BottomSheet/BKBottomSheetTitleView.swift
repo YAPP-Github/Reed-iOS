@@ -34,7 +34,7 @@ public final class BKBottomSheetTitleView: UIView {
 private extension BKBottomSheetTitleView {
     func configure() {
         titleLabel.text = title
-        titleLabel.numberOfLines = 0
+        titleLabel.numberOfLines = .zero
         titleLabel.font = BKTextStyle.heading2(weight: .semiBold).uiFont
         titleLabel.textColor = .bkContentColor(.primary)
         subtitleLabel.textColor = .bkContentColor(.secondary)
@@ -61,17 +61,18 @@ private extension BKBottomSheetTitleView {
         addSubview(titleLabel)
         titleLabel.snp.makeConstraints {
             $0.leading.top.equalToSuperview()
-            $0.height.equalTo(24)
+            $0.height.equalTo(LayoutConstants.labelHeight)
         }
 
         if let subtitle {
             subtitleLabel.text = subtitle
-            subtitleLabel.numberOfLines = 0
+            subtitleLabel.numberOfLines = .zero
             addSubview(subtitleLabel)
             subtitleLabel.snp.makeConstraints {
                 $0.leading.equalTo(titleLabel)
-                $0.top.equalTo(titleLabel.snp.bottom).offset(2)
-                $0.height.equalTo(24)
+                $0.top.equalTo(titleLabel.snp.bottom)
+                    .offset(LayoutConstants.leadingContentSpacing)
+                $0.height.equalTo(LayoutConstants.labelHeight)
                 $0.bottom.equalToSuperview()
             }
         } else {
@@ -91,20 +92,36 @@ private extension BKBottomSheetTitleView {
         let vStack = UIStackView(arrangedSubviews: [titleLabel])
         vStack.axis = .vertical
         vStack.alignment = .center
-        vStack.spacing = 4
+        vStack.spacing = LayoutConstants.centeredContentSpacing
         addSubview(vStack)
         vStack.snp.makeConstraints { $0.edges.equalToSuperview() }
-        titleLabel.snp.makeConstraints { $0.height.equalTo(24) }
+        titleLabel.snp.makeConstraints {
+            $0.height.equalTo(
+                LayoutConstants.labelHeight
+            )
+        }
 
         if let subtitle {
             subtitleLabel.text = subtitle
-            subtitleLabel.numberOfLines = 0
+            subtitleLabel.numberOfLines = .zero
             vStack.addArrangedSubview(subtitleLabel)
-            subtitleLabel.snp.makeConstraints { $0.height.equalTo(24) }
+            subtitleLabel.snp.makeConstraints {
+                $0.height.equalTo(
+                    LayoutConstants.labelHeight
+                )
+            }
         }
     }
     
     @objc func didTapCloseButton() {
         onClose?()
+    }
+}
+
+private extension BKBottomSheetTitleView {
+    enum LayoutConstants {
+        static let leadingContentSpacing: CGFloat = 2
+        static let centeredContentSpacing: CGFloat = 4
+        static let labelHeight: CGFloat = 24
     }
 }
