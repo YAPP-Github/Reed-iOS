@@ -2,9 +2,18 @@
 
 import UIKit
 
-class BaseViewController<T: BaseView>: UIViewController {
+///
+class BaseViewController<T: BaseView>: UIViewController, BKNavigationBarStylable {
     // MARK: - Properties
     let contentView: T
+    
+    open var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
+        fatalError("Subclasses must override bkNavigationBarStyle")
+    }
+
+    open var bkNavigationTitle: String {
+        fatalError("Subclasses must override bkNavigationTitle")
+    }
     
     // MARK: - Initialize
     init() {
@@ -33,6 +42,13 @@ class BaseViewController<T: BaseView>: UIViewController {
         self.setupLayout()
         self.bindAction()
         self.bindState()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let _ = self as? BKNavigationBarStylable {
+            navigationController?.applyStyleIfNeeded(for: self)
+        }
     }
     
     // MARK: - Common Methods
