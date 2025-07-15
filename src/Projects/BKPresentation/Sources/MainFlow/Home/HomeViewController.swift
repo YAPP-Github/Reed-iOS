@@ -3,8 +3,17 @@
 import SnapKit
 import UIKit
 
-final class HomeViewController: UIViewController {
-    weak var coordinator: MainFlowCoordinator?
+final class HomeViewController: UIViewController, BKNavigationBarStylable {
+    weak var coordinator: MainFlowCoordinator?    
+    var bkNavigationTitle: String = "홈"
+    var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
+        .main(
+            viewController: self,
+            target: self,
+            searchAction: #selector(dummyFunc),
+            gearAction: #selector(dummyFunc)
+        )
+    }
     
     private let settingButton: UIButton = {
         let button = UIButton(type: .system)
@@ -14,10 +23,14 @@ final class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "홈 화면"
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .bkBaseColor(.primary)
         configure()
         bindActions()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.applyStyleIfNeeded(for: self)
     }
 
     private func configure() {
@@ -38,6 +51,10 @@ final class HomeViewController: UIViewController {
 
     private func bindActions() {
         settingButton.addTarget(self, action: #selector(openSettings), for: .touchUpInside)
+    }
+    
+    @objc private func dummyFunc() {
+        
     }
 
     @objc private func openSettings() {

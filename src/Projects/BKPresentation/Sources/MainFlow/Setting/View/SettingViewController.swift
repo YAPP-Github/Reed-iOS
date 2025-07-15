@@ -2,6 +2,7 @@
 
 import Combine
 import Foundation
+import UIKit
 
 enum SettingViewEvent {
     case logoutButtonTapped
@@ -11,17 +12,27 @@ enum SettingViewEvent {
 final class SettingViewController: BaseViewController<SettingView> {
     weak var coordinator: SettingCoordinator?
     
+    override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
+        return .standard(
+            viewController: self,
+            rightButton: .init(
+                isEnabled: true,
+                target: self,
+                action: #selector(dummyFunc)
+            )
+        )
+    }
+    
+    override var bkNavigationTitle: String {
+        return "설정"
+    }
+    
     private var cancellable = Set<AnyCancellable>()
     let viewModel: AnyViewBindableViewModel<SettingViewModel.State, SettingViewModel.Action>
     
     init(viewModel: SettingViewModel) {
         self.viewModel = AnyViewBindableViewModel(viewModel)
         super.init()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        title = "설정"
     }
     
     override func bindAction() {
@@ -41,7 +52,7 @@ final class SettingViewController: BaseViewController<SettingView> {
     override func bindState() {
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
-            .map { ( first: $0.firstMenuItems, second: $0.secondMenuItems )}
+            .map {( first: $0.firstMenuItems, second: $0.secondMenuItems )}
             .sink { menus in
                 self.contentView.apply(
                     firstMenus: menus.first,
@@ -59,4 +70,6 @@ final class SettingViewController: BaseViewController<SettingView> {
             }
             .store(in: &cancellable)
     }
+    
+    @objc func dummyFunc() {}
 }

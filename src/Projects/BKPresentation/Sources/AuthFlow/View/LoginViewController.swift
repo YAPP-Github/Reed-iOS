@@ -9,6 +9,19 @@ final class LoginViewController: BaseViewController<LoginView> {
     var cancellable: Set<AnyCancellable> = []
     let viewModel: AnyViewBindableViewModel<LoginViewModel.State, LoginViewModel.Action>
     
+    override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
+        .main(
+            viewController: self,
+            target: self,
+            searchAction: #selector(dummyFunc),
+            gearAction: #selector(dummyFunc)
+        )
+    }
+    
+    override var bkNavigationTitle: String {
+        return "로그인"
+    }
+    
     init(viewModel: LoginViewModel) {
         self.viewModel = AnyViewBindableViewModel(viewModel)
         super.init()
@@ -57,4 +70,6 @@ final class LoginViewController: BaseViewController<LoginView> {
             }
             .store(in: &cancellable)
     }
+    
+    @objc func dummyFunc() {}
 }
