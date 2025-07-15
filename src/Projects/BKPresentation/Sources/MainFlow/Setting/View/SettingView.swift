@@ -121,6 +121,13 @@ extension SettingView: UICollectionViewDelegate {
             return true
         }
     }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        shouldHighlightItemAt indexPath: IndexPath
+    ) -> Bool {
+        return false
+    }
 }
 
 extension SettingView: UICollectionViewDataSource {
