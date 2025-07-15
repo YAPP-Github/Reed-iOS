@@ -127,8 +127,8 @@ public class BKButton: UIButton, BKButtonProtocol {
     
     private func setupCustomViews() {
         addSubview(customContainerView)
-        customContainerView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        customContainerView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
         
         customContainerView.isUserInteractionEnabled = false
