@@ -5,7 +5,7 @@ import UIKit
 
 final class HomeViewController: UIViewController, BKNavigationBarStylable {
     weak var coordinator: MainFlowCoordinator?    
-    var bkNavigationTitle: String = "설정"
+    var bkNavigationTitle: String = "홈"
     var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
         .main(
             viewController: self,

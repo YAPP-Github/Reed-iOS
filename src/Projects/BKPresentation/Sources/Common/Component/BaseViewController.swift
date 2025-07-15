@@ -46,9 +46,7 @@ class BaseViewController<T: BaseView>: UIViewController, BKNavigationBarStylable
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if let _ = self as? BKNavigationBarStylable {
-            navigationController?.applyStyleIfNeeded(for: self)
-        }
+        navigationController?.applyStyleIfNeeded(for: self)
     }
     
     // MARK: - Common Methods
