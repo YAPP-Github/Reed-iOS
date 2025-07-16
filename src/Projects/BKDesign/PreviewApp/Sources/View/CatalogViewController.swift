@@ -23,15 +23,21 @@ final class CatalogViewController: UIViewController {
         return button
     }()
     
-    private let bottomSheetButton: UIButton = {
+    private let bottomSheetTitleButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("BottomSheetTitleViewController", for: .normal)
         return button
     }()
     
-    private let showBottomSheetButton: UIButton = {
+    private let bottomSheetButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("BottomSheetTestMenuViewController", for: .normal)
+        return button
+    }()
+    
+    private let dialogButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("BKDialogTestViewController", for: .normal)
         return button
     }()
     
@@ -48,8 +54,9 @@ final class CatalogViewController: UIViewController {
             inputCatalogButton,
             buttonTestButton,
             buttonGroupDemoButton,
+            bottomSheetTitleButton,
             bottomSheetButton,
-            showBottomSheetButton
+            dialogButton
         ])
         stack.axis = .vertical
         stack.spacing = 16
@@ -67,11 +74,11 @@ final class CatalogViewController: UIViewController {
         inputCatalogButton.addTarget(self, action: #selector(openInputCatalog), for: .touchUpInside)
         buttonTestButton.addTarget(self, action: #selector(openButtonTest), for: .touchUpInside)
         buttonGroupDemoButton.addTarget(self, action: #selector(openButtonGroupDemo), for: .touchUpInside)
-        bottomSheetButton.addTarget(self, action: #selector(openBottomSheetTitle), for: .touchUpInside)
-        showBottomSheetButton.addTarget(self, action: #selector(presentExampleBottomSheet), for: .touchUpInside)
+        bottomSheetTitleButton.addTarget(self, action: #selector(openBottomSheetTitle), for: .touchUpInside)
+        bottomSheetButton.addTarget(self, action: #selector(openBottomSheetTest), for: .touchUpInside)
+        dialogButton.addTarget(self, action: #selector(openDialogTest), for: .touchUpInside)
     }
 
-    
     @objc private func openBottomSheetTitle() {
         let vc = BKBottomSheetTitleViewController()
         navigationController?.pushViewController(vc, animated: true)
@@ -92,8 +99,13 @@ final class CatalogViewController: UIViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
     
-    @objc private func presentExampleBottomSheet() {
+    @objc private func openBottomSheetTest() {
         let vc = BKBottomSheetTestMenuViewController()
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc private func openDialogTest() {
+        let vc = BKDialogTestViewController()
         navigationController?.pushViewController(vc, animated: true)
     }
 }
