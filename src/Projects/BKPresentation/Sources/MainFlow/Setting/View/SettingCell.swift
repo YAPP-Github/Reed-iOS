@@ -32,7 +32,7 @@ final class SettingCell: UICollectionViewListCell {
         
         titleLabel.snp.makeConstraints {
             $0.leading.equalToSuperview()
-                .inset(BKInset.inset20)
+                .inset(BKInset.inset5)
             $0.centerY.equalToSuperview()
         }
 
