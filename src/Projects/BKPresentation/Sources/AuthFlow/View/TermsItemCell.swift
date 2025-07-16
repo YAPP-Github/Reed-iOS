@@ -7,6 +7,13 @@ import UIKit
 final class TermsItemCell: UICollectionViewListCell {
     static let identifier: String = "TermsItemCell"
     
+    // MARK: - Layout Metrics
+    enum LayoutGuide {
+        static let iconSize: CGFloat = 24
+        static let checkBoxInteractionSize: CGFloat = 44
+        static let horizontalPadding: CGFloat = BKSpacing.spacing1
+    }
+    
     // MARK: - UI Components
     private let checkBoxInteractionView = UIView()
     private let checkBox = BKCheckBox(frame: .zero, type: .roundStroke)
@@ -24,6 +31,14 @@ final class TermsItemCell: UICollectionViewListCell {
     // MARK: - Inits
     override init(frame: CGRect) {
         super.init(frame: frame)
+        setupView()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupView() {
         checkBoxInteractionView.addSubview(checkBox)
         
         checkBox.snp.makeConstraints {
@@ -50,15 +65,13 @@ final class TermsItemCell: UICollectionViewListCell {
         }
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    public func configure(
+        _ title: String,
+        showMore: Bool
+    ) {
+        titleLabel.setText(text: title)
+        chevronIconView.isHidden = !showMore
     }
-    
-    
-    enum LayoutGuide {
-        static let iconSize: CGFloat = 24
-        static let checkBoxInteractionSize: CGFloat = 44
-        static let horizontalPadding: CGFloat = BKSpacing.spacing1
-    }
+
 }
 
