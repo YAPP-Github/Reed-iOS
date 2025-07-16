@@ -38,6 +38,14 @@ final class TermsItemCell: UICollectionViewListCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func preferredLayoutAttributesFitting(
+        _ layoutAttributes: UICollectionViewLayoutAttributes
+    ) -> UICollectionViewLayoutAttributes {
+        let attrs = super.preferredLayoutAttributesFitting(layoutAttributes)
+        attrs.frame.size.height = BKLayoutSize.Height.termsCell
+        return attrs
+    }
+    
     private func setupView() {
         checkBoxInteractionView.addSubview(checkBox)
         

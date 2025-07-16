@@ -12,5 +12,6 @@ enum BKLayoutSize {
     
     enum Height {
         static let cell: CGFloat = 56
+        static let termsCell: CGFloat = 44
     }
 }
