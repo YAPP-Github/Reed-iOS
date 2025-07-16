@@ -11,6 +11,7 @@ public enum BKSpacing {
     public static let spacing4: CGFloat = 16
     public static let spacing5: CGFloat = 20
     public static let spacing6: CGFloat = 24
+    public static let spacing7: CGFloat = 28
     public static let spacing8: CGFloat = 32
     public static let spacing10: CGFloat = 40
     public static let spacing12: CGFloat = 48
