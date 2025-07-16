@@ -90,6 +90,13 @@ public class BKBaseTextField: UITextField {
         endEditing(true)
         super.touchesBegan(touches, with: event)
     }
+    
+    private var onTextChanged: ((String) -> Void)?
+
+    public func setOnTextChanged(_ handler: @escaping (String) -> Void) {
+        self.onTextChanged = handler
+    }
+    
     public func setType(type: TextFieldType) {
         self.type = type
     }
@@ -101,8 +108,8 @@ extension BKBaseTextField: UITextFieldDelegate {
 }
 
 private extension BKBaseTextField {
-    func setup() {
     func configure() {
+        addTarget(self, action: #selector(textDidChange), for: .editingChanged)
         layer.cornerRadius = BKRadius.small
         layer.borderWidth = LayoutConstants.borderWidth
         layer.borderColor = type.borderColor.cgColor
@@ -161,11 +168,13 @@ private extension BKBaseTextField {
     @objc private func updateClearButtonVisibility() {
         clearButton.isHidden = (text?.isEmpty ?? true)
     }
+    
+    @objc func textDidChange() {
+        onTextChanged?(text ?? "")
+    }
+    
     enum LayoutConstants {
         static let height: CGFloat = 50
-        static let horizontalInset: CGFloat = 16
-        static let verticalInset: CGFloat = 13
-        static let borderWidth: CGFloat = 1
         static let clearButtonSize: CGFloat = 22
         static let horizontalInset = BKInset.inset4
         static let verticalInset = BKInset.inset3_2
