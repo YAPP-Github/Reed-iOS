@@ -132,7 +132,7 @@ final class BKInputCatalogView: BaseView {
 
         stackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
-                .inset(BKInset.inset20)
+                .inset(BKInset.inset5)
         }
     }
 }
