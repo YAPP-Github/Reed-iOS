@@ -16,19 +16,19 @@ public final class BKLabel: UILabel {
     private var labelColor: UIColor
     private var alignment: NSTextAlignment
     
-    @available(*, unavailable, message: "Use `apply(_:)` instead.")
+    @available(*, unavailable, message: "Use `setText(_:)` instead.")
     override public var text: String? {
         get { super.text }
         set { super.text = newValue }
     }
     
-    @available(*, unavailable, message: "Use `apply(_:)` instead.")
+    @available(*, unavailable, message: "Use `setColor(_:)` instead.")
     override public var textColor: UIColor! {
         get { super.textColor }
         set { super.textColor = newValue }
     }
 
-    @available(*, unavailable, message: "Use `apply(_:)` instead.")
+    @available(*, unavailable, message: "Implement `setFont(_:)` instead.")
     override public var font: UIFont! {
         get { super.font }
         set { super.font = newValue }
