@@ -38,11 +38,17 @@ final class TermsView: BaseView {
         alignment: .left
     )
     
+    private lazy var collectionView = UICollectionView()
+    
     override func setupView() {
         titleLabel.numberOfLines = 2
         
         setupAgreeAllAreaView()
-        addSubviews(titleLabel, agreeAllAreaView)
+        addSubviews(titleLabel, agreeAllAreaView, collectionView)
+    }
+    
+    override func configure() {
+
     }
     
     override func setupLayout() {
@@ -66,6 +72,10 @@ final class TermsView: BaseView {
             $0.top.equalTo(titleLabel.snp.bottom).offset(LayoutGuide.agreeAreaTopInset)
             $0.leading.trailing.equalToSuperview().inset(LayoutGuide.verticalPadding)
             $0.height.equalTo(LayoutGuide.agreeAreaHeight)
+        }
+        
+        collectionView.snp.makeConstraints {
+            $0.top.equalTo(agreeAllAreaView.snp.bottom).offset(LayoutGuide.verticalPadding)
         }
         
     }
