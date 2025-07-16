@@ -68,14 +68,29 @@ private extension BKSearchTextField {
                 .inset(BKInset.inset4)
             $0.centerY.equalToSuperview()
         }
+        
+        clearButton.snp.remakeConstraints {
+            $0.height.width.equalTo(LayoutConstants.clearButtonSize)
+            $0.top.leading.bottom.equalToSuperview()
+            $0.trailing.equalToSuperview()
+                .inset(LayoutConstants.clearButtonHorizontalInset)
+        }
     }
     
     func textInsets() -> UIEdgeInsets {
         return UIEdgeInsets(
-            top: BKInset.inset2,
-            left: BKInset.inset4,
-            bottom: BKInset.inset2,
-            right: BKInset.inset11
+            top: LayoutConstants.verticalInset,
+            left: LayoutConstants.horizontalInset,
+            bottom: LayoutConstants.verticalInset,
+            right: LayoutConstants.textRightInset
         )
+    }
+    
+    enum LayoutConstants {
+        static let clearButtonSize: CGFloat = 24
+        static let clearButtonHorizontalInset: CGFloat = 48
+        static let verticalInset = BKInset.inset3_2
+        static let horizontalInset = BKInset.inset4
+        static let textRightInset: CGFloat = 78
     }
 }

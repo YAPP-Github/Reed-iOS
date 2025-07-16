@@ -31,6 +31,12 @@ public class BKBaseTextField: UITextField {
     
     private let textFont = BKTextStyle.body2(weight: .medium).uiFont
     private let placeholderFont = BKTextStyle.body2(weight: .regular).uiFont
+    let clearButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(BKImage.Icon.xCircle, for: .normal)
+        button.tintColor = .bkContentColor(.tertiary)
+        return button
+    }()
     
     public init(
         frame: CGRect = .zero,
@@ -40,7 +46,7 @@ public class BKBaseTextField: UITextField {
         self.type = type
         super.init(frame: frame)
         self.placeholder = placeholder
-        setup()
+        configure()
     }
     
     required init?(coder: NSCoder) {
@@ -53,7 +59,7 @@ public class BKBaseTextField: UITextField {
                 top: LayoutConstants.verticalInset,
                 left: LayoutConstants.horizontalInset,
                 bottom: LayoutConstants.verticalInset,
-                right: LayoutConstants.horizontalInset
+                right: LayoutConstants.textRightInset
             )
         )
     }
@@ -64,7 +70,7 @@ public class BKBaseTextField: UITextField {
                 top: LayoutConstants.verticalInset,
                 left: LayoutConstants.horizontalInset,
                 bottom: LayoutConstants.verticalInset,
-                right: LayoutConstants.horizontalInset
+                right: LayoutConstants.textRightInset
             )
         )
     }
@@ -75,11 +81,15 @@ public class BKBaseTextField: UITextField {
                 top: LayoutConstants.verticalInset,
                 left: LayoutConstants.horizontalInset,
                 bottom: LayoutConstants.verticalInset,
-                right: LayoutConstants.horizontalInset
+                right: LayoutConstants.textRightInset
             )
         )
     }
     
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        endEditing(true)
+        super.touchesBegan(touches, with: event)
+    }
     public func setType(type: TextFieldType) {
         self.type = type
     }
@@ -92,6 +102,7 @@ extension BKBaseTextField: UITextFieldDelegate {
 
 private extension BKBaseTextField {
     func setup() {
+    func configure() {
         layer.cornerRadius = BKRadius.small
         layer.borderWidth = LayoutConstants.borderWidth
         layer.borderColor = type.borderColor.cgColor
@@ -99,7 +110,24 @@ private extension BKBaseTextField {
         font = BKTextStyle.body2(weight: .medium).uiFont
         textColor = .bkContentColor(.primary)
         textAlignment = .natural
+        applyClearButtonStyle()
         applyPlaceholderStyle()
+    }
+    
+    func applyClearButtonStyle() {
+        let containerView = UIView()
+        containerView.addSubview(clearButton)
+        addTarget(self, action: #selector(updateClearButtonVisibility), for: .editingChanged)
+        clearButton.addTarget(self, action: #selector(clearButtonTapped), for: .touchUpInside)
+        rightView = containerView
+        rightViewMode = .whileEditing
+        
+        clearButton.snp.makeConstraints {
+            $0.height.width.equalTo(LayoutConstants.clearButtonSize)
+            $0.top.leading.bottom.equalToSuperview()
+            $0.trailing.equalToSuperview()
+                .inset(LayoutConstants.horizontalInset)
+        }
     }
     
     func applyPlaceholderStyle() {
@@ -126,11 +154,23 @@ private extension BKBaseTextField {
             )
     }
     
+    @objc private func clearButtonTapped() {
+        text = ""
+    }
+    
+    @objc private func updateClearButtonVisibility() {
+        clearButton.isHidden = (text?.isEmpty ?? true)
+    }
     enum LayoutConstants {
         static let height: CGFloat = 50
         static let horizontalInset: CGFloat = 16
         static let verticalInset: CGFloat = 13
         static let borderWidth: CGFloat = 1
+        static let clearButtonSize: CGFloat = 22
+        static let horizontalInset = BKInset.inset4
+        static let verticalInset = BKInset.inset3_2
+        static let borderWidth = BKBorder.border1
+        static let textRightInset: CGFloat = 46
     }
 }
 
