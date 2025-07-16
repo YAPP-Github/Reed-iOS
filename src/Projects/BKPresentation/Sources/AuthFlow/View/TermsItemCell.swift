@@ -9,7 +9,7 @@ final class TermsItemCell: UICollectionViewListCell {
     
     // MARK: - UI Components
     private let checkBoxInteractionView = UIView()
-    private let checkBox = BKCheckBox()
+    private let checkBox = BKCheckBox(frame: .zero, type: .roundStroke)
     
     private let titleLabel = BKLabel(fontStyle: .body1(weight: .medium))
     
@@ -28,7 +28,7 @@ final class TermsItemCell: UICollectionViewListCell {
         
         checkBox.snp.makeConstraints {
             $0.center.equalToSuperview()
-            $0.width.height.equalTo(LayoutGuide.checkBoxSize)
+            $0.width.height.equalTo(LayoutGuide.iconSize)
         }
         
         addSubviews(checkBoxInteractionView, titleLabel, chevronIconView)
@@ -40,9 +40,14 @@ final class TermsItemCell: UICollectionViewListCell {
         
         titleLabel.snp.makeConstraints {
             $0.leading.equalTo(checkBoxInteractionView.snp.trailing).offset(LayoutGuide.horizontalPadding)
-            
+            $0.centerY.equalToSuperview()
         }
         
+        chevronIconView.snp.makeConstraints {
+            $0.width.height.equalTo(LayoutGuide.iconSize)
+            $0.trailing.equalToSuperview()
+            $0.centerY.equalToSuperview()
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -50,8 +55,8 @@ final class TermsItemCell: UICollectionViewListCell {
     }
     
     
-    struct LayoutGuide {
-        static let checkBoxSize: CGFloat = 24
+    enum LayoutGuide {
+        static let iconSize: CGFloat = 24
         static let checkBoxInteractionSize: CGFloat = 44
         static let horizontalPadding: CGFloat = BKSpacing.spacing1
     }
