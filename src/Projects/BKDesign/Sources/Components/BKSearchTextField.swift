@@ -41,6 +41,7 @@ public final class BKSearchTextField: BKBaseTextField {
             type: type
         )
         setup()
+        configure()
         layout()
     }
     
@@ -55,11 +56,20 @@ public final class BKSearchTextField: BKBaseTextField {
     ) {
         searchButton.addTarget(target, action: action, for: controlEvents)
     }
+    
+    override func typeDidChanged() {
+        layer.borderColor = textFieldType.borderColor.cgColor
+        searchButton.configuration?.baseForegroundColor = textFieldType.searchButtonColor
+    }
 }
 
 private extension BKSearchTextField {
     func setup() {
         addSubview(searchButton)
+    }
+    
+    func configure() {
+        searchButton.configuration?.baseForegroundColor = textFieldType.searchButtonColor
     }
     
     func layout() {

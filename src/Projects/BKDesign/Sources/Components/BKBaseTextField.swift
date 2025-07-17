@@ -23,9 +23,9 @@ public class BKBaseTextField: UITextField {
         }
     }
     
-    private var type: TextFieldType {
+    var textFieldType: TextFieldType {
         didSet {
-            layer.borderColor = type.borderColor.cgColor
+            typeDidChanged()
         }
     }
     
@@ -38,12 +38,14 @@ public class BKBaseTextField: UITextField {
         return button
     }()
     
+    private var onTextChanged: ((String) -> Void)?
+    
     public init(
         frame: CGRect = .zero,
         placeholder: String = "",
         type: TextFieldType = .normal
     ) {
-        self.type = type
+        self.textFieldType = type
         super.init(frame: frame)
         self.placeholder = placeholder
         configure()
@@ -90,15 +92,17 @@ public class BKBaseTextField: UITextField {
         endEditing(true)
         super.touchesBegan(touches, with: event)
     }
-    
-    private var onTextChanged: ((String) -> Void)?
 
     public func setOnTextChanged(_ handler: @escaping (String) -> Void) {
         self.onTextChanged = handler
     }
     
     public func setType(type: TextFieldType) {
-        self.type = type
+        self.textFieldType = type
+    }
+    
+    func typeDidChanged() {
+        layer.borderColor = textFieldType.borderColor.cgColor
     }
 }
 
@@ -112,7 +116,7 @@ private extension BKBaseTextField {
         addTarget(self, action: #selector(textDidChange), for: .editingChanged)
         layer.cornerRadius = BKRadius.small
         layer.borderWidth = LayoutConstants.borderWidth
-        layer.borderColor = type.borderColor.cgColor
+        layer.borderColor = textFieldType.borderColor.cgColor
         backgroundColor = .bkBackgroundColor(.secondary)
         font = BKTextStyle.body2(weight: .medium).uiFont
         textColor = .bkContentColor(.primary)
@@ -163,6 +167,7 @@ private extension BKBaseTextField {
     
     @objc private func clearButtonTapped() {
         text = ""
+        clearButton.isHidden = true
     }
     
     @objc private func updateClearButtonVisibility() {
@@ -192,6 +197,17 @@ extension BKBaseTextField.TextFieldType {
             return .bkBorderColor(.brand)
         case .error:
             return .bkBorderColor(.error)
+        }
+    }
+    
+    var searchButtonColor: UIColor {
+        switch self {
+        case .normal:
+            return .bkContentColor(.primary)
+        case .brand:
+            return .bkContentColor(.brand)
+        case .error:
+            return .bkContentColor(.primary)
         }
     }
 }
