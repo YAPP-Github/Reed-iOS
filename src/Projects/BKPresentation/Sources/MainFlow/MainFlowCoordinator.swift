@@ -32,4 +32,13 @@ extension MainFlowCoordinator {
         childCoordinators.append(settingCoordinator)
         settingCoordinator.start()
     }
+    
+    func didTapSearchButton() {
+        let searchCoordinator = SearchCoordinator(
+            parentCoordinator: self,
+            navigationController: navigationController
+        )
+        childCoordinators.append(searchCoordinator)
+        searchCoordinator.start()
+    }
 }
