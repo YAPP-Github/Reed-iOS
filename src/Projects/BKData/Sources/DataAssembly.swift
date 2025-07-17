@@ -55,6 +55,13 @@ public struct DataAssembly: Assembly {
         }
         
         container.register(
+            type: RecentSearchRepository.self
+        ) { _ in
+            @Autowired(name: "UserDefaults") var storage: KeyValueStorage
+            return DefaultRecentSearchRepository(storage: storage)
+        }
+        
+        container.register(
             type: RefreshHandler.self
         ) { _ in
             @Autowired var repository: DefaultAuthRepository
