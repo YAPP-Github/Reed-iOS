@@ -9,16 +9,24 @@ public struct StorageAssembly: Assembly {
     
     public func assemble(container: DIContainer) {
         container.register(
-            type: KeyValueStorage.self
+            type: KeyValueStorage.self,
+            name: "Keychain"
         ) { _ in
             return KeychainKeyValueStorage()
+        }
+        
+        container.register(
+            type: KeyValueStorage.self,
+            name: "UserDefaults"
+        ) { _ in
+            return UserDefaultsStorage()
         }
         
         container.register(
             type: TokenProvider.self,
             scope: .singleton
         ) { _ in
-            @Autowired var keyValueStorage: KeyValueStorage
+            @Autowired(name: "Keychain") var keyValueStorage: KeyValueStorage
             return KeychainTokenProvider(
                 storage: keyValueStorage
             )
@@ -27,7 +35,7 @@ public struct StorageAssembly: Assembly {
         container.register(
             type: TokenStore.self
         ) { _ in
-            @Autowired var keyValueStorage: KeyValueStorage
+            @Autowired(name: "Keychain") var keyValueStorage: KeyValueStorage
             return KeychainTokenStore(
                 storage: keyValueStorage
             )
