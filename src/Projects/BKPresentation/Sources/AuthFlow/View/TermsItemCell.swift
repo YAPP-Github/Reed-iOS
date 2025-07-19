@@ -73,12 +73,12 @@ final class TermsItemCell: UICollectionViewListCell {
         }
     }
     
-    public func configure(
-        _ title: String,
-        showMore: Bool
-    ) {
-        titleLabel.setText(text: title)
-        chevronIconView.isHidden = !showMore
+    public func configure(_ vo: TermsViewObject) {
+        titleLabel.setText(text: vo.title)
+        
+        if vo.URL != nil {
+            chevronIconView.isHidden = false
+        }
     }
 
 }
