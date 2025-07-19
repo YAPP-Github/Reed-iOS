@@ -38,17 +38,36 @@ final class TermsView: BaseView {
         alignment: .left
     )
     
-    private lazy var collectionView = UICollectionView()
+    private lazy var collectionView: UICollectionView = {
+        let layout = createListLayout()
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
+        collectionView.showsVerticalScrollIndicator = false
+        
+        collectionView.contentInset.left = BKSpacing.spacing2
+        collectionView.contentInset.right = BKSpacing.spacing3
+        
+        return collectionView
+    }()
+    
+    // MARK: - ViewModel로 이전 예정(뷰만 먼저 봄)
+    private var terms: [TermsViewObject] = []
     
     override func setupView() {
         titleLabel.numberOfLines = 2
         
         setupAgreeAllAreaView()
         addSubviews(titleLabel, agreeAllAreaView, collectionView)
+        
+        collectionView.dataSource = self
+        collectionView
+            .register(TermsItemCell.self, forCellWithReuseIdentifier: TermsItemCell.identifier)
     }
     
     override func configure() {
-
+        configure(terms: [
+            TermsViewObject(title: "", URL: <#T##URL?#>)
+        ])
     }
     
     override func setupLayout() {
@@ -76,6 +95,7 @@ final class TermsView: BaseView {
         
         collectionView.snp.makeConstraints {
             $0.top.equalTo(agreeAllAreaView.snp.bottom).offset(LayoutGuide.verticalPadding)
+            $0.leading.trailing.equalToSuperview().inset(LayoutGuide.verticalPadding)
         }
         
     }
@@ -89,6 +109,43 @@ final class TermsView: BaseView {
         agreeAllAreaView.layer.cornerRadius = BKRadius.small
         
         agreeAllAreaView.addSubviews(checkOnceBox, agreeAllLabel)
+    }
+    
+    public func configure(terms: [TermsViewObject]) {
+        self.terms = terms
+        
+        collectionView.reloadData()
+    }
+    
+}
+
+private extension TermsView {
+    private func createListLayout() -> UICollectionViewCompositionalLayout {
+        let configuration = UICollectionLayoutListConfiguration(appearance: .plain)
+        var config = configuration
+        config.showsSeparators = false
+        config.backgroundColor = .clear
+
+        let layout = UICollectionViewCompositionalLayout.list(using: config)
+
+        layout.configuration.interSectionSpacing = BKSpacing.spacing3
+        return layout
+    }
+}
+
+extension TermsView: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return terms.count
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TermsItemCell.identifier, for: indexPath) as? TermsItemCell else {
+            return UICollectionViewCell()
+        }
+        
+        cell.configure(terms[indexPath.item])
+        
+        return cell
     }
     
 }
