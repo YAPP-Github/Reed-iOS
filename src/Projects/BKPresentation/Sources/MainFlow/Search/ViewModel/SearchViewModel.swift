@@ -3,43 +3,55 @@
 import BKCore
 import BKDomain
 import Combine
-import UIKit.UIImage
+import Foundation
 
 enum SearchItem: Hashable {
     case keyword(String)
-    case result(SearchResult)
-}
-
-struct SearchResult: Hashable {
-    let thumbnail: UIImage
-    let title: String
-    let description: String
+    case result(Book)
 }
 
 final class SearchViewModel: BaseViewModel {
+    enum SearchState: Equatable {
+        case recent([String])
+        case result([Book])
+    }
+    
     struct State: Equatable {
         var searchState: SearchState = .recent([])
-        
-        enum SearchState: Equatable {
-            case recent([String])
-            case result([SearchResult])
-        }
+        var isLoading = false
+        var hasMoreData = true
+        var totalResults = 0
     }
     
     enum Action {
         case onAppear
+        case search(String)
+        case loadNextPage
+        case deleteRecentQuery(String)
         case fetchRecentQueriesSuccessed([String])
+        case fetchSearchResultSuccessed((books: [Book], totalResults: Int))
+        case fetchNextPageSuccessed([Book])
     }
     
     enum SideEffect {
         case recentQueries
+        case deleteRecentQuery(String)
+        case searchResult(String)
+        case loadNextPage
     }
     
     @Published private var state = State()
     private var cancellables = Set<AnyCancellable>()
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
+    private let pageSize = 10
+    private var allBooks: [Book] = []
+    private var currentQuery: String?
+    private var currentPage = 1
     
     @Autowired var fetchRecentSearchUseCase: FetchRecentSearchUseCase
+    @Autowired var storeRecentSearchUseCase: StoreRecentSearchUseCase
+    @Autowired var deleteRecentSearchUseCase: DeleteRecentSearchUseCase
+    @Autowired var searchBookUseCase: SearchBookUseCase
     
     var statePublisher: AnyPublisher<State, Never> {
         $state.eraseToAnyPublisher()
@@ -62,8 +74,42 @@ final class SearchViewModel: BaseViewModel {
         switch action {
         case .onAppear:
             effects.append(.recentQueries)
+            
+        case .search(let query):
+            currentQuery = query
+            currentPage = 1
+            allBooks = []
+            newState.isLoading = true
+            effects.append(.searchResult(query))
+            
         case .fetchRecentQueriesSuccessed(let queries):
             newState.searchState = .recent(queries)
+            
+        case .fetchSearchResultSuccessed(let result):
+            allBooks = result.books
+            newState.totalResults = result.totalResults
+            newState.isLoading = false
+            newState.searchState = .result(result.books)
+            newState.hasMoreData = allBooks.count < result.totalResults
+            
+        case .loadNextPage:
+            guard !state.isLoading, state.hasMoreData else { break }
+            newState.isLoading = true
+            currentPage += 1
+            effects.append(.loadNextPage)
+            
+        case .fetchNextPageSuccessed(let books):
+            let unique = books.filter { book in
+                !allBooks.contains { $0.isbn == book.isbn }
+            }
+            
+            allBooks += unique
+            newState.isLoading = false
+            newState.searchState = .result(allBooks)
+            newState.hasMoreData = allBooks.count < newState.totalResults
+            
+        case .deleteRecentQuery(let query):
+            effects.append(.deleteRecentQuery(query))
         }
         
         return (newState, effects)
@@ -72,9 +118,41 @@ final class SearchViewModel: BaseViewModel {
     func handle(_ effect: SideEffect) -> AnyPublisher<Action, Never> {
         switch effect {
         case .recentQueries:
-            fetchRecentSearchUseCase.execute()
+            return fetchRecentSearchUseCase.execute()
                 .map(Action.fetchRecentQueriesSuccessed)
                 .eraseToAnyPublisher()
+            
+        case .deleteRecentQuery(let query):
+            return deleteRecentSearchUseCase.execute(query: query)
+                .flatMap { _ in
+                    self.fetchRecentSearchUseCase.execute()
+                }
+                .map { Action.fetchRecentQueriesSuccessed($0) }
+                .eraseToAnyPublisher()
+            
+        case .searchResult(let query):
+            return Publishers.Zip(
+                searchBookUseCase.execute(
+                    query: query,
+                    startIndex: currentPage
+                ),
+                storeRecentSearchUseCase.execute(query: query)
+            )
+            .map { (result, _) in
+                Action.fetchSearchResultSuccessed(result)
+            }
+            .eraseToAnyPublisher()
+            
+        case .loadNextPage:
+            guard let query = currentQuery else {
+                return Empty().eraseToAnyPublisher()
+            }
+            return searchBookUseCase.execute(
+                query: query,
+                startIndex: currentPage
+            )
+            .map { Action.fetchNextPageSuccessed($0.books) }
+            .eraseToAnyPublisher()
         }
     }
     
@@ -87,4 +165,3 @@ final class SearchViewModel: BaseViewModel {
             .store(in: &cancellables)
     }
 }
-
