@@ -64,6 +64,13 @@ public struct DataAssembly: Assembly {
         }
         
         container.register(
+            type: BookRepository.self
+        ) { _ in
+            @Autowired(name: "OAuth") var networkProvider: NetworkProvider
+            return DefaultBookRepository(networkProvider: networkProvider)
+        }
+        
+        container.register(
             type: RefreshHandler.self
         ) { _ in
             @Autowired var repository: DefaultAuthRepository
