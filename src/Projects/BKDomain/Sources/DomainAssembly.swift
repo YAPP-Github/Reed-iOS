@@ -68,6 +68,13 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(
+            type: SearchBookUseCase.self
+        ) { _ in
+            @Autowired var repository: BookRepository
+            return DefaultSearchBookUseCase(repository: repository)
+        }
+        
+        container.register(
             type: StoreRecentSearchUseCase.self
         ) { _ in
             @Autowired var repository: RecentSearchRepository
