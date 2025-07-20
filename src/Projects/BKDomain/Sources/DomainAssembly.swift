@@ -66,5 +66,19 @@ public struct DomainAssembly: Assembly {
             @Autowired var repository: RecentSearchRepository
             return DefaultFetchRecentSearchUseCase(repository: repository)
         }
+        
+        container.register(
+            type: StoreRecentSearchUseCase.self
+        ) { _ in
+            @Autowired var repository: RecentSearchRepository
+            return DefaultStoreRecentSearchUseCase(repository: repository)
+        }
+        
+        container.register(
+            type: DeleteRecentSearchUseCase.self
+        ) { _ in
+            @Autowired var repository: RecentSearchRepository
+            return DefaultDeleteRecentSearchUseCase(repository: repository)
+        }
     }
 }
