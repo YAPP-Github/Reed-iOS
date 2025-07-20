@@ -12,27 +12,32 @@ final class RecentKeywordCell: UICollectionViewCell {
         alignment: .left
     )
     
-    private let clearButton: UIButton = {
+    private let deleteButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(BKImage.Icon.x, for: .normal)
         button.tintColor = .bkContentColor(.secondary)
         return button
     }()
     
+    var onQueryLabelTapped: (() -> Void)?
+    var onDeleteTapped: (() -> Void)?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        addSubviews(searchQueryLabel, clearButton)
+        addSubviews(searchQueryLabel, deleteButton)
         
         searchQueryLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
             $0.leading.equalToSuperview()
-                .inset(LayoutConstants.leadingInset)
+                .inset(LayoutConstants.labelLeadingInset)
+            $0.trailing.equalToSuperview()
+                .inset(LayoutConstants.labelTrailingInset)
         }
         
-        clearButton.snp.makeConstraints {
+        deleteButton.snp.makeConstraints {
             $0.centerY.equalToSuperview()
             $0.trailing.equalToSuperview()
-                .inset(LayoutConstants.trailingInset)
+                .inset(LayoutConstants.deleteButtonTrailingInset)
             $0.size.equalTo(
                 CGSize(
                     width: LayoutConstants.iconSize,
@@ -40,6 +45,11 @@ final class RecentKeywordCell: UICollectionViewCell {
                 )
             )
         }
+        
+        deleteButton.addTarget(self, action: #selector(didTapDeleteButton), for: .touchUpInside)
+        searchQueryLabel.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(didTapQueryLabel))
+        searchQueryLabel.addGestureRecognizer(tap)
     }
     
     required init?(coder: NSCoder) {
@@ -52,9 +62,18 @@ final class RecentKeywordCell: UICollectionViewCell {
 }
 
 private extension RecentKeywordCell {
+    @objc func didTapDeleteButton() {
+        onDeleteTapped?()
+    }
+    
+    @objc func didTapQueryLabel() {
+        onQueryLabelTapped?()
+    }
+    
     enum LayoutConstants {
-        static let leadingInset = BKInset.inset6
-        static let trailingInset = BKInset.inset5
-        static let iconSize = 18
+        static let labelLeadingInset = BKInset.inset6
+        static let labelTrailingInset: CGFloat = 50
+        static let deleteButtonTrailingInset = BKInset.inset5
+        static let iconSize: CGFloat = 18
     }
 }

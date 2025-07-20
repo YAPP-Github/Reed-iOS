@@ -5,6 +5,7 @@ import SnapKit
 import UIKit
 
 final class SearchSectionHeaderView: UIView {
+    private var heightConstraint: Constraint?
     private let titleLabel = BKLabel()
     
     enum SearchSectionHeaderType {
@@ -16,11 +17,15 @@ final class SearchSectionHeaderView: UIView {
         super.init(frame: frame)
         addSubview(titleLabel)
         
+        snp.makeConstraints {
+            heightConstraint = $0.height.equalTo(LayoutConstants.selfHeight).constraint
+        }
+        
         titleLabel.snp.makeConstraints {
             $0.leading.equalToSuperview()
-                .inset(LayoutConstants.leadingInset)
+                .inset(LayoutConstants.leadingInset).priority(.low)
             $0.top.bottom.equalToSuperview()
-                .inset(LayoutConstants.verticalInset)
+                .inset(LayoutConstants.verticalInset).priority(.low)
         }
         setTitle(.recent)
     }
@@ -32,19 +37,22 @@ final class SearchSectionHeaderView: UIView {
     func setTitle(_ type: SearchSectionHeaderType) {
         switch type {
         case .recent:
-            isHidden = false
+            titleLabel.isHidden = false
+            heightConstraint?.update(offset: LayoutConstants.selfHeight)
             titleLabel.setFontStyle(style: .body1(weight: .semiBold))
             titleLabel.setText(text: "최근 검색어")
         case .result(let count):
             // swiftlint:disable:next empty_count
-            isHidden = count == 0
-            // swiftlint:disable:next empty_count
             if count > 0 {
+                titleLabel.isHidden = false
                 titleLabel.setAttributedText(
                     with: makeResultString(
                         count: count
                     )
                 )
+            } else {
+                titleLabel.isHidden = true
+                heightConstraint?.update(offset: 0)
             }
         }
     }
@@ -79,5 +87,6 @@ private extension SearchSectionHeaderView {
     enum LayoutConstants {
         static let verticalInset: CGFloat = 8
         static let leadingInset: CGFloat = 20
+        static let selfHeight: CGFloat = 42
     }
 }
