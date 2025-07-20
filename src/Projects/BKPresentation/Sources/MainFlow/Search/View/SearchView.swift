@@ -1,11 +1,22 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import BKDomain
 import Combine
 import SnapKit
 import UIKit
 
 final class SearchView: BaseView {
+    enum CollectionLayoutMode {
+        case beforeSearch
+        case afterSearch
+    }
+    
+    enum SearchSection: Hashable {
+        case recent
+        case result
+    }
+    
     let eventPublisher = PassthroughSubject<SearchViewEvent, Never>()
     
     private let searchBar = BKSearchTextField(
@@ -24,13 +35,16 @@ final class SearchView: BaseView {
         return setupDataSource()
     }()
     
-    enum SearchSection: Hashable {
-        case recent
-        case result
-    }
+    private var layoutMode = CollectionLayoutMode.beforeSearch
     
     override func setupView() {
         addSubviews(searchBar, divider, header, collectionView)
+    }
+    
+    override func configure() {
+        searchBar.setOnReturn { [weak self] text in
+            self?.eventPublisher.send(.search(text))
+        }
     }
     
     override func setupLayout() {
@@ -60,10 +74,13 @@ final class SearchView: BaseView {
         }
     }
     
-    func applySnapshot(with state: SearchViewModel.State) {
+    func applySnapshot(
+        with state: SearchViewModel.SearchState,
+        count: Int = 0
+    ) {
         var snapshot = NSDiffableDataSourceSnapshot<SearchSection, SearchItem>()
         
-        switch state.searchState {
+        switch state {
         case .recent(let keywords):
             if keywords.isEmpty {
                 collectionView.backgroundView = makeEmptyLabel("최근 검색어 내역이 없습니다.")
@@ -79,12 +96,12 @@ final class SearchView: BaseView {
                 collectionView.backgroundView = makeEmptyLabel("검색어와 일치하는 도서가 없습니다.")
             } else {
                 collectionView.backgroundView = nil
-                header.setTitle(.result(count: results.count))
                 snapshot.appendSections([.result])
                 snapshot.appendItems(results.map { .result($0) }, toSection: .result)
             }
+            header.setTitle(.result(count: count))
+            layoutMode = .afterSearch
         }
-        
         dataSource.apply(snapshot, animatingDifferences: true)
     }
 }
@@ -92,6 +109,9 @@ final class SearchView: BaseView {
 private extension SearchView {
     func setupCollectionView() -> UICollectionView {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+        collectionView.backgroundColor = .bkBaseColor(.primary)
+        collectionView.delegate = self
+        collectionView.alwaysBounceVertical = false
         collectionView.register(RecentKeywordCell.self, forCellWithReuseIdentifier: RecentKeywordCell.identifier)
         collectionView.register(SearchResultCell.self, forCellWithReuseIdentifier: SearchResultCell.identifier)
         
@@ -104,33 +124,63 @@ private extension SearchView {
         ) { collectionView, indexPath, item in
             switch item {
             case .keyword(let keyword):
-                guard let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: RecentKeywordCell.identifier,
-                    for: indexPath
-                ) as? RecentKeywordCell else {
-                    return UICollectionViewCell()
-                }
-                cell.configure(labelText: keyword)
-                return cell
+                return self.makeRecentKeywordCell(in: collectionView, at: indexPath, keyword: keyword)
             case .result(let result):
-                guard let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: SearchResultCell.identifier,
-                    for: indexPath
-                ) as? SearchResultCell else {
-                    return UICollectionViewCell()
-                }
-                cell.configure(title: result.title, description: result.description, image: result.thumbnail)
-                return cell
+                return self.makeSearchResultCell(in: collectionView, at: indexPath, book: result)
             }
         }
         
         return dataSource
     }
+    
+    func makeRecentKeywordCell(
+        in collectionView: UICollectionView,
+        at indexPath: IndexPath,
+        keyword: String
+    ) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: RecentKeywordCell.identifier,
+            for: indexPath
+        ) as? RecentKeywordCell else {
+            return UICollectionViewCell()
+        }
+        cell.configure(labelText: keyword)
+        
+        cell.onDeleteTapped = { [weak self] in
+            self?.eventPublisher.send(.deleteRecentQuery(keyword))
+        }
+        cell.onQueryLabelTapped = { [weak self] in
+            self?.eventPublisher.send(.search(keyword))
+        }
+        
+        return cell
+    }
+    
+    func makeSearchResultCell(
+        in collectionView: UICollectionView,
+        at indexPath: IndexPath,
+        book: Book
+    ) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: SearchResultCell.identifier,
+            for: indexPath
+        ) as? SearchResultCell else {
+            return UICollectionViewCell()
+        }
+        cell.configure(
+            title: book.title,
+            description: .init(
+                author: book.author,
+                publisher: book.publisher
+            ),
+            image: book.thumbnail
+        )
+        return cell
+    }
 
     func createLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
         layout.minimumLineSpacing = .zero
         layout.sectionInset = .zero
         return layout
@@ -139,9 +189,50 @@ private extension SearchView {
     func makeEmptyLabel(_ text: String) -> UILabel {
         let label = UILabel()
         label.text = text
-        label.textColor = .secondaryLabel
+        label.textColor = .bkContentColor(.secondary)
+        label.backgroundColor = .bkBaseColor(.primary)
         label.textAlignment = .center
         return label
+    }
+    
+    @objc func searchButtonTapped() {
+        guard let text = searchBar.text, !text.isEmpty else { return }
+        eventPublisher.send(.search(text))
+    }
+}
+
+extension SearchView: UICollectionViewDelegateFlowLayout {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        switch layoutMode {
+        case .beforeSearch:
+            return CGSize(
+                width: collectionView.bounds.width,
+                height: LayoutConstants.recentItemHeight
+            )
+        case .afterSearch:
+            return CGSize(
+                width: collectionView.bounds.width,
+                height: LayoutConstants.resultItemHeight
+            )
+        }
+    }
+}
+
+extension SearchView: UICollectionViewDelegate {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        willDisplay cell: UICollectionViewCell,
+        forItemAt indexPath: IndexPath
+    ) {
+        let section = indexPath.section
+        let totalItems = collectionView.numberOfItems(inSection: section)
+        if indexPath.item == totalItems - 1 {
+            eventPublisher.send(.loadNextPage)
+        }
     }
 }
 
@@ -151,5 +242,7 @@ private extension SearchView {
         static let dividerOffset = BKInset.inset2
         static let horizontalInset = BKInset.inset5
         static let headerOffset = BKInset.inset1
+        static let recentItemHeight: CGFloat = 56
+        static let resultItemHeight: CGFloat = 132
     }
 }
