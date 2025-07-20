@@ -7,16 +7,19 @@ import Foundation
 
 /// NetworkProvider는 반드시 OAuthNetworkProvider로
 public struct DefaultAuthRepository: AuthRepository {
-    private let networkProvider: NetworkProvider
+    private let defaultProvider: NetworkProvider
+    private let oauthProvider: NetworkProvider
     private let tokenStore: TokenStore
     private let tokenProvider: TokenProvider
     
     public init(
-        networkProvider: NetworkProvider,
+        defaultProvider: NetworkProvider,
+        oauthProvider: NetworkProvider,
         tokenStore: TokenStore,
         tokenProvider: TokenProvider
     ) {
-        self.networkProvider = networkProvider
+        self.defaultProvider = defaultProvider
+        self.oauthProvider = oauthProvider
         self.tokenStore = tokenStore
         self.tokenProvider = tokenProvider
     }
@@ -25,7 +28,7 @@ public struct DefaultAuthRepository: AuthRepository {
         provider: AuthProvider,
         token: String
     ) -> AnyPublisher<Void, AuthError> {
-        return networkProvider.request(
+        return defaultProvider.request(
             target: AuthAPI.login(
                 provider: provider,
                 token: token
@@ -46,7 +49,7 @@ public struct DefaultAuthRepository: AuthRepository {
     }
     
     public func logout() -> AnyPublisher<Void, AuthError> {
-        return networkProvider.request(
+        return oauthProvider.request(
             target: AuthAPI.logout,
             type: EmptyResponse.self
         )
@@ -67,7 +70,7 @@ public struct DefaultAuthRepository: AuthRepository {
         token: String?
     ) -> AnyPublisher<Void, AuthError> {
         // TODO: - 현재 탈퇴 API가 없으므로 logout으로 대체
-        return networkProvider.request(
+        return oauthProvider.request(
             target: AuthAPI.logout,
             type: EmptyResponse.self
         )
@@ -84,7 +87,7 @@ public struct DefaultAuthRepository: AuthRepository {
 
 extension DefaultAuthRepository: RefreshHandler {
     public func refresh(token refreshToken: String) -> AnyPublisher<Void, AuthError> {
-        return networkProvider.request(
+        return defaultProvider.request(
             target: AuthAPI.refresh(
                 token: refreshToken
             ),

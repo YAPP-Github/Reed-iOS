@@ -6,6 +6,8 @@ import Foundation
 import UIKit
 
 final class LoginViewController: BaseViewController<LoginView> {
+    weak var coordinator: LoginCoordinator?
+    
     var cancellable: Set<AnyCancellable> = []
     let viewModel: AnyViewBindableViewModel<LoginViewModel.State, LoginViewModel.Action>
     
@@ -65,8 +67,9 @@ final class LoginViewController: BaseViewController<LoginView> {
             .map { $0.isLoggedIn }
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
-            .sink { isLoggedIn in
+            .sink { [weak self] isLoggedIn in
                 print("authentication status: \(isLoggedIn)")
+                self?.coordinator?.popAndFinish()
             }
             .store(in: &cancellable)
     }

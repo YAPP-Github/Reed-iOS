@@ -3,7 +3,7 @@
 import BKDomain
 import Foundation
 
-enum AuthAPI {
+public enum AuthAPI {
     case login(provider: AuthProvider, token: String)
     case logout
     case refresh(token: String)
@@ -11,11 +11,11 @@ enum AuthAPI {
 }
 
 extension AuthAPI: RequestTarget {
-    var baseURL: String {
+    public var baseURL: String {
         return "\(APIConfig.baseURL)/auth"
     }
     
-    var path: String {
+    public var path: String {
         switch self {
         case .login:
             return "/signin"
@@ -28,7 +28,7 @@ extension AuthAPI: RequestTarget {
         }
     }
     
-    var method: HTTPMethod {
+    public var method: HTTPMethod {
         switch self {
         case .login, .logout, .refresh:
             return .post
@@ -37,7 +37,7 @@ extension AuthAPI: RequestTarget {
         }
     }
     
-    var headers: [String: String] {
+    public var headers: [String: String] {
         switch self {
         case .login, .refresh:
             return [
@@ -48,7 +48,7 @@ extension AuthAPI: RequestTarget {
         }
     }
     
-    var body: (any Encodable)? {
+    public var body: (any Encodable)? {
         switch self {
         case .login(let provider, let token):
             return AuthLoginRequestDTO(
@@ -64,7 +64,7 @@ extension AuthAPI: RequestTarget {
         }
     }
     
-    var query: [String: Any] {
+    public var query: [String: Any] {
         switch self {
         case .login, .logout, .refresh, .me:
             return [:]

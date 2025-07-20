@@ -2,6 +2,6 @@
 
 import Foundation
 
-public struct RefreshRequestDTO: Encodable {
-    public var refreshToken: String
+struct RefreshRequestDTO: Encodable {
+    var refreshToken: String
 }
