@@ -16,7 +16,8 @@ let project = Project.project(
                 .core(),
                 .domain(),
                 .design(),
-                .external(dependency: .SnapKit)
+                .external(dependency: .SnapKit),
+                .external(dependency: .Kingfisher)
             ]
         ),
         Target.target(
