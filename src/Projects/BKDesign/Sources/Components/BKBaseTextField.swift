@@ -38,7 +38,7 @@ public class BKBaseTextField: UITextField {
         return button
     }()
     
-    private var onTextChanged: ((String) -> Void)?
+    var onReturn: ((String) -> Void)?
     
     public init(
         frame: CGRect = .zero,
@@ -93,8 +93,8 @@ public class BKBaseTextField: UITextField {
         super.touchesBegan(touches, with: event)
     }
 
-    public func setOnTextChanged(_ handler: @escaping (String) -> Void) {
-        self.onTextChanged = handler
+    public func setOnReturn(_ handler: @escaping (String) -> Void) {
+        self.onReturn = handler
     }
     
     public func setType(type: TextFieldType) {
@@ -106,14 +106,23 @@ public class BKBaseTextField: UITextField {
     }
 }
 
-/// 필요 시 추가
 extension BKBaseTextField: UITextFieldDelegate {
-    
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        resignFirstResponder()
+        guard let text, !text.isEmpty else {
+            setType(type: .error)
+            return false
+        }
+        setType(type: .brand)
+        onReturn?(text)
+        return true
+    }
 }
 
 private extension BKBaseTextField {
     func configure() {
-        addTarget(self, action: #selector(textDidChange), for: .editingChanged)
+        delegate = self
+        returnKeyType = .done
         layer.cornerRadius = BKRadius.small
         layer.borderWidth = LayoutConstants.borderWidth
         layer.borderColor = textFieldType.borderColor.cgColor
@@ -172,10 +181,6 @@ private extension BKBaseTextField {
     
     @objc private func updateClearButtonVisibility() {
         clearButton.isHidden = (text?.isEmpty ?? true)
-    }
-    
-    @objc func textDidChange() {
-        onTextChanged?(text ?? "")
     }
     
     enum LayoutConstants {
