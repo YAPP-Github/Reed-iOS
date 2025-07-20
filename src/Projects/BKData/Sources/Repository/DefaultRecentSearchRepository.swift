@@ -22,6 +22,12 @@ public final class DefaultRecentSearchRepository: RecentSearchRepository {
         list = Array(list.prefix(maxCount))
         try? storage.save(list, for: key)
     }
+    
+    public func delete(query: String) {
+        var list = load()
+        list.removeAll { $0 == query }
+        try? storage.save(list, for: key)
+    }
 
     public func clear() {
         try? storage.delete(for: key)
