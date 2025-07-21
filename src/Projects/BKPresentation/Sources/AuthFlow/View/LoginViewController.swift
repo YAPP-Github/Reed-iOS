@@ -55,21 +55,13 @@ final class LoginViewController: BaseViewController<LoginView> {
             .store(in: &cancellable)
         
         viewModel.statePublisher
-            .map { $0.latestProvider }
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { provider in
-                print("latestProvider: \(String(describing: provider))")
-            }
-            .store(in: &cancellable)
-        
-        viewModel.statePublisher
             .map { $0.isLoggedIn }
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isLoggedIn in
-                print("authentication status: \(isLoggedIn)")
-                self?.coordinator?.popAndFinish()
+                if isLoggedIn {
+                    self?.coordinator?.popAndFinish()
+                }
             }
             .store(in: &cancellable)
     }
