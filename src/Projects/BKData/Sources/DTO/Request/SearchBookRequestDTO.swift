@@ -13,6 +13,6 @@ struct SearchBookRequestDTO: DictionaryRepresentable {
     let categoryId: Int?
     
     var dictionary: [String: Any] {
-        return self.toSnakeCaseDictionary()
+        return self.toDictionary()
     }
 }

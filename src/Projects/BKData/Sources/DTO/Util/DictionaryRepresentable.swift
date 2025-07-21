@@ -2,12 +2,10 @@
 
 import Foundation
 
-protocol DictionaryRepresentable {
-    var dictionary: [String: Any] { get }
-}
+protocol DictionaryRepresentable {}
 
 extension DictionaryRepresentable {
-    func toSnakeCaseDictionary() -> [String: Any] {
+    func toDictionary() -> [String: Any] {
         var dict = [String: Any]()
         let mirror = Mirror(reflecting: self)
         
@@ -32,23 +30,6 @@ extension DictionaryRepresentable {
             return mirror.children.first?.value
         }
         return value
-    }
-}
-
-// MARK: - String extension
-private extension String {
-    func toSnakeCase() -> String {
-        guard !isEmpty else { return self }
-        var result = ""
-        for char in self {
-            if char.isUppercase {
-                result.append("_")
-                result.append(char.lowercased())
-            } else {
-                result.append(char)
-            }
-        }
-        return result.trimmingCharacters(in: CharacterSet(charactersIn: "_"))
     }
 }
 
