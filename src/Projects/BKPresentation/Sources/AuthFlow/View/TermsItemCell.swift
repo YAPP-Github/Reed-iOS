@@ -16,7 +16,10 @@ final class TermsItemCell: UICollectionViewListCell {
     
     // MARK: - UI Components
     private let checkBoxInteractionView = UIView()
-    private let checkBox = BKCheckBox(frame: .zero, type: .roundStroke)
+    private let checkBox = BKCheckBox(
+        frame: .zero,
+        type: .roundStroke
+    )
     
     private let titleLabel = BKLabel(fontStyle: .body1(weight: .medium))
     
