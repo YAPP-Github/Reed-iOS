@@ -31,7 +31,10 @@ final class TermsView: BaseView {
     )
     
     private let agreeAllAreaView = UIView()
-    private let checkOnceBox = BKCheckBox(frame: .zero, type: .rectangle)
+    private let checkOnceBox = BKCheckBox(
+        frame: .zero,
+        type: .rectangle
+    )
     
     private let agreeAllLabel = BKLabel(
         fontStyle: .headline1(weight: .semiBold),
@@ -40,7 +43,10 @@ final class TermsView: BaseView {
     
     private lazy var collectionView: UICollectionView = {
         let layout = createListLayout()
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        let collectionView = UICollectionView(
+            frame: .zero,
+            collectionViewLayout: layout
+        )
         collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = false
         collectionView.allowsSelection = false
@@ -109,7 +115,7 @@ final class TermsView: BaseView {
         
         startButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(LayoutGuide.verticalPadding)
-            $0.bottom.equalToSuperview().inset(LayoutGuide.innerViewHPadding + 21)
+            $0.bottom.equalToSuperview().inset(LayoutGuide.innerViewHPadding + 21) // 디자인팀이랑 하단 여백 다시 의논하기
         }
     }
     
@@ -138,21 +144,30 @@ private extension TermsView {
         var config = configuration
         config.showsSeparators = false
         config.backgroundColor = .clear
-
+        
         let layout = UICollectionViewCompositionalLayout.list(using: config)
-
+        
         layout.configuration.interSectionSpacing = BKSpacing.spacing3
         return layout
     }
 }
 
 extension TermsView: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        numberOfItemsInSection section: Int
+    ) -> Int {
         return terms.count
     }
-
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TermsItemCell.identifier, for: indexPath) as? TermsItemCell else {
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: TermsItemCell.identifier,
+            for: indexPath
+        ) as? TermsItemCell else {
             return UICollectionViewCell()
         }
         
