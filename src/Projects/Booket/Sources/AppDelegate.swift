@@ -2,6 +2,8 @@
 
 import BKData
 import KakaoSDKCommon
+import Pulse
+import PulseProxy
 import UIKit
 
 @main
@@ -13,6 +15,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         guard let kakaoAPIkey = Bundle.main.object(forInfoDictionaryKey: "KAKAO_NATIVE_APP_KEY") as? String else {
             fatalError("Error: KAKAO_NATIVE_APP_KEY not found in Info.plist")
         }
+        NetworkLogger.enableProxy()
         KakaoSDK.initSDK(appKey: kakaoAPIkey)
         return true
     }
