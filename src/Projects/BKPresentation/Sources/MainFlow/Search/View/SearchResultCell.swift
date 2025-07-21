@@ -85,6 +85,14 @@ final class SearchResultCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        thumbnail.image = nil
+        titleLabel.setText(text: "")
+        authorLabel.setText(text: "")
+        publisherLabel.setText(text: "")
+    }
+    
     func configure(
         title: String,
         description: BookDescription,

@@ -56,6 +56,13 @@ final class RecentKeywordCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        onQueryLabelTapped = nil
+        onDeleteTapped = nil
+        searchQueryLabel.setText(text: "")
+    }
+    
     func configure(labelText text: String) {
         self.searchQueryLabel.setText(text: text)
     }
