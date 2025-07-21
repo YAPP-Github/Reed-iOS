@@ -22,7 +22,10 @@ let appTarget = Target.target(
         .design(),
         .network(),
         .storage(),
-        .domain()
+        .domain(),
+        .external(dependency: .Pulse),
+        .external(dependency: .PulseUI),
+        .external(dependency: .PulseProxy)
     ],
     settings: .settings(
         base: [

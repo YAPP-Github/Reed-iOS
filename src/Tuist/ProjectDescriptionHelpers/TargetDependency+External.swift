@@ -14,6 +14,10 @@ public enum External: String {
     case FittedSheets
     case Then
     
+    case Pulse
+    case PulseUI
+    case PulseProxy
+    
     case Nimble
     case Quick
 }
