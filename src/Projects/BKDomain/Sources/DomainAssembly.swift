@@ -59,5 +59,33 @@ public struct DomainAssembly: Assembly {
         ) { _ in
             return DefaultAppVersionUseCase()
         }
+        
+        container.register(
+            type: FetchRecentSearchUseCase.self
+        ) { _ in
+            @Autowired var repository: RecentSearchRepository
+            return DefaultFetchRecentSearchUseCase(repository: repository)
+        }
+        
+        container.register(
+            type: SearchBookUseCase.self
+        ) { _ in
+            @Autowired var repository: BookRepository
+            return DefaultSearchBookUseCase(repository: repository)
+        }
+        
+        container.register(
+            type: StoreRecentSearchUseCase.self
+        ) { _ in
+            @Autowired var repository: RecentSearchRepository
+            return DefaultStoreRecentSearchUseCase(repository: repository)
+        }
+        
+        container.register(
+            type: DeleteRecentSearchUseCase.self
+        ) { _ in
+            @Autowired var repository: RecentSearchRepository
+            return DefaultDeleteRecentSearchUseCase(repository: repository)
+        }
     }
 }

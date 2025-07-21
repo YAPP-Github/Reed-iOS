@@ -28,7 +28,7 @@ public final class DIContainer: DependencyInjectable {
         scope: ContainerScope = .transient,
         containerClosure: @escaping DependencyContainerClosure
     ) {
-        let key = "\(name ?? "default")_\(type)"
+        let key = "\(name ?? "Default")_\(type)"
         services[key] = { container in
             switch scope {
             case .transient:
@@ -49,7 +49,7 @@ public final class DIContainer: DependencyInjectable {
         type: T.Type,
         name: String? = nil
     ) -> T? {
-        let key = "\(name ?? "default")_\(type)"
+        let key = "\(name ?? "Default")_\(type)"
         
         resolveLock.lock()
         if resolving.contains(key) {

@@ -6,6 +6,8 @@ import Foundation
 import UIKit
 
 final class LoginViewController: BaseViewController<LoginView> {
+    weak var coordinator: LoginCoordinator?
+    
     var cancellable: Set<AnyCancellable> = []
     let viewModel: AnyViewBindableViewModel<LoginViewModel.State, LoginViewModel.Action>
     
@@ -53,20 +55,13 @@ final class LoginViewController: BaseViewController<LoginView> {
             .store(in: &cancellable)
         
         viewModel.statePublisher
-            .map { $0.latestProvider }
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { provider in
-                print("latestProvider: \(String(describing: provider))")
-            }
-            .store(in: &cancellable)
-        
-        viewModel.statePublisher
             .map { $0.isLoggedIn }
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
-            .sink { isLoggedIn in
-                print("authentication status: \(isLoggedIn)")
+            .sink { [weak self] isLoggedIn in
+                if isLoggedIn {
+                    self?.coordinator?.popAndFinish()
+                }
             }
             .store(in: &cancellable)
     }

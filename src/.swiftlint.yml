@@ -38,7 +38,6 @@ identifier_name:
 
 function_body_length:
   warning: 30
-  error: 50
 
 type_body_length:
   warning: 200

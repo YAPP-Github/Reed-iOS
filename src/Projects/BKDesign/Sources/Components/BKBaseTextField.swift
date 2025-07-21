@@ -23,9 +23,9 @@ public class BKBaseTextField: UITextField {
         }
     }
     
-    private var type: TextFieldType {
+    var textFieldType: TextFieldType {
         didSet {
-            layer.borderColor = type.borderColor.cgColor
+            typeDidChanged()
         }
     }
     
@@ -38,12 +38,14 @@ public class BKBaseTextField: UITextField {
         return button
     }()
     
+    var onReturn: ((String) -> Void)?
+    
     public init(
         frame: CGRect = .zero,
         placeholder: String = "",
         type: TextFieldType = .normal
     ) {
-        self.type = type
+        self.textFieldType = type
         super.init(frame: frame)
         self.placeholder = placeholder
         configure()
@@ -90,29 +92,40 @@ public class BKBaseTextField: UITextField {
         endEditing(true)
         super.touchesBegan(touches, with: event)
     }
-    
-    private var onTextChanged: ((String) -> Void)?
 
-    public func setOnTextChanged(_ handler: @escaping (String) -> Void) {
-        self.onTextChanged = handler
+    public func setOnReturn(_ handler: @escaping (String) -> Void) {
+        self.onReturn = handler
     }
     
     public func setType(type: TextFieldType) {
-        self.type = type
+        self.textFieldType = type
+    }
+    
+    func typeDidChanged() {
+        layer.borderColor = textFieldType.borderColor.cgColor
     }
 }
 
-/// 필요 시 추가
 extension BKBaseTextField: UITextFieldDelegate {
-    
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        resignFirstResponder()
+        guard let text, !text.isEmpty else {
+            setType(type: .error)
+            return false
+        }
+        setType(type: .brand)
+        onReturn?(text)
+        return true
+    }
 }
 
 private extension BKBaseTextField {
     func configure() {
-        addTarget(self, action: #selector(textDidChange), for: .editingChanged)
+        delegate = self
+        returnKeyType = .done
         layer.cornerRadius = BKRadius.small
         layer.borderWidth = LayoutConstants.borderWidth
-        layer.borderColor = type.borderColor.cgColor
+        layer.borderColor = textFieldType.borderColor.cgColor
         backgroundColor = .bkBackgroundColor(.secondary)
         font = BKTextStyle.body2(weight: .medium).uiFont
         textColor = .bkContentColor(.primary)
@@ -163,14 +176,11 @@ private extension BKBaseTextField {
     
     @objc private func clearButtonTapped() {
         text = ""
+        clearButton.isHidden = true
     }
     
     @objc private func updateClearButtonVisibility() {
         clearButton.isHidden = (text?.isEmpty ?? true)
-    }
-    
-    @objc func textDidChange() {
-        onTextChanged?(text ?? "")
     }
     
     enum LayoutConstants {
@@ -192,6 +202,17 @@ extension BKBaseTextField.TextFieldType {
             return .bkBorderColor(.brand)
         case .error:
             return .bkBorderColor(.error)
+        }
+    }
+    
+    var searchButtonColor: UIColor {
+        switch self {
+        case .normal:
+            return .bkContentColor(.primary)
+        case .brand:
+            return .bkContentColor(.brand)
+        case .error:
+            return .bkContentColor(.primary)
         }
     }
 }

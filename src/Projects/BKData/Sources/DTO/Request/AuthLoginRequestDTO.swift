@@ -3,7 +3,7 @@
 import BKDomain
 import Foundation
 
-public struct AuthLoginRequestDTO: Encodable {
+struct AuthLoginRequestDTO: Encodable {
     let providerType: AuthProvider
     let oauthToken: String
 }

@@ -1,13 +1,11 @@
 // Copyright © 2025 Booket. All rights reserved
 
-import Foundation
 import UIKit
 
-final class LoginCoordinator: Coordinator, FinishNotifying {
+final class SearchCoordinator: Coordinator {
     weak var parentCoordinator: Coordinator?
     var childCoordinators = [Coordinator]()
     var navigationController: UINavigationController
-    var onFinish: (() -> Void)?
     
     init(
         parentCoordinator: Coordinator?,
@@ -18,8 +16,8 @@ final class LoginCoordinator: Coordinator, FinishNotifying {
     }
     
     func start() {
-        let loginViewController = LoginViewController(viewModel: LoginViewModel())
-        loginViewController.coordinator = self
-        navigationController.pushViewController(loginViewController, animated: true)
+        let searchViewController = SearchViewController(viewModel: SearchViewModel())
+        searchViewController.coordinator = self
+        navigationController.pushViewController(searchViewController, animated: true)
     }
 }

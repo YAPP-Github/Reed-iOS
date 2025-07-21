@@ -12,11 +12,13 @@ public struct DataAssembly: Assembly {
             type: DefaultAuthRepository.self,
             scope: .singleton
         ) { _ in
-            @Autowired(name: "oauth") var networkProvider: NetworkProvider
+            @Autowired var defaultProvider: NetworkProvider
+            @Autowired(name: "OAuth") var oauthProvider: NetworkProvider
             @Autowired var tokenStore: TokenStore
             @Autowired var tokenProvider: TokenProvider
             return DefaultAuthRepository(
-                networkProvider: networkProvider,
+                defaultProvider: defaultProvider,
+                oauthProvider: oauthProvider,
                 tokenStore: tokenStore,
                 tokenProvider: tokenProvider
             )
@@ -25,7 +27,7 @@ public struct DataAssembly: Assembly {
         container.register(
             type: AuthStateRepository.self
         ) { _ in
-            @Autowired(name: "oauth") var networkProvider: NetworkProvider
+            @Autowired(name: "OAuth") var networkProvider: NetworkProvider
             @Autowired var tokenProvider: TokenProvider
             return DefaultAuthStateRepository(
                 networkProvider: networkProvider,
@@ -52,6 +54,20 @@ public struct DataAssembly: Assembly {
         ) { _ in
             @Autowired var repository: DefaultAuthRepository
             return repository
+        }
+        
+        container.register(
+            type: RecentSearchRepository.self
+        ) { _ in
+            @Autowired(name: "UserDefaults") var storage: KeyValueStorage
+            return DefaultRecentSearchRepository(storage: storage)
+        }
+        
+        container.register(
+            type: BookRepository.self
+        ) { _ in
+            @Autowired(name: "OAuth") var networkProvider: NetworkProvider
+            return DefaultBookRepository(networkProvider: networkProvider)
         }
         
         container.register(

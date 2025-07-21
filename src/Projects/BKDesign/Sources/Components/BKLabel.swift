@@ -68,6 +68,15 @@ public final class BKLabel: UILabel {
         fatalError("init(coder:) has not been implemented")
     }
     
+    public func setAttributedText(with attributedString: NSAttributedString) {
+        super.attributedText = attributedString
+    }
+    
+    public func setFontStyle(style: BKTextStyle) {
+        self.fontStyle = style
+        apply()
+    }
+    
     public func setText(text: String) {
         self.labelText = text
         apply()

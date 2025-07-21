@@ -6,11 +6,8 @@ import Foundation
 extension URLRequest {
     init(_ urlString: String, query: [String: Any]) throws {
         guard var components = URLComponents(string: urlString) else { throw NetworkError.invalidURL }
-        components.queryItems = query.compactMap {
-            URLQueryItem(
-                name: $0.key.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? $0.key,
-                value: "\( $0.value )".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
-            )
+        components.queryItems = query.map { key, value in
+            URLQueryItem(name: key, value: "\(value)")
         }
         
         guard let url = components.url else { throw NetworkError.invalidURL }

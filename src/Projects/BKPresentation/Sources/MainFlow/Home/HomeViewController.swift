@@ -21,6 +21,12 @@ final class HomeViewController: UIViewController, BKNavigationBarStylable {
         return button
     }()
     
+    private let searchButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("SearchViewController", for: .normal)
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .bkBaseColor(.primary)
@@ -35,7 +41,8 @@ final class HomeViewController: UIViewController, BKNavigationBarStylable {
 
     private func configure() {
         let stack = UIStackView(arrangedSubviews: [
-            settingButton
+            settingButton,
+            searchButton
         ])
         stack.axis = .vertical
         stack.spacing = 16
@@ -51,6 +58,7 @@ final class HomeViewController: UIViewController, BKNavigationBarStylable {
 
     private func bindActions() {
         settingButton.addTarget(self, action: #selector(openSettings), for: .touchUpInside)
+        searchButton.addTarget(self, action: #selector(openSearch), for: .touchUpInside)
     }
     
     @objc private func dummyFunc() {
@@ -59,5 +67,9 @@ final class HomeViewController: UIViewController, BKNavigationBarStylable {
 
     @objc private func openSettings() {
         coordinator?.didTapSettingButton()
+    }
+    
+    @objc private func openSearch() {
+        coordinator?.didTapSearchButton()
     }
 }
