@@ -43,12 +43,15 @@ final class TermsView: BaseView {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = false
+        collectionView.allowsSelection = false
         
         collectionView.contentInset.left = BKSpacing.spacing2
         collectionView.contentInset.right = BKSpacing.spacing3
         
         return collectionView
     }()
+    
+    private let startButton = BKButton.primary(title: "시작하기", size: .large)
     
     // MARK: - ViewModel로 이전 예정(뷰만 먼저 봄)
     private var terms: [TermsViewObject] = []
@@ -57,16 +60,21 @@ final class TermsView: BaseView {
         titleLabel.numberOfLines = 2
         
         setupAgreeAllAreaView()
-        addSubviews(titleLabel, agreeAllAreaView, collectionView)
+        addSubviews(titleLabel, agreeAllAreaView, collectionView, startButton)
         
         collectionView.dataSource = self
         collectionView
             .register(TermsItemCell.self, forCellWithReuseIdentifier: TermsItemCell.identifier)
+        
+        startButton.isDisabled = true
     }
     
     override func configure() {
+        let dummyURL = URL(string: "https://kean-docs.github.io/pulseui/documentation/pulseui/")!
         configure(terms: [
-            TermsViewObject(title: "", URL: <#T##URL?#>)
+            TermsViewObject(title: "(필수)서비스 이용약관", URL: dummyURL),
+            TermsViewObject(title: "(필수)개인정보처리방침", URL: dummyURL),
+            TermsViewObject(title: "(필수)만 14세 이상입니다")
         ])
     }
     
@@ -96,8 +104,13 @@ final class TermsView: BaseView {
         collectionView.snp.makeConstraints {
             $0.top.equalTo(agreeAllAreaView.snp.bottom).offset(LayoutGuide.verticalPadding)
             $0.leading.trailing.equalToSuperview().inset(LayoutGuide.verticalPadding)
+            $0.height.equalTo(156)
         }
         
+        startButton.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview().inset(LayoutGuide.verticalPadding)
+            $0.bottom.equalToSuperview().inset(LayoutGuide.innerViewHPadding + 21)
+        }
     }
     
     private func setupAgreeAllAreaView() {
@@ -147,5 +160,4 @@ extension TermsView: UICollectionViewDataSource {
         
         return cell
     }
-    
 }

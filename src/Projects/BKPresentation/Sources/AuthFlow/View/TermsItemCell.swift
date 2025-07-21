@@ -68,7 +68,7 @@ final class TermsItemCell: UICollectionViewListCell {
         
         chevronIconView.snp.makeConstraints {
             $0.width.height.equalTo(LayoutGuide.iconSize)
-            $0.trailing.equalToSuperview()
+            $0.trailing.equalToSuperview().inset(BKSpacing.spacing3)
             $0.centerY.equalToSuperview()
         }
     }
