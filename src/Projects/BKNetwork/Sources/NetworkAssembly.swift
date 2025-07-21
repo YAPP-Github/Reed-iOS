@@ -38,6 +38,9 @@ public struct NetworkAssembly: Assembly {
                                     accessToken: tokens.accessToken,
                                     refreshToken: tokens.refreshToken
                                 )
+                                .handleEvents(receiveOutput: { _ in
+                                    tokenProvider.clearCache()
+                                })
                                 .mapError { _ in NetworkError.badRequest }
                             }
                             .debugError("[Refresh]", logger: AppLogger.storage)

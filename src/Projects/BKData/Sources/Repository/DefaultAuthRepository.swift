@@ -42,6 +42,9 @@ public struct DefaultAuthRepository: AuthRepository {
                 accessToken: tokens.accessToken,
                 refreshToken: tokens.refreshToken
             )
+            .handleEvents(receiveOutput: { _ in
+                tokenProvider.clearCache()
+            })
             .mapError { _ in AuthError.missingToken }
         }
         .debugError("[Login]", logger: AppLogger.storage)
