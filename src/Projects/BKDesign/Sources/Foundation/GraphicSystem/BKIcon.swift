@@ -34,6 +34,8 @@ public enum BKImage {
         public static let star = BKDesignAsset.star.image
         public static let x = BKDesignAsset.x.image
         public static let xCircle = BKDesignAsset.xCircle.image
+        public static let home = BKDesignAsset.home.image
+        public static let archive = BKDesignAsset.folder.image
     }
     
     public enum Checkbox {
