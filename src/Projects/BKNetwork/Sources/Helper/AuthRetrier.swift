@@ -31,7 +31,7 @@ public struct AuthRetrier {
     }
 }
 
-private extension AuthRetrier {
+extension AuthRetrier {
     func shouldRetry(response: URLResponse) -> Bool {
         guard let httpResponse = response as? HTTPURLResponse else {
             return false
