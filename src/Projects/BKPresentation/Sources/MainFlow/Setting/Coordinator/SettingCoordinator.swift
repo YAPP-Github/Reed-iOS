@@ -2,7 +2,7 @@
 
 import UIKit
 
-final class SettingCoordinator: Coordinator {
+final class SettingCoordinator: Coordinator, SessionExpirationNotifying {
     weak var parentCoordinator: Coordinator?
     var childCoordinators = [Coordinator]()
     var navigationController: UINavigationController
