@@ -72,7 +72,7 @@ final class SettingViewController: BaseViewController<SettingView> {
             .map { $0.isLoggedOut }
             .filter { $0 }
             .removeDuplicates()
-            .sink { [weak self] isLoggedOut in
+            .sink { [weak self] _ in
                 self?.coordinator?.notifyParentSessionExpired()
             }
             .store(in: &cancellable)
