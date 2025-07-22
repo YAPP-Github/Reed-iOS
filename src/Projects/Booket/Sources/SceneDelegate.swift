@@ -8,6 +8,9 @@ import BKNetwork
 import BKPresentation
 import BKStorage
 import KakaoSDKAuth
+import Pulse
+import PulseUI
+import SwiftUI
 import UIKit
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -23,7 +26,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         setupNavigationBar()
-        window = UIWindow(windowScene: windowScene)
+        window = PulseWindow(windowScene: windowScene)
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
         
@@ -69,5 +72,16 @@ private extension SceneDelegate {
         navigationController.navigationBar.standardAppearance = appearance
         navigationController.navigationBar.scrollEdgeAppearance = appearance
         navigationController.navigationBar.compactAppearance = appearance
+    }
+}
+
+class PulseWindow: UIWindow {
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        super.motionEnded(motion, with: event)
+        guard motion == .motionShake else { return }
+        
+        let viewController = MainViewController()
+        let navigation = UINavigationController(rootViewController: viewController)
+        rootViewController?.present(navigation, animated: true)
     }
 }
