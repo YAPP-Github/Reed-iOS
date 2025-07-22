@@ -78,8 +78,8 @@ final class TermsView: BaseView {
     override func configure() {
         let dummyURL = URL(string: "https://kean-docs.github.io/pulseui/documentation/pulseui/")!
         configure(terms: [
-            TermsViewObject(title: "(필수)서비스 이용약관", URL: dummyURL),
-            TermsViewObject(title: "(필수)개인정보처리방침", URL: dummyURL),
+            TermsViewObject(title: "(필수)서비스 이용약관", url: dummyURL),
+            TermsViewObject(title: "(필수)개인정보처리방침", url: dummyURL),
             TermsViewObject(title: "(필수)만 14세 이상입니다")
         ])
     }
@@ -168,6 +168,7 @@ extension TermsView: UICollectionViewDataSource {
             withReuseIdentifier: TermsItemCell.identifier,
             for: indexPath
         ) as? TermsItemCell else {
+            assertionFailure("Failed to dequeue TermsItemCell")
             return UICollectionViewCell()
         }
         

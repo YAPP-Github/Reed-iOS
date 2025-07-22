@@ -41,6 +41,11 @@ final class TermsItemCell: UICollectionViewListCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        titleLabel.setText(text: "")
+        chevronIconView.isHidden = true
+    }
+    
     override func preferredLayoutAttributesFitting(
         _ layoutAttributes: UICollectionViewLayoutAttributes
     ) -> UICollectionViewLayoutAttributes {
@@ -76,11 +81,13 @@ final class TermsItemCell: UICollectionViewListCell {
         }
     }
     
-    public func configure(_ vo: TermsViewObject) {
-        titleLabel.setText(text: vo.title)
+    public func configure(_ termVO: TermsViewObject) {
+        titleLabel.setText(text: termVO.title)
         
-        if vo.URL != nil {
+        if termVO.url != nil {
             chevronIconView.isHidden = false
+        } else {
+            chevronIconView.isHidden = true
         }
     }
 
