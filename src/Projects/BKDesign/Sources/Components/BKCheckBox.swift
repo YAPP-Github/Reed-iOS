@@ -26,13 +26,6 @@ public final class BKCheckBox: UIControl {
             updateImage()
         }
     }
-    
-    override public var intrinsicContentSize: CGSize {
-        return CGSize(
-            width: LayoutConstants.size,
-            height: LayoutConstants.size
-        )
-    }
 
     public init(
         frame: CGRect = .zero,
@@ -51,6 +44,12 @@ public final class BKCheckBox: UIControl {
         addSubview(imageView)
         imageView.snp.makeConstraints {
             $0.edges.equalToSuperview()
+            $0.size.equalTo(
+                CGSize(
+                    width: LayoutConstants.size,
+                    height: LayoutConstants.size
+                )
+            )
         }
         imageView.image = type.defaultImage
         addTarget(self, action: #selector(toggleCheck), for: .touchUpInside)
