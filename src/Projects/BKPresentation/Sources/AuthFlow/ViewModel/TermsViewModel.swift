@@ -2,12 +2,15 @@
 
 import UIKit
 
-struct TermsViewObject {
+struct TermsViewObject: Equatable {
     let title: String
-    let URL: URL?
+    let url: URL?
     
-    init(title: String, URL: URL? = nil) {
+    init(
+        title: String,
+        url: URL? = nil
+    ) {
         self.title = title
-        self.URL = URL
+        self.url = url
     }
 }
