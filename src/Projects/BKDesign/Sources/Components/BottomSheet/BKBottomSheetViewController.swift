@@ -107,6 +107,43 @@ public final class BKBottomSheetViewController: UIViewController {
     }
 }
 
+public extension BKBottomSheetViewController {
+    static func makeWithdrawalSheet(
+        title: String,
+        subtitle: String,
+        agreementText: String,
+        cancelTitle: String = "취소",
+        confirmTitle: String = "탈퇴하기",
+        cancelAction: @escaping ()->Void,
+        confirmAction: @escaping ()->Void
+    ) -> BKBottomSheetViewController {
+        let checkBox = BKCheckBoxLabel(
+            checkboxType: .rectangle,
+            labelText: agreementText
+        )
+        
+        let sheet = BKBottomSheetViewController(
+            title: title,
+            subtitle: subtitle,
+            style: .centered,
+            suppliedContentStyle: .lower(checkBox),
+            buttonConfiguration: .twoButtonGroup(
+                leftTitle: cancelTitle,
+                rightTitle: confirmTitle,
+                leftAction: cancelAction,
+                rightAction: confirmAction
+            )
+        )
+        
+        sheet.button?.setPrimaryButtonState(false)
+        checkBox.onChecked = { isChecked in
+            sheet.button?.setPrimaryButtonState(isChecked)
+        }
+        
+        return sheet
+    }
+}
+
 private extension BKBottomSheetViewController {
     func setup() {
         view.backgroundColor = .bkBaseColor(.primary)
