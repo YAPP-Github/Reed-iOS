@@ -1,5 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
+import BKDesign
 import Combine
 import Foundation
 import UIKit
@@ -14,12 +16,7 @@ final class SettingViewController: BaseViewController<SettingView> {
     
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
         return .standard(
-            viewController: self,
-            rightButton: .init(
-                isEnabled: true,
-                target: self,
-                action: #selector(dummyFunc)
-            )
+            viewController: self
         )
     }
     
@@ -37,24 +34,24 @@ final class SettingViewController: BaseViewController<SettingView> {
     
     override func bindAction() {
         viewModel.send(.onAppear)
-//        contentView.eventPublisher
-//            .sink { event in
-//                switch event {
-//                case .logoutButtonTapped:
-//                    viewModel.send()
-//                case .withdrawalButtonTapped:
-//                    viewModel.send()
-//                }
-//            }
-//            .store(in: &cancellable)
+        contentView.eventPublisher
+            .sink { [weak self] event in
+                switch event {
+                case .logoutButtonTapped:
+                    self?.presentLogoutDialog()
+                case .withdrawalButtonTapped:
+                    self?.presentWithdrawalSheet()
+                }
+            }
+            .store(in: &cancellable)
     }
     
     override func bindState() {
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
             .map {( first: $0.firstMenuItems, second: $0.secondMenuItems )}
-            .sink { menus in
-                self.contentView.apply(
+            .sink { [weak self] menus in
+                self?.contentView.apply(
                     firstMenus: menus.first,
                     secondMenus: menus.second
                 )
@@ -65,11 +62,61 @@ final class SettingViewController: BaseViewController<SettingView> {
             .receive(on: DispatchQueue.main)
             .map { $0.appVersion }
             .removeDuplicates()
-            .sink { version in
-                self.contentView.setAppVersion(version)
+            .sink { [weak self] version in
+                self?.contentView.setAppVersion(version)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .map { $0.isLoggedOut }
+            .filter { $0 }
+            .removeDuplicates()
+            .sink { [weak self] isLoggedOut in
+                self?.coordinator?.notifyParentSessionExpired()
             }
             .store(in: &cancellable)
     }
     
     @objc func dummyFunc() {}
+}
+
+private extension SettingViewController {
+    func presentLogoutDialog() {
+        let dialog = BKDialog(
+            title: "정말 로그아웃 하시겠습니까?",
+            subtitle: "",
+            config: BKDialogConfiguration(
+                leftButtonTitle: "취소",
+                leftButtonAction: { [weak self] in
+                    self?.dismiss(animated: true)
+                },
+                rightButtonTitle: "로그아웃",
+                rightButtonAction: { [weak self] in
+                    self?.viewModel.send(.logoutButtonTapped)
+                    self?.dismiss(animated: true)
+                }
+            )
+        )
+        let dialogViewController = BKDialogViewController(dialog: dialog)
+        present(dialogViewController, animated: true)
+    }
+    
+    func presentWithdrawalSheet() {
+        let sheet = BKBottomSheetViewController.makeWithdrawalSheet(
+            title: "정말 탈퇴하시겠어요?",
+            subtitle: """
+            탈퇴 시, 개인 정보와 그동안의 독서기록이
+            모두 삭제되며 복구가 어렵습니다. 
+            """,
+            agreementText: "확인하였으며 이에 동의합니다",
+            cancelAction: { [weak self] in self?.dismiss(animated: true) },
+            confirmAction: { [weak self] in
+                Log.debug("[WithdrawalSheet] confirmed", logger: AppLogger.ui)
+                // self?.viewModel.send()
+            }
+        )
+        
+        sheet.show(from: self, animated: true)
+    }
 }
