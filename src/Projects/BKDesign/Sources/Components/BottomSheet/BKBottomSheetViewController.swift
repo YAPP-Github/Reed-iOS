@@ -4,7 +4,7 @@ import SnapKit
 import UIKit
 
 public final class BKBottomSheetViewController: UIViewController {
-    public var suppliedContent: UIView?
+    public var suppliedContentStyle: SuppliedContentStyle?
     public var button: BKButtonGroup?
     public var cornerRadius: CGFloat = BKSpacing.spacing5
     private var contentAspectRatio: CGFloat?
@@ -20,11 +20,11 @@ public final class BKBottomSheetViewController: UIViewController {
         title: String,
         subtitle: String? = nil,
         style: BKBottomSheetStyle = .leadingCloseButton,
-        suppliedContent: UIView? = nil,
+        suppliedContentStyle: SuppliedContentStyle? = nil,
         buttonConfiguration: BKButtonGroup? = nil
     ) {
         self.style = style
-        self.suppliedContent = suppliedContent
+        self.suppliedContentStyle = suppliedContentStyle
         self.button = buttonConfiguration
         self.titleView = BKBottomSheetTitleView(
             style: style == .leadingCloseButton ? .leadingCloseButton : .centered,
@@ -57,9 +57,13 @@ public final class BKBottomSheetViewController: UIViewController {
     
     public override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        view.layoutIfNeeded()
-        
+    }
+    
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
         let targetWidth = rootStack.bounds.width
+        guard targetWidth > 0 else { return }
+
         let fittingSize = rootStack.systemLayoutSizeFitting(
             CGSize(
                 width: targetWidth,
@@ -68,7 +72,7 @@ public final class BKBottomSheetViewController: UIViewController {
             withHorizontalFittingPriority: .required,
             verticalFittingPriority: .fittingSizeLevel
         )
-        
+
         let buttonHeight = button?.frame.height ?? .zero
         let totalHeight = fittingSize.height + buttonHeight + BKSpacing.spacing5
 
@@ -76,10 +80,7 @@ public final class BKBottomSheetViewController: UIViewController {
             width: view.bounds.width,
             height: totalHeight
         )
-    }
-    
-    public override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+
         applyBottomSheetShadow(to: view)
     }
     
@@ -115,6 +116,7 @@ private extension BKBottomSheetViewController {
         view.addSubview(rootStack)
         rootStack.axis = .vertical
         rootStack.spacing = .zero
+        rootStack.alignment = .center
         
         titleView.onClose = { [weak self] in
             self?.dismiss(animated: true)
@@ -160,14 +162,17 @@ private extension BKBottomSheetViewController {
     }
     
     func makeLeadingContent() {
-        rootStack.addArrangedSubview(titleView)
-        if let suppliedContent {
-            rootStack.addArrangedSubview(suppliedContent)
-            if let ratio = contentAspectRatio {
-                suppliedContent.snp.makeConstraints {
-                    $0.height.equalTo(suppliedContent.snp.width).multipliedBy(ratio)
-                }
-            }
+        switch suppliedContentStyle {
+        case .upper(let contentView):
+            rootStack.addArrangedSubview(contentView)
+            applyRatioIfNeeded(to: contentView)
+            rootStack.addArrangedSubview(titleView)
+        case .lower(let contentView):
+            rootStack.addArrangedSubview(titleView)
+            rootStack.addArrangedSubview(contentView)
+            applyRatioIfNeeded(to: contentView)
+        case .none:
+            rootStack.addArrangedSubview(titleView)
         }
     }
     
@@ -175,7 +180,7 @@ private extension BKBottomSheetViewController {
         let paddedContainer = UIView()
         let inner = UIStackView()
         inner.axis = .vertical
-        inner.alignment = .fill
+        inner.alignment = .center
         inner.spacing = BKSpacing.spacing5
         paddedContainer.addSubview(inner)
         
@@ -184,15 +189,19 @@ private extension BKBottomSheetViewController {
             $0.leading.trailing.equalToSuperview()
         }
         
-        if let suppliedContent {
-            inner.addArrangedSubview(suppliedContent)
-            if let ratio = contentAspectRatio {
-                suppliedContent.snp.makeConstraints {
-                    $0.height.equalTo(suppliedContent.snp.width).multipliedBy(ratio)
-                }
-            }
+        switch suppliedContentStyle {
+        case .upper(let contentView):
+            inner.addArrangedSubview(contentView)
+            applyRatioIfNeeded(to: contentView)
+            inner.addArrangedSubview(titleView)
+        case .lower(let contentView):
+            inner.addArrangedSubview(titleView)
+            inner.addArrangedSubview(contentView)
+            applyRatioIfNeeded(to: contentView)
+        case .none:
+            inner.addArrangedSubview(titleView)
         }
-        inner.addArrangedSubview(titleView)
+
         rootStack.addArrangedSubview(paddedContainer)
         innerStack = inner
     }
@@ -225,10 +234,23 @@ private extension BKBottomSheetViewController {
     }
     
     func calculateRatioIfNeeded() {
-        if let imageView = suppliedContent as? UIImageView,
-           let image = imageView.image {
-            contentAspectRatio = image.size.height / image.size.width
-            imageView.contentMode = .scaleAspectFit
+        if let style = suppliedContentStyle {
+            switch style {
+            case .lower(let view), .upper(let view):
+                if let view = view as? UIImageView,
+                   let image = view.image {
+                    contentAspectRatio = image.size.height / image.size.width
+                    view.contentMode = .scaleAspectFit
+                }
+            }
+        }
+    }
+    
+    func applyRatioIfNeeded(to view: UIView) {
+        if let ratio = contentAspectRatio {
+            view.snp.makeConstraints {
+                $0.height.equalTo(view.snp.width).multipliedBy(ratio)
+            }
         }
     }
 }

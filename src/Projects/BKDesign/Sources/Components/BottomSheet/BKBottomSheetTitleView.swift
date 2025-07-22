@@ -35,81 +35,78 @@ private extension BKBottomSheetTitleView {
     func configure() {
         titleLabel.text = title
         titleLabel.numberOfLines = .zero
-        titleLabel.font = BKTextStyle.heading2(weight: .semiBold).uiFont
+        titleLabel.font = BKTextStyle
+            .heading2(weight: .semiBold).uiFont
         titleLabel.textColor = .bkContentColor(.primary)
-        subtitleLabel.textColor = .bkContentColor(.secondary)
-
-        switch style {
-        case .leadingCloseButton:
-            subtitleLabel.font = BKTextStyle.label2(weight: .regular).uiFont
-            closeButton.setImage(BKImage.Icon.x, for: .normal)
-            closeButton.tintColor = .bkContentColor(.primary)
-            addLeadingLayout(subtitle: subtitle)
-        case .centered:
-            subtitleLabel.font = BKTextStyle.body1(weight: .medium).uiFont
-            addCenteredLayout(subtitle: subtitle)
-        }
         
+        subtitleLabel.text = subtitle
+        subtitleLabel.numberOfLines = .zero
+        subtitleLabel.font = (
+            style == .leadingCloseButton
+                ? BKTextStyle.label2(weight: .regular)
+                : BKTextStyle.body1(weight: .medium))
+            .uiFont
+        subtitleLabel.textColor = .bkContentColor(.secondary)
+        
+        closeButton.setImage(
+            style == .leadingCloseButton
+                ? BKImage.Icon.x
+                : UIImage(),
+            for: .normal
+        )
+        closeButton.tintColor = .bkContentColor(.primary)
         closeButton.addTarget(
             self,
             action: #selector(didTapCloseButton),
             for: .touchUpInside
         )
-    }
-
-    func addLeadingLayout(subtitle: String?) {
-        addSubview(titleLabel)
-        titleLabel.snp.makeConstraints {
-            $0.leading.top.equalToSuperview()
-            $0.height.equalTo(LayoutConstants.labelHeight)
-        }
-
-        if let subtitle {
-            subtitleLabel.text = subtitle
-            subtitleLabel.numberOfLines = .zero
-            addSubview(subtitleLabel)
-            subtitleLabel.snp.makeConstraints {
-                $0.leading.equalTo(titleLabel)
-                $0.top.equalTo(titleLabel.snp.bottom)
-                    .offset(LayoutConstants.leadingContentSpacing)
-                $0.height.equalTo(LayoutConstants.labelHeight)
-                $0.bottom.equalToSuperview()
-            }
-        } else {
-            titleLabel.snp.makeConstraints {
-                $0.bottom.equalToSuperview()
-            }
-        }
-
-        addSubview(closeButton)
-        closeButton.snp.makeConstraints {
-            $0.centerY.equalTo(titleLabel)
-            $0.trailing.equalToSuperview()
+        
+        switch style {
+        case .leadingCloseButton:
+            addLeadingLayout()
+        case .centered:
+            addCenteredLayout()
         }
     }
-
-    func addCenteredLayout(subtitle: String?) {
-        let vStack = UIStackView(arrangedSubviews: [titleLabel])
+    
+    func addLeadingLayout() {
+        let labelStack = UIStackView(arrangedSubviews: [
+            titleLabel,
+            subtitle != nil ? subtitleLabel : nil
+        ].compactMap { $0 })
+        labelStack.axis = .vertical
+        labelStack.alignment = .leading
+        labelStack.spacing = LayoutConstants.leadingContentSpacing
+        
+        let hStack = UIStackView(arrangedSubviews: [labelStack, closeButton])
+        hStack.axis = .horizontal
+        hStack.alignment = .top
+        hStack.spacing = LayoutConstants.leadingContentSpacing
+        
+        addSubview(hStack)
+        hStack.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        closeButton.setContentHuggingPriority(.required, for: .horizontal)
+        closeButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+    }
+    
+    func addCenteredLayout() {
+        titleLabel.textAlignment = .center
+        subtitleLabel.textAlignment = .center
+        
+        let vStack = UIStackView(arrangedSubviews: [
+            titleLabel,
+            subtitle != nil ? subtitleLabel : nil
+        ].compactMap { $0 })
         vStack.axis = .vertical
-        vStack.alignment = .center
+        vStack.alignment = .fill
         vStack.spacing = LayoutConstants.centeredContentSpacing
+        
         addSubview(vStack)
-        vStack.snp.makeConstraints { $0.edges.equalToSuperview() }
-        titleLabel.snp.makeConstraints {
-            $0.height.equalTo(
-                LayoutConstants.labelHeight
-            )
-        }
-
-        if let subtitle {
-            subtitleLabel.text = subtitle
-            subtitleLabel.numberOfLines = .zero
-            vStack.addArrangedSubview(subtitleLabel)
-            subtitleLabel.snp.makeConstraints {
-                $0.height.equalTo(
-                    LayoutConstants.labelHeight
-                )
-            }
+        vStack.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
     }
     
