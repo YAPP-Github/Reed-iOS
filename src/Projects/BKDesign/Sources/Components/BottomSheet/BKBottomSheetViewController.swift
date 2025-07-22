@@ -14,7 +14,6 @@ public final class BKBottomSheetViewController: UIViewController {
     private var dimView: BKDimView?
     
     private let rootStack = UIStackView()
-    private var innerStack: UIStackView?
     
     public init(
         title: String,
@@ -243,7 +242,10 @@ private extension BKBottomSheetViewController {
         }
 
         rootStack.addArrangedSubview(paddedContainer)
-        innerStack = inner
+         
+        paddedContainer.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview()
+        }
     }
     
     func applyBottomSheetShadow(to view: UIView) {
@@ -274,21 +276,25 @@ private extension BKBottomSheetViewController {
     }
     
     func calculateRatioIfNeeded() {
-        if let style = suppliedContentStyle {
-            switch style {
-            case .lower(let view), .upper(let view):
-                if let view = view as? UIImageView,
-                   let image = view.image {
-                    contentAspectRatio = image.size.height / image.size.width
-                    view.contentMode = .scaleAspectFit
-                }
-            }
+        guard let style = suppliedContentStyle else { return }
+
+        let targetView: UIView
+        switch style {
+        case .upper(let view), .lower(let view):
+            targetView = view
+        }
+
+        if let imageView = targetView as? UIImageView,
+           let image = imageView.image {
+            contentAspectRatio = image.size.height / image.size.width
+            imageView.contentMode = .scaleAspectFit
         }
     }
     
     func applyRatioIfNeeded(to view: UIView) {
         if let ratio = contentAspectRatio {
             view.snp.makeConstraints {
+                $0.width.equalToSuperview()
                 $0.height.equalTo(view.snp.width).multipliedBy(ratio)
             }
         }
