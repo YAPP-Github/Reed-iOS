@@ -3,10 +3,11 @@
 import Foundation
 import UIKit
 
-final class MainFlowCoordinator: Coordinator {
+final class MainFlowCoordinator: Coordinator, FinishNotifying {
     weak var parentCoordinator: Coordinator?
     var childCoordinators = [Coordinator]()
     var navigationController: UINavigationController
+    var onFinish: (() -> Void)?
     
     init(
         parentCoordinator: Coordinator?,
@@ -20,6 +21,13 @@ final class MainFlowCoordinator: Coordinator {
         let homeViewController = HomeViewController()
         homeViewController.coordinator = self
         navigationController.pushViewController(homeViewController, animated: true)
+    }
+}
+
+extension MainFlowCoordinator: SessionExpirationNotifying {
+    func notifySessionExpired() {
+        navigationController.setViewControllers([], animated: false)
+        didFinish()
     }
 }
 
