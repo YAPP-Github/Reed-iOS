@@ -153,7 +153,6 @@ private extension BKBottomSheetViewController {
         view.addSubview(rootStack)
         rootStack.axis = .vertical
         rootStack.spacing = .zero
-        rootStack.alignment = .center
         
         titleView.onClose = { [weak self] in
             self?.dismiss(animated: true)
@@ -199,6 +198,8 @@ private extension BKBottomSheetViewController {
     }
     
     func makeLeadingContent() {
+        rootStack.alignment = .fill
+        
         switch suppliedContentStyle {
         case .upper(let contentView):
             rootStack.addArrangedSubview(contentView)
@@ -214,6 +215,8 @@ private extension BKBottomSheetViewController {
     }
     
     func makeCenteredContent() {
+        rootStack.alignment = .center
+        
         let paddedContainer = UIView()
         let inner = UIStackView()
         inner.axis = .vertical
