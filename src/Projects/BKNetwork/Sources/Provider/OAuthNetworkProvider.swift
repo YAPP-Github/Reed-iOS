@@ -25,19 +25,51 @@ public struct OAuthNetworkProvider: NetworkProvider {
         target: RequestTarget,
         type: T.Type
     ) -> AnyPublisher<T, NetworkError> {
-        makeRequest(target: target)
-            .flatMap(handleRetryIfNeeded)
+        return requestWithRetry(target: target)
             .tryMap { data, response in
                 try self.decodeResponse(data: data, response: response, type: type)
             }
             .debugError("Decoding Failed", logger: AppLogger.network)
             .mapError { $0 as? NetworkError ?? .invalidResponse }
-            .retryIf({ $0 == .retryTrigger }, maxRetries: 1)
             .eraseToAnyPublisher()
     }
 }
 
 private extension OAuthNetworkProvider {
+    func requestWithRetry(
+        target: RequestTarget
+    ) -> AnyPublisher<(Data, URLResponse), NetworkError> {
+        makeRequest(target: target)
+            .flatMap { data, response in
+                self.retryIfNeeded(
+                    target: target,
+                    data: data,
+                    response: response
+                )
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    func retryIfNeeded(
+        target: RequestTarget,
+        data: Data,
+        response: URLResponse
+    ) -> AnyPublisher<(Data, URLResponse), NetworkError> {
+        guard let http = response as? HTTPURLResponse,
+              http.statusCode == 401
+        else {
+            return Just((data, response))
+                .setFailureType(to: NetworkError.self)
+                .eraseToAnyPublisher()
+        }
+        
+        return authRetrier.performRefresh()
+            .flatMap { _ in
+                self.makeRequest(target: target)
+            }
+            .eraseToAnyPublisher()
+    }
+    
     func makeRequest(
         target: RequestTarget
     ) -> AnyPublisher<(Data, URLResponse), NetworkError> {
@@ -68,22 +100,5 @@ private extension OAuthNetworkProvider {
 
         try httpResponse.validate(data)
         return try data.decode(to: type)
-    }
-    
-    func handleRetryIfNeeded(
-        data: Data,
-        response: URLResponse
-    ) -> AnyPublisher<(Data, URLResponse), NetworkError> {
-        authRetrier.retryIfNeeded(response, data)
-            .catch { error -> AnyPublisher<Void, NetworkError> in
-                switch error {
-                case .retryFailed, .retryTrigger:
-                    return Just(()).setFailureType(to: NetworkError.self).eraseToAnyPublisher()
-                default:
-                    return Fail(error: error).eraseToAnyPublisher()
-                }
-            }
-            .map { (data, response) }
-            .eraseToAnyPublisher()
     }
 }

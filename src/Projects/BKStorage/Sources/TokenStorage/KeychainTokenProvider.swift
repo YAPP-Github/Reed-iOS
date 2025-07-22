@@ -12,6 +12,7 @@ public final class KeychainTokenProvider: TokenProvider {
     public init(storage: KeyValueStorage) {
         self.storage = storage
     }
+    
     public var accessToken: String? {
         if let cachedAccessToken {
             return cachedAccessToken
