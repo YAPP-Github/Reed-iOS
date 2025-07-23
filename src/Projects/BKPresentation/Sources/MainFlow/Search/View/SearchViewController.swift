@@ -1,5 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
+import BKDesign
 import Combine
 import UIKit
 
@@ -7,6 +9,7 @@ enum SearchViewEvent: Equatable {
     case search(String)
     case loadNextPage
     case deleteRecentQuery(String)
+    case upsertBook(String)
 }
 
 final class SearchViewController: BaseViewController<SearchView> {
@@ -64,6 +67,17 @@ final class SearchViewController: BaseViewController<SearchView> {
                 self?.viewModel.send(.deleteRecentQuery(query))
             }
             .store(in: &cancellable)
+        
+        contentView.eventPublisher
+            .compactMap { event -> String? in
+                if case let .upsertBook(isbn) = event { return isbn }
+                return nil
+            }
+            .removeDuplicates()
+            .sink { [weak self] query in
+                self?.presentBookRegistration(with: query)
+            }
+            .store(in: &cancellable)
     }
     
     override func bindState() {
@@ -83,5 +97,27 @@ final class SearchViewController: BaseViewController<SearchView> {
                 )
             }
             .store(in: &cancellable)
+    }
+}
+
+private extension SearchViewController {
+    func presentBookRegistration(with isbn: String) {
+        let statusView = BookRegistrationStatusView()
+        let sheet = BKBottomSheetViewController(
+            title: "등록 옵션",
+            style: .leadingCloseButton,
+            suppliedContentStyle: .lower(statusView),
+            buttonConfiguration: .singleFullButton() { [weak self] in
+                guard let selected = statusView.selectedStatus else { return }
+                self?.handleRegistrationSelection(status: selected, isbn: isbn)
+            }
+        )
+        
+        sheet.show(from: self, animated: true)
+    }
+    
+    func handleRegistrationSelection(status: BookRegistrationStatus, isbn: String) {
+        Log.debug("선택된 책: \(isbn), 상태: \(status.rawValue)", logger: AppLogger.ui)
+//        viewModel.send(.upsertBook(isbn))
     }
 }
