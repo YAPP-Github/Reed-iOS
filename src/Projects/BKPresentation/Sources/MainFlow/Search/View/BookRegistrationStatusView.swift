@@ -15,7 +15,13 @@ final class BookRegistrationStatusView: UIView {
     private let statuses: [BookRegistrationStatus] = [.before, .inProgress, .after]
     private var buttons: [BKButton] = []
     
-    private(set) var selectedStatus: BookRegistrationStatus?
+    var onSelected: (() -> Void)?
+    
+    private(set) var selectedStatus: BookRegistrationStatus? {
+        didSet {
+            onSelected?()
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
