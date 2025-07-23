@@ -67,11 +67,11 @@ private extension BookRegistrationStatusView {
     func select(status: BookRegistrationStatus) {
         selectedStatus = status
         
-        for (index, btutton) in buttons.enumerated() {
+        for (index, button) in buttons.enumerated() {
             if statuses[index] == status {
-                btutton.style = .tertiary
+                button.style = .tertiary
             } else {
-                btutton.style = .secondary
+                button.style = .secondary
             }
         }
     }
