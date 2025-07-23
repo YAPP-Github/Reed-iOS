@@ -1,5 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
+import BKDesign
 import Combine
 import UIKit
 
@@ -7,6 +9,7 @@ enum SearchViewEvent: Equatable {
     case search(String)
     case loadNextPage
     case deleteRecentQuery(String)
+    case upsertBook(String)
 }
 
 final class SearchViewController: BaseViewController<SearchView> {
@@ -64,6 +67,17 @@ final class SearchViewController: BaseViewController<SearchView> {
                 self?.viewModel.send(.deleteRecentQuery(query))
             }
             .store(in: &cancellable)
+        
+        contentView.eventPublisher
+            .compactMap { event -> String? in
+                if case let .upsertBook(isbn) = event { return isbn }
+                return nil
+            }
+            .removeDuplicates()
+            .sink { [weak self] query in
+                self?.presentBookRegistration(with: query)
+            }
+            .store(in: &cancellable)
     }
     
     override func bindState() {
@@ -83,5 +97,60 @@ final class SearchViewController: BaseViewController<SearchView> {
                 )
             }
             .store(in: &cancellable)
+    }
+}
+
+private extension SearchViewController {
+    func presentBookRegistration(with isbn: String) {
+        let statusView = BookRegistrationStatusView()
+        let sheet = BKBottomSheetViewController(
+            title: "등록 옵션",
+            style: .leadingCloseButton,
+            suppliedContentStyle: .lower(statusView),
+            buttonConfiguration: .singleFullButton(
+                title: "도서 등록"
+            ) { [weak self] in
+                guard let selected = statusView.selectedStatus else { return }
+                self?.dismiss(animated: true)
+                self?.handleRegistrationSelection(status: selected, isbn: isbn)
+            }
+        )
+        sheet.button?.primaryButton?.isEnabled = false
+        statusView.onSelected = {
+            sheet.button?.primaryButton?.isEnabled = true
+        }
+        sheet.show(from: self, animated: true)
+    }
+    
+    func handleRegistrationSelection(status: BookRegistrationStatus, isbn: String) {
+        Log.debug("선택된 책: \(isbn), 상태: \(status.rawValue)", logger: AppLogger.ui)
+//        viewModel.send(.upsertBook(isbn))
+        // TODO: - upsert 성공 시 따라오는 동작으로 변경해야 함
+        presentNoteSuggestion(with: isbn)
+    }
+    
+    func presentNoteSuggestion(with isbn: String) {
+        // TODO: - 그래픽 디자인 작업 이후 변경
+        let graphic = BKImage.Icon.bookmark
+        let graphicView = UIImageView(image: graphic)
+        let sheet = BKBottomSheetViewController(
+            title: "도서가 등록되었어요!",
+            subtitle: "독서 기록을 시작할까요?",
+            style: .centered,
+            suppliedContentStyle: .upper(graphicView),
+            buttonConfiguration: .twoButtonGroup(
+                leftTitle: "아니요, 나중에요",
+                rightTitle: "네, 시작할게요!",
+                leftAction: { [weak self] in
+                    self?.dismiss(animated: true)
+                },
+                rightAction: { [weak self] in
+                    Log.debug("선택된 책 \(isbn), 등록 시작", logger: AppLogger.ui)
+                    self?.dismiss(animated: true)
+                }
+            )
+        )
+        
+        sheet.show(from: self, animated: true)
     }
 }

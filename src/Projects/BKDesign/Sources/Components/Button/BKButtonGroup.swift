@@ -99,7 +99,7 @@ public class BKButtonGroup: UIView {
         switch layout {
         case .horizontal:
             stackView.axis = .horizontal
-            stackView.distribution = .fillProportionally
+            stackView.distribution = .fillEqually
             stackView.alignment = .fill
             buttons.forEach { $0.isFullWidth = false }
             
