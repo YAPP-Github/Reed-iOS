@@ -54,8 +54,9 @@ private extension SettingView {
     func makeLayout() -> UICollectionViewCompositionalLayout {
         UICollectionViewCompositionalLayout { sectionIndex, env in
             var cfg = UICollectionLayoutListConfiguration(appearance: .plain)
-            cfg.footerMode      = sectionIndex == 0 ? .supplementary : .none
+            cfg.footerMode = sectionIndex == 0 ? .supplementary : .none
             cfg.showsSeparators = false
+            cfg.backgroundColor = .bkBaseColor(.primary)
             let section = NSCollectionLayoutSection.list(using: cfg, layoutEnvironment: env)
             section.contentInsets = .init(
                 top: BKInset.inset4,
@@ -78,7 +79,7 @@ private extension SettingView {
 
     func configureCollectionView() {
         collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        collectionView.backgroundColor = .systemBackground
+        collectionView.backgroundColor = .bkBaseColor(.primary)
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.isScrollEnabled = true
@@ -126,7 +127,7 @@ extension SettingView: UICollectionViewDelegate {
         _ collectionView: UICollectionView,
         shouldHighlightItemAt indexPath: IndexPath
     ) -> Bool {
-        return false
+        return true
     }
 }
 

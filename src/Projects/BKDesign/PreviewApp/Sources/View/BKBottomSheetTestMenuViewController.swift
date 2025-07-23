@@ -126,7 +126,7 @@ final class BKBottomSheetTestMenuViewController: UIViewController {
             title: "타이틀틀",
             subtitle: "서브타이틀틀",
             style: .centered,
-            suppliedContent: image,
+            suppliedContentStyle: .upper(image),
             buttonConfiguration: .singleFullButton()
         )
         sheet.show(from: self, animated: true)
@@ -154,10 +154,17 @@ final class BKBottomSheetTestMenuViewController: UIViewController {
     @objc private func openLeadingWithSubtitleAndImage() {
         let image = UIImageView(image: BKImage.Icon.search)
         let sheet = BKBottomSheetViewController(
-            title: "타이틀틀",
-            subtitle: "서브타이틀틀",
+            title: """
+            두줄을 가뿐
+            히넘기는
+            타이틀
+            """,
+            subtitle: """
+            두줄을 가뿐히 넘겨버리
+            는 서브타이틀
+            """,
             style: .leadingCloseButton,
-            suppliedContent: image,
+            suppliedContentStyle: .lower(image),
             buttonConfiguration: .singleFullButton()
         )
         sheet.show(from: self, animated: true)

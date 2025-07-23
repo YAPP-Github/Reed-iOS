@@ -54,6 +54,11 @@ public final class AppCoordinator: Coordinator {
             parentCoordinator: self,
             navigationController: navigationController
         )
+        
+        mainFlowCoordinator.onFinish = { [weak self] in
+            self?.startAuthFlow()
+        }
+        
         addChildCoordinator(mainFlowCoordinator)
         mainFlowCoordinator.start()
     }
