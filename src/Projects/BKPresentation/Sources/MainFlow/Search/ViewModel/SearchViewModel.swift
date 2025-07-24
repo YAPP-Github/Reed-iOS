@@ -28,6 +28,7 @@ final class SearchViewModel: BaseViewModel {
         case search(String)
         case loadNextPage
         case deleteRecentQuery(String)
+//        case upsertBook(String)
         case fetchRecentQueriesSuccessed([String])
         case fetchSearchResultSuccessed((books: [Book], totalResults: Int))
         case fetchNextPageSuccessed([Book])
@@ -38,6 +39,7 @@ final class SearchViewModel: BaseViewModel {
         case deleteRecentQuery(String)
         case searchResult(String)
         case loadNextPage
+//        case upsert(Book)
     }
     
     @Published private var state = State()

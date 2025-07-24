@@ -10,6 +10,7 @@ final class SettingCell: UICollectionViewListCell {
         case label
         case none
     }
+    
     static let identifier = "SettingCell"
     
     private let titleLabel = BKLabel()
@@ -26,8 +27,17 @@ final class SettingCell: UICollectionViewListCell {
         return view
     }()
     
+    override var isHighlighted: Bool {
+        didSet {
+            backgroundColor = .bkBaseColor(.primary)
+            contentView.backgroundColor = .bkBaseColor(.primary)
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
+        backgroundColor = .bkBaseColor(.primary)
+        contentView.backgroundColor = .bkBaseColor(.primary)
         [titleLabel, iconView, versionLabel].forEach(addSubview(_:))
         
         titleLabel.snp.makeConstraints {

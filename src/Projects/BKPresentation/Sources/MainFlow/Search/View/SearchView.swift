@@ -234,6 +234,16 @@ extension SearchView: UICollectionViewDelegate {
             eventPublisher.send(.loadNextPage)
         }
     }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
+        guard let item = dataSource.itemIdentifier(for: indexPath) else { return }
+        if case let .result(book) = item {
+            eventPublisher.send(.upsertBook(book.isbn))
+        }
+    }
 }
 
 private extension SearchView {

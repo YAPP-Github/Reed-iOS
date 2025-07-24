@@ -26,18 +26,22 @@ final class SettingViewModel: BaseViewModel {
         var firstMenuItems = FirstMenuItem.allCases
         var secondMenuItems = SecondMenuItem.allCases
         var appVersion: String = ""
+        var errorMessage: String?
+        var isLoggedOut: Bool = false
     }
     
     enum Action {
         case onAppear
         case fetchAppVersionSuccessed(String)
-//        case logoutButtonTapped
+        case logoutButtonTapped
+        case logoutSuccessed
+        case logoutFailed
 //        case withdrawButtonTapped
     }
     
     enum SideEffect {
         case appVersion
-//        case logout
+        case logout
 //        case withdraw
     }
     
@@ -46,6 +50,7 @@ final class SettingViewModel: BaseViewModel {
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
     
     @Autowired private var appVersionUseCase: AppVersionUseCase
+    @Autowired private var logoutUseCase: LogoutUseCase
     
     var statePublisher: AnyPublisher<State, Never> {
         $state.eraseToAnyPublisher()
@@ -70,6 +75,13 @@ final class SettingViewModel: BaseViewModel {
             effects.append(.appVersion)
         case .fetchAppVersionSuccessed(let version):
             newState.appVersion = version
+        case .logoutButtonTapped:
+            effects.append(.logout)
+        case .logoutSuccessed:
+            newState.isLoggedOut = true
+        case .logoutFailed:
+            newState.errorMessage = "Logout Failed"
+            newState.isLoggedOut = false
         }
         
         return (newState, effects)
@@ -80,6 +92,11 @@ final class SettingViewModel: BaseViewModel {
         case .appVersion:
             return appVersionUseCase.execute()
                 .map(Action.fetchAppVersionSuccessed)
+                .eraseToAnyPublisher()
+        case .logout:
+            return logoutUseCase.execute()
+                .map { _ in Action.logoutSuccessed }
+                .catch { _ in Just(Action.logoutFailed) }
                 .eraseToAnyPublisher()
         }
     }

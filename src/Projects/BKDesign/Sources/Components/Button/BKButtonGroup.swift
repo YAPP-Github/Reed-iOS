@@ -15,6 +15,14 @@ public class BKButtonGroup: UIView {
     // MARK: - Properties
     private let stackView = UIStackView()
     private var buttons: [BKButton] = []
+    public var primaryButton: BKButton? {
+        didSet {
+            guard let primaryButton else { return }
+            if !buttons.contains(primaryButton) {
+                self.primaryButton = oldValue
+            }
+        }
+    }
     
     public var layout: Layout = .horizontal {
         didSet {
@@ -77,6 +85,10 @@ public class BKButtonGroup: UIView {
         }
     }
     
+    public func setPrimaryButtonState(_ state: Bool) {
+        primaryButton?.isEnabled = state
+    }
+    
     public func removeAllButtons() {
         buttons.removeAll()
         updateButtons()
@@ -87,7 +99,7 @@ public class BKButtonGroup: UIView {
         switch layout {
         case .horizontal:
             stackView.axis = .horizontal
-            stackView.distribution = .fillProportionally
+            stackView.distribution = .fillEqually
             stackView.alignment = .fill
             buttons.forEach { $0.isFullWidth = false }
             
@@ -142,7 +154,9 @@ extension BKButtonGroup {
             rightButton.addAction(UIAction { _ in action() }, for: .touchUpInside)
         }
         
-        return BKButtonGroup(buttons: [leftButton, rightButton], layout: .fullWidth)
+        let group = BKButtonGroup(buttons: [leftButton, rightButton], layout: .fullWidth)
+        group.primaryButton = rightButton
+        return group
     }
     
     public static func singleFullButton(
@@ -155,7 +169,9 @@ extension BKButtonGroup {
             nextButton.addAction(UIAction { _ in action() }, for: .touchUpInside)
         }
         
-        return BKButtonGroup(buttons: [nextButton], layout: .vertical)
+        let group = BKButtonGroup(buttons: [nextButton], layout: .vertical)
+        group.primaryButton = nextButton
+        return group
     }
     
     /// 3개 버튼 수평 그룹

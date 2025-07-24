@@ -58,4 +58,15 @@ public extension Coordinator {
         }
         childCoordinators.removeAll()
     }
+    
+    func firstAncestor<T>(
+        ofType type: T.Type
+    ) -> T? {
+        var current: Coordinator? = self
+        while let parent = current?.parentCoordinator {
+            if let match = parent as? T { return match }
+            current = parent
+        }
+        return nil
+    }
 }
