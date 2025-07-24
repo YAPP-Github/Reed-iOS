@@ -7,6 +7,7 @@ final class TabBarCoordinator: Coordinator {
     weak var parentCoordinator: Coordinator?
     var childCoordinators = [Coordinator]()
     var navigationController: UINavigationController
+    var onFinish: (() -> Void)?
     
     private let tabBarController: BottomTabBarController
     
@@ -64,12 +65,9 @@ final class TabBarCoordinator: Coordinator {
     
 }
 
-extension TabBarCoordinator {
-    func addChildCoordinator(_ coordinator: Coordinator) {
-        childCoordinators.append(coordinator)
-    }
-    
-    func removeChildCoordinator(_ coordinator: Coordinator) {
-        childCoordinators = childCoordinators.filter { $0 !== coordinator }
+extension TabBarCoordinator: SessionExpirationHandling {
+    func handleSessionExpired() {
+        navigationController.setViewControllers([], animated: false)
+        didFinish()
     }
 }
