@@ -4,6 +4,7 @@ import BKDesign
 import UIKit
 
 final class BottomTabBarController: UITabBarController {
+    private var shadowView: UIView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,44 +20,95 @@ final class BottomTabBarController: UITabBarController {
         super.viewWillDisappear(animated)
         navigationController?.navigationBar.isHidden = false
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        setupTabBarFrame()
+        let customLayer = createCustomTabBarLayer()
+        applyCustomLayer(customLayer)
+    }
+    
+}
 
-    private func customizeTabBarAppearance() {
+// MARK: - TabBar Appearance
+private extension BottomTabBarController {
+    func customizeTabBarAppearance() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .bkBaseColor(.primary)
+        appearance.shadowColor = .clear
         
-        appearance.shadowColor = UIColor(hex: "6D6D6D").withAlphaComponent(0.05)
+        setupTabBarTextAttributes(appearance: appearance)
+        setupTabBarIconColors(appearance: appearance)
         
-        let normalAttrs: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.bkContentColor(.secondary)]
-        let selectedAttrs: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.bkContentColor(.primary)]
-
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = normalAttrs
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = selectedAttrs
-        appearance.stackedLayoutAppearance.normal.iconColor = .bkBackgroundColor(.disable)
-        appearance.stackedLayoutAppearance.selected.iconColor = .bkContentColor(.primary)
-
         tabBar.standardAppearance = appearance
         tabBar.scrollEdgeAppearance = appearance
     }
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-
+    
+    func setupTabBarTextAttributes(appearance: UITabBarAppearance) {
+        let normalAttrs: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.bkContentColor(.secondary)]
+        let selectedAttrs: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.bkContentColor(.primary)]
+        
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = normalAttrs
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = selectedAttrs
+    }
+    
+    func setupTabBarIconColors(appearance: UITabBarAppearance) {
+        appearance.stackedLayoutAppearance.normal.iconColor = .bkBackgroundColor(.disable)
+        appearance.stackedLayoutAppearance.selected.iconColor = .bkContentColor(.primary)
+    }
+    
+    func setupTabBarFrame() {
         let height: CGFloat = 92
-
+        
         var tabFrame = tabBar.frame
         tabFrame.size.height = height
         tabFrame.origin.y = view.frame.height - height
         tabBar.frame = tabFrame
-
-        tabBar.layer.cornerRadius = BKRadius.large
-        tabBar.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        tabBar.layer.masksToBounds = true
-
-        // TODO: - 그림자 값 조정 더 해야함
-        tabBar.layer.shadowColor = UIColor(hex: "6D6D6D").cgColor
-        tabBar.layer.shadowOpacity = 0.1
-        tabBar.layer.shadowOffset = CGSize(width: 0, height: -4)
-        tabBar.layer.shadowRadius = 10
+        
+        tabBar.layer.sublayers?.removeAll(where: { $0.name == "customTabBarLayer" })
+    }
+    
+    func createCustomTabBarLayer() -> CAShapeLayer {
+        let customLayer = CAShapeLayer()
+        customLayer.name = "customTabBarLayer"
+        
+        let tabFrame = tabBar.frame
+        let cornerRadius = BKRadius.large
+        
+        let path = UIBezierPath()
+        path.move(to: CGPoint(x: cornerRadius, y: 0))
+        path.addLine(to: CGPoint(x: tabFrame.width - cornerRadius, y: 0))
+        path.addQuadCurve(
+            to: CGPoint(x: tabFrame.width, y: cornerRadius),
+            controlPoint: CGPoint(x: tabFrame.width, y: 0)
+        )
+        path.addLine(to: CGPoint(x: tabFrame.width, y: tabFrame.height))
+        path.addLine(to: CGPoint(x: 0, y: tabFrame.height))
+        path.addLine(to: CGPoint(x: 0, y: cornerRadius))
+        path.addQuadCurve(
+            to: CGPoint(x: cornerRadius, y: 0),
+            controlPoint: CGPoint(x: 0, y: 0)
+        )
+        path.close()
+        
+        customLayer.path = path.cgPath
+        customLayer.fillColor = UIColor.bkBaseColor(.primary).cgColor
+        customLayer.strokeColor = UIColor.bkBorderColor(.primary).cgColor
+        customLayer.lineWidth = 1.0
+        
+        customLayer.shadowColor = UIColor(hex: "6D6D6D").cgColor
+        customLayer.shadowOpacity = 0.1
+        customLayer.shadowOffset = CGSize(width: 0, height: -4)
+        customLayer.shadowRadius = 10
+        customLayer.masksToBounds = false
+        
+        return customLayer
+    }
+    
+    func applyCustomLayer(_ customLayer: CAShapeLayer) {
+        tabBar.backgroundColor = .clear
+        tabBar.layer.insertSublayer(customLayer, at: 0)
     }
 }
