@@ -29,8 +29,7 @@ public final class AppCoordinator: Coordinator {
                 case .finished:
                     self?.startMainFlow()
                 case .failure:
-//                    self?.startAuthFlow()
-                    self?.startMainFlow()
+                    self?.startAuthFlow()
                 }
             }, receiveValue: { _ in })
             .store(in: &cancellable)
@@ -55,6 +54,10 @@ public final class AppCoordinator: Coordinator {
             parentCoordinator: self,
             navigationController: navigationController
         )
+        
+        tabBarCoordinator.onFinish = { [weak self] in
+            self?.startAuthFlow()
+        }
         
         addChildCoordinator(tabBarCoordinator)
         tabBarCoordinator.start()
