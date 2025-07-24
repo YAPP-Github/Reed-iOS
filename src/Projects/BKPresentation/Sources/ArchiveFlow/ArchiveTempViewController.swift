@@ -4,7 +4,7 @@ import UIKit
 import SnapKit
 
 final class ArchiveTempViewController: UIViewController {
-    var coordinator: ArchiveCoordinator?
+    weak var coordinator: ArchiveCoordinator?
     
     override func viewDidLoad() {
         super.viewDidLoad()
