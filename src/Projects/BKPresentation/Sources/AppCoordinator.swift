@@ -29,7 +29,8 @@ public final class AppCoordinator: Coordinator {
                 case .finished:
                     self?.startMainFlow()
                 case .failure:
-                    self?.startAuthFlow()
+//                    self?.startAuthFlow()
+                    self?.startMainFlow()
                 }
             }, receiveValue: { _ in })
             .store(in: &cancellable)
@@ -50,16 +51,16 @@ public final class AppCoordinator: Coordinator {
     }
     
     func startMainFlow() {
-        let mainFlowCoordinator = MainFlowCoordinator(
+        let tabBarCoordinator = TabBarCoordinator(
             parentCoordinator: self,
             navigationController: navigationController
         )
         
-        mainFlowCoordinator.onFinish = { [weak self] in
+        tabBarCoordinator.onFinish = { [weak self] in
             self?.startAuthFlow()
         }
         
-        addChildCoordinator(mainFlowCoordinator)
-        mainFlowCoordinator.start()
+        addChildCoordinator(tabBarCoordinator)
+        tabBarCoordinator.start()
     }
 }
