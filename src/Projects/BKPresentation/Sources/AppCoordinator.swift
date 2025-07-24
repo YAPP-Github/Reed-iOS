@@ -56,10 +56,6 @@ public final class AppCoordinator: Coordinator {
             navigationController: navigationController
         )
         
-        tabBarCoordinator.onFinish = { [weak self] in
-            self?.startAuthFlow()
-        }
-        
         addChildCoordinator(tabBarCoordinator)
         tabBarCoordinator.start()
     }
