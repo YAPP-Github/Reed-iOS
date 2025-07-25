@@ -41,6 +41,12 @@ final class CatalogViewController: UIViewController {
         return button
     }()
     
+    private let chipButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("BKChipDemoViewController", for: .normal)
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Test Menu"
@@ -56,7 +62,8 @@ final class CatalogViewController: UIViewController {
             buttonGroupDemoButton,
             bottomSheetTitleButton,
             bottomSheetButton,
-            dialogButton
+            dialogButton,
+            chipButton
         ])
         stack.axis = .vertical
         stack.spacing = 16
@@ -77,6 +84,12 @@ final class CatalogViewController: UIViewController {
         bottomSheetTitleButton.addTarget(self, action: #selector(openBottomSheetTitle), for: .touchUpInside)
         bottomSheetButton.addTarget(self, action: #selector(openBottomSheetTest), for: .touchUpInside)
         dialogButton.addTarget(self, action: #selector(openDialogTest), for: .touchUpInside)
+        chipButton.addTarget(self, action: #selector(openChipTest), for: .touchUpInside)
+    }
+    
+    @objc private func openChipTest() {
+        let vc = BKChipDemoViewController()
+        navigationController?.pushViewController(vc, animated: true)
     }
 
     @objc private func openBottomSheetTitle() {
