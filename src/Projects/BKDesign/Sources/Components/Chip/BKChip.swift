@@ -2,31 +2,31 @@
 
 import UIKit
 
-final class BKChip: UIView {
+public final class BKChip: UIView {
     private var titleLabel = BKLabel()
     private var countLabel = BKLabel()
     private let labelContainer = UIView()
     private var onTap: (() -> Void)?
     
-    var isSelected: Bool = false {
+    public var isSelected: Bool = false {
         didSet {
             updateAppearance()
         }
     }
     
-    var title: String = "" {
+    public var title: String = "" {
         didSet {
             titleLabel.setText(text: title)
         }
     }
     
-    var count: Int = 0 {
+    public var count: Int = 0 {
         didSet {
             countLabel.setText(text: "\(count)")
         }
     }
     
-    init(title: String, count: Int = 0, onTap: (() -> Void)? = nil) {
+    public init(title: String, count: Int = 0, onTap: (() -> Void)? = nil) {
         super.init(frame: .zero)
         self.title = title
         self.count = count
@@ -38,7 +38,7 @@ final class BKChip: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
         layer.cornerRadius = frame.height / 2
     }
@@ -66,19 +66,22 @@ final class BKChip: UIView {
     
     private func setupLayout() {
         titleLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview()
-            $0.centerY.equalToSuperview()
+            $0.leading.top.bottom.equalToSuperview()
         }
         
         countLabel.snp.makeConstraints {
             $0.leading.equalTo(titleLabel.snp.trailing).offset(BKSpacing.spacing1)
-            $0.trailing.equalToSuperview()
-            $0.centerY.equalToSuperview()
+            $0.trailing.top.bottom.equalToSuperview()
+            $0.centerY.equalTo(titleLabel)
         }
         
         labelContainer.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(BKSpacing.spacing3)
-            $0.verticalEdges.equalToSuperview().inset(BKSpacing.spacing2)
+            $0.center.equalToSuperview()
+        }
+        
+        self.snp.makeConstraints {
+            $0.width.equalTo(labelContainer.snp.width).offset(BKSpacing.spacing3 * 2)
+            $0.height.equalTo(labelContainer.snp.height).offset(BKSpacing.spacing2 * 2)
         }
     }
     
@@ -90,7 +93,6 @@ final class BKChip: UIView {
             // 기존 라벨의 스타일만 업데이트
             titleLabel.setFontStyle(style: .label1(weight: .semiBold))
             titleLabel.setColor(color: .bkBaseColor(.primary))
-            
             
             countLabel.setColor(color: .bkBaseColor(.primary))
         } else {
