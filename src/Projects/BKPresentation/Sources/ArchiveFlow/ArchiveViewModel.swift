@@ -145,7 +145,7 @@ final class ArchiveViewModel: BaseViewModel {
                     isSelected: index == newState.selectedChipIndex
                 )
             }
-
+            
             if case .empty = state.archiveState {
                 newState.archiveState = .empty(updatedChips)
             } else if case .books(_, let books) = state.archiveState {
@@ -236,36 +236,97 @@ final class ArchiveViewModel: BaseViewModel {
     
     private func createMockChips() -> [ChipData] {
         return [
-            ChipData(title: "전체", count: 2, isSelected: true),
-            ChipData(title: "읽기 전", count: 0, isSelected: false),
-            ChipData(title: "읽는 중", count: 0, isSelected: false),
-            ChipData(title: "완독", count: 0, isSelected: false)
+            ChipData(title: "전체", count: 4),
+            ChipData(title: "읽기 전", count: 2),
+            ChipData(title: "읽는 중", count: 2),
+            ChipData(title: "완독", count: 0)
         ]
     }
     
     private func createMockBooks(for status: BookStatus?) -> [ArchiveBook] {
         // 임시 Mock 데이터
-        if status == .total { // 전체
+        switch status {
+        case .total: // 전체 (4개)
             return [
                 ArchiveBook(
                     isbn: "1234",
                     title: "여름은 오래 그곳에 남아",
                     author: "미쓰이에 다카시",
                     publisher: "비채",
-                    imageURL: URL(string: "https://example.com/book1.jpg"),
+                    imageURL: URL(string: "https://image.aladin.co.kr/product/7492/9/cover500/8934972203_1.jpg"),
                     recordCount: 24
                 ),
                 ArchiveBook(
                     isbn: "5678",
-                    title: "쇼펜하우어 인생수업 한 번 뿐인 삶 이...",
+                    title: "쇼펜하우어 인생수업",
                     author: "쇼펜하우어",
                     publisher: "민음사",
-                    imageURL: URL(string: "https://example.com/book2.jpg"),
-                    recordCount: 24
+                    imageURL: URL(string: "https://image.aladin.co.kr/product/33464/3/cover500/k082938849_3.jpg"),
+                    recordCount: 15
+                ),
+                ArchiveBook(
+                    isbn: "9101",
+                    title: "작별인사",
+                    author: "김영하",
+                    publisher: "복복서가",
+                    imageURL: URL(string: "https://image.aladin.co.kr/product/29281/68/cover500/k122837904_2.jpg"),
+                    recordCount: 0
+                ),
+                ArchiveBook(
+                    isbn: "1121",
+                    title: "불편한 편의점",
+                    author: "김호연",
+                    publisher: "나무옆의자",
+                    imageURL: URL(string: "https://image.aladin.co.kr/product/29045/74/cover500/k192836746_2.jpg"),
+                    recordCount: 0
                 )
             ]
-        } else {
-            return [] // 다른 상태는 빈 배열 반환 (테스트용)
+            
+        case .toRead: // 읽기 전 (2개)
+            return [
+                ArchiveBook(
+                    isbn: "9101",
+                    title: "작별인사",
+                    author: "김영하",
+                    publisher: "복복서가",
+                    imageURL: URL(string: "https://image.aladin.co.kr/product/29281/68/cover500/k122837904_2.jpg"),
+                    recordCount: 0
+                ),
+                ArchiveBook(
+                    isbn: "1121",
+                    title: "불편한 편의점",
+                    author: "김호연",
+                    publisher: "나무옆의자",
+                    imageURL: URL(string: "https://image.aladin.co.kr/product/29045/74/cover500/k192836746_2.jpg"),
+                    recordCount: 0
+                )
+            ]
+            
+        case .reading: // 읽는 중 (2개)
+            return [
+                ArchiveBook(
+                    isbn: "1234",
+                    title: "여름은 오래 그곳에 남아",
+                    author: "미쓰이에 다카시",
+                    publisher: "비채",
+                    imageURL: URL(string: "https://image.aladin.co.kr/product/7492/9/cover500/8934972203_1.jpg"),
+                    recordCount: 24
+                ),
+                ArchiveBook(
+                    isbn: "5678",
+                    title: "쇼펜하우어 인생수업",
+                    author: "쇼펜하우어",
+                    publisher: "민음사",
+                    imageURL: URL(string: "https://image.aladin.co.kr/product/33464/3/cover500/k082938849_3.jpg"),
+                    recordCount: 15
+                )
+            ]
+            
+        case .completed: // 완독 (0개)
+            return []
+            
+        default:
+            return []
         }
     }
 }
