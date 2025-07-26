@@ -6,7 +6,7 @@ public final class BKChip: UIView {
     private var titleLabel = BKLabel()
     private var countLabel = BKLabel()
     private let labelContainer = UIView()
-    private var onTap: (() -> Void)?
+    public var onTap: (() -> Void)?
     
     public var isSelected: Bool = false {
         didSet {
@@ -117,7 +117,6 @@ public final class BKChip: UIView {
     }
     
     @objc private func handleTap() {
-        isSelected.toggle()
         onTap?()
     }
 }
