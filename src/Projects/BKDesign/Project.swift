@@ -19,15 +19,6 @@ let project = Project.project(
             ]
         ),
         Target.target(
-            name: "\(BKModule.BKDesign.rawValue)Test",
-            product: .unitTests,
-            bundleId: "designtest" + Project.bundleID,
-            sources: .tests,
-            dependencies: [
-                .design()
-            ]
-        ),
-        Target.target(
             name: "BKDesignPreviewApp",
             product: .app,
             bundleId: "designpreview." + Project.bundleID,

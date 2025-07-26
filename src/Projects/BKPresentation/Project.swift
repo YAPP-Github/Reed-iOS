@@ -19,15 +19,6 @@ let project = Project.project(
                 .external(dependency: .SnapKit),
                 .external(dependency: .Kingfisher)
             ]
-        ),
-        Target.target(
-            name: "\(BKModule.BKPresentation.rawValue)Test",
-            product: .unitTests,
-            bundleId: "presentationtest" + Project.bundleID,
-            sources: .tests,
-            dependencies: [
-                .presentation()
-            ]
         )
     ]
 )
