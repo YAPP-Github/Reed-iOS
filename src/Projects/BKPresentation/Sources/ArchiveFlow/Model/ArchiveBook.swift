@@ -2,7 +2,8 @@
 
 import UIKit
 
-struct ArchiveBook: Hashable {
+struct ArchiveBook: Hashable, Equatable {
+    let isbn: String
     let title: String
     let author: String
     let publisher: String
@@ -13,14 +14,8 @@ struct ArchiveBook: Hashable {
         hasher.combine(title)
         hasher.combine(author)
     }
-}
-
-struct ChipData: Hashable {
-    let title: String
-    let count: Int
-    var isSelected: Bool = false
     
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(title)
+    static func == (lhs: ArchiveBook, rhs: ArchiveBook) -> Bool {
+        lhs.isbn == rhs.isbn
     }
 }
