@@ -16,7 +16,7 @@ final class ArchiveCoordinator: Coordinator {
     }
     
     func start() {
-        let archiveViewController = ArchiveTempViewController()
+        let archiveViewController = ArchiveViewController(viewModel: ArchiveViewModel())
         archiveViewController.coordinator = self
         navigationController.pushViewController(archiveViewController, animated: false)
     }
