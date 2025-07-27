@@ -16,10 +16,7 @@ final class TermsItemCell: UICollectionViewListCell {
     
     // MARK: - UI Components
     private let checkBoxInteractionView = UIView()
-    private let checkBox = BKCheckBox(
-        frame: .zero,
-        type: .roundStroke
-    )
+    private let checkBox = UIImageView(image: BKImage.Icon.check)
     
     private let titleLabel = BKLabel(fontStyle: .body1(weight: .medium))
     
@@ -31,10 +28,17 @@ final class TermsItemCell: UICollectionViewListCell {
         return view
     }()
     
+    // MARK: - Callbacks
+    /// 체크박스 영역이 탭 되었을 때 호출될 클로저
+    var onCheckTapped: (() -> Void)?
+    /// 상세보기(chevron) 아이콘이 탭 되었을 때 호출될 클로저
+    var onDetailTapped: (() -> Void)?
+    
     // MARK: - Inits
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
+        setupActions()
     }
     
     required init?(coder: NSCoder) {
@@ -44,6 +48,9 @@ final class TermsItemCell: UICollectionViewListCell {
     override func prepareForReuse() {
         titleLabel.setText(text: "")
         chevronIconView.isHidden = true
+        
+        onCheckTapped = nil
+        onDetailTapped = nil
     }
     
     override func preferredLayoutAttributesFitting(
@@ -81,14 +88,28 @@ final class TermsItemCell: UICollectionViewListCell {
         }
     }
     
-    public func configure(_ termVO: TermsViewObject) {
-        titleLabel.setText(text: termVO.title)
+    public func configure(_ term: Term) {
+        titleLabel.setText(text: term.title)
+
+        checkBox.tintColor = term.isAgreed ? .bkContentColor(.brand) : .bkContentColor(.tertiary)
+        chevronIconView.isHidden = (term.url == nil)
+    }
+    
+    private func setupActions() {
+        let checkTap = UITapGestureRecognizer(target: self, action: #selector(handleCheckTap))
+        checkBoxInteractionView.addGestureRecognizer(checkTap)
         
-        if termVO.url != nil {
-            chevronIconView.isHidden = false
-        } else {
-            chevronIconView.isHidden = true
-        }
+        let detailTap = UITapGestureRecognizer(target: self, action: #selector(handleDetailTap))
+        chevronIconView.addGestureRecognizer(detailTap)
+        chevronIconView.isUserInteractionEnabled = true
+    }
+    
+    @objc private func handleCheckTap() {
+        onCheckTapped?()
+    }
+    
+    @objc private func handleDetailTap() {
+        onDetailTapped?()
     }
 
 }
