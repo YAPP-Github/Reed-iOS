@@ -26,6 +26,15 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(
+            type: TermsAgreeUseCase.self
+        ) { _ in
+            @Autowired var repository: AuthStateRepository
+            return DefaultTermsAgreeUseCase(
+                authStateRepository: repository
+            )
+        }
+        
+        container.register(
             type: SocialLoginUseCase.self,
             name: "apple"
         ) { _ in
