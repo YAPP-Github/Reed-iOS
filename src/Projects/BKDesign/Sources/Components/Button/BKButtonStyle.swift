@@ -93,6 +93,12 @@ public struct BKButtonColorSet {
     /// 비활성화(disabled) 상태에서의 색상
     let disabled: UIColor
     
+    public init(normal: UIColor, pressed: UIColor, disabled: UIColor) {
+        self.normal = normal
+        self.pressed = pressed
+        self.disabled = disabled
+    }
+    
     /// 버튼의 상태에 맞는 색상을 반환합니다.
     ///
     /// - Parameter state: 버튼의 현재 상태
