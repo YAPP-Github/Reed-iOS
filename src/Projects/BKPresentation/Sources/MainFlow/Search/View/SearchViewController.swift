@@ -131,7 +131,7 @@ private extension SearchViewController {
     
     func presentNoteSuggestion(with isbn: String) {
         // TODO: - 그래픽 디자인 작업 이후 변경
-        let graphic = BKImage.Icon.bookmark
+        let graphic = BKImage.Graphics.mascot
         let graphicView = UIImageView(image: graphic)
         let sheet = BKBottomSheetViewController(
             title: "도서가 등록되었어요!",

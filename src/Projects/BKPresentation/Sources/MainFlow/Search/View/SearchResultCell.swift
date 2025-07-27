@@ -39,6 +39,8 @@ final class SearchResultCell: UICollectionViewCell {
         color: .bkContentColor(.disable)
     )
     
+    private let dividerView = BKDivider(type: .small)
+    
     private let descriptionStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -49,7 +51,7 @@ final class SearchResultCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        addSubviews(thumbnail, labelStack)
+        addSubviews(thumbnail, labelStack, dividerView)
         [titleLabel, descriptionStack].forEach(labelStack.addArrangedSubview(_:))
         [authorLabel, separatorLabel, publisherLabel].forEach(descriptionStack.addArrangedSubview(_:))
         
@@ -71,6 +73,10 @@ final class SearchResultCell: UICollectionViewCell {
         authorLabel.snp.makeConstraints {
             $0.width.lessThanOrEqualTo(descriptionStack.snp.width)
                 .multipliedBy(LayoutConstants.authorMaxRatio)
+        }
+        
+        dividerView.snp.makeConstraints {
+            $0.leading.trailing.bottom.equalToSuperview()
         }
         
         authorLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
