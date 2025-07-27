@@ -12,21 +12,29 @@ final class LoginViewController: BaseViewController<LoginView> {
     let viewModel: AnyViewBindableViewModel<LoginViewModel.State, LoginViewModel.Action>
     
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
-        .main(
+        .standard(
             viewController: self,
-            target: self,
-            searchAction: #selector(dummyFunc),
-            gearAction: #selector(dummyFunc)
+            rightButton: .none
         )
     }
     
     override var bkNavigationTitle: String {
-        return "로그인"
+        return ""
     }
     
     init(viewModel: LoginViewModel) {
         self.viewModel = AnyViewBindableViewModel(viewModel)
         super.init()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.navigationBar.isHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.navigationController?.navigationBar.isHidden = false
     }
     
     override func bindAction() {
@@ -60,11 +68,9 @@ final class LoginViewController: BaseViewController<LoginView> {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isLoggedIn in
                 if isLoggedIn {
-                    self?.coordinator?.popAndFinish()
+                    self?.coordinator?.goToTermsViewController()
                 }
             }
             .store(in: &cancellable)
     }
-    
-    @objc func dummyFunc() {}
 }
