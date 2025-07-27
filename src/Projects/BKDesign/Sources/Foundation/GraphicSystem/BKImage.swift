@@ -52,4 +52,8 @@ public enum BKImage {
         public static let strokeRectangle = BKDesignAsset.checkboxStrokeRectangle.image
         public static let strokeRound = BKDesignAsset.checkboxStrokeRound.image
     }
+    
+    public enum Graphics {
+        public static let mascot = BKDesignAsset.mascot.image
+    }
 }
