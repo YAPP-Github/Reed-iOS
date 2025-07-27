@@ -9,4 +9,3 @@ public enum AuthError: Error {
     case missingToken                 // 토큰이 없을 때
     case unknown
 }
-
