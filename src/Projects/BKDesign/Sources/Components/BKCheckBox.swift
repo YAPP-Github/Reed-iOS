@@ -39,11 +39,15 @@ public final class BKCheckBox: UIControl {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    public override var intrinsicContentSize: CGSize {
+        CGSize(width: LayoutConstants.size, height: LayoutConstants.size)
+    }
 
     private func setup() {
         addSubview(imageView)
         imageView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.center.equalToSuperview()
             $0.size.equalTo(
                 CGSize(
                     width: LayoutConstants.size,
