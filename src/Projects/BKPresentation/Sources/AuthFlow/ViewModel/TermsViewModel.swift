@@ -101,7 +101,6 @@ final class TermsViewModel: BaseViewModel {
         case .agreeToTerms:
             return termsAgreeUseCase.execute(true)
                 .map { isSuccess -> Action in
-                    print(isSuccess)
                     return isSuccess ? .agreementSuccess : .agreementFailed(.unknown)
                 }
                 .catch { error -> Just<Action> in
