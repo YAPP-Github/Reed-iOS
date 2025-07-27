@@ -65,13 +65,21 @@ final class TermsView: BaseView {
         return collectionView
     }()
     
-    private let startButton = BKButton.primary(title: "시작하기", size: .large)
+    private let startButton = BKButton.primary(
+        title: "시작하기",
+        size: .large
+    )
     
     override func setupView() {
         titleLabel.numberOfLines = 2
         
         setupAgreeAllAreaView()
-        addSubviews(titleLabel, agreeAllAreaView, collectionView, startButton)
+        addSubviews(
+            titleLabel,
+            agreeAllAreaView,
+            collectionView,
+            startButton
+        )
         
         startButton.isDisabled = true
         
@@ -132,7 +140,11 @@ final class TermsView: BaseView {
         let agreeAllTap = UITapGestureRecognizer(target: self, action: #selector(agreeAllAreaTapped))
         agreeAllAreaView.addGestureRecognizer(agreeAllTap)
         
-         startButton.addTarget(self, action: #selector(startButtonTapped), for: .touchUpInside)
+         startButton.addTarget(
+            self,
+            action: #selector(startButtonTapped),
+            for: .touchUpInside
+         )
     }
     
     @objc private func agreeAllAreaTapped() {
@@ -165,7 +177,9 @@ final class TermsView: BaseView {
             }
         }
         
-        dataSource = UICollectionViewDiffableDataSource<Int, Term>(collectionView: collectionView) {
+        dataSource = UICollectionViewDiffableDataSource<Int, Term>(
+            collectionView: collectionView
+        ) {
             (collectionView, indexPath, term) -> UICollectionViewCell? in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: term)
         }
