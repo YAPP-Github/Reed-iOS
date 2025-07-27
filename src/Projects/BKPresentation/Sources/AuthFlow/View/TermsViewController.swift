@@ -1,10 +1,17 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import BKDomain
 import Combine
+import SafariServices
 import UIKit
 
 final class TermsViewController: BaseViewController<TermsView> {
+    
+    weak var coordinator: LoginCoordinator?
+    
+    let viewModel: AnyViewBindableViewModel<TermsViewModel.State, TermsViewModel.Action>
+    private var cancellables = Set<AnyCancellable>()
     
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
         .standard(
@@ -17,4 +24,57 @@ final class TermsViewController: BaseViewController<TermsView> {
         return ""
     }
     
+    init(viewModel: TermsViewModel) {
+        self.viewModel = AnyViewBindableViewModel(viewModel)
+        super.init()
+    }
+    
+    override func bindAction() {
+        viewModel.send(.viewDidLoad)
+        
+        contentView.events
+            .sink { [weak self] event in
+                switch event {
+                case .agreeAllTapped:
+                    self?.viewModel.send(.agreeAllTapped)
+                case .termTapped(let index):
+                    self?.viewModel.send(.termTapped(index: index))
+                case .startButtonTapped:
+                    self?.viewModel.send(.startButtonTapped)
+                case .showTermDetail(let url):
+                    self?.coordinator?.showWebView(url: url)
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    override func bindState() {
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                self?.contentView.update(with: state)
+            }
+            .store(in: &cancellables)
+        
+        viewModel.statePublisher
+            .map(\.errorMessage)
+            .removeDuplicates()
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { message in
+                // TODO: 에러 메시지를 알림창 등으로 표시
+                print("Error: \(message)")
+            }
+            .store(in: &cancellables)
+        
+        viewModel.statePublisher
+            .map(\.didAgreementSucceed)
+            .removeDuplicates()
+            .filter { $0 == true }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.coordinator?.goToMainFlow()
+            }
+            .store(in: &cancellables)
+    }
 }
