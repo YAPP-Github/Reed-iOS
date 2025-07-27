@@ -7,7 +7,10 @@ import SnapKit
 import UIKit
 
 enum TermsViewEvent {
-    
+    case agreeAllTapped
+    case termTapped(index: Int)
+     case showTermDetail(url: URL)
+     case startButtonTapped
 }
 
 final class TermsView: BaseView {
@@ -23,6 +26,10 @@ final class TermsView: BaseView {
         static let agreeAreaHeight: CGFloat = 66
         
     }
+    
+    let events = PassthroughSubject<TermsViewEvent, Never>()
+    
+    private var dataSource: UICollectionViewDiffableDataSource<Int, Term>!
     
     private let titleLabel = BKLabel(
         text: "약관 동의 후\n독서 기록을 남겨보세요",
@@ -50,6 +57,7 @@ final class TermsView: BaseView {
         collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = false
         collectionView.allowsSelection = false
+        collectionView.isScrollEnabled = false
         
         collectionView.contentInset.left = BKSpacing.spacing2
         collectionView.contentInset.right = BKSpacing.spacing3
@@ -59,29 +67,20 @@ final class TermsView: BaseView {
     
     private let startButton = BKButton.primary(title: "시작하기", size: .large)
     
-    // MARK: - ViewModel로 이전 예정(뷰만 먼저 봄)
-    private var terms: [TermsViewObject] = []
-    
     override func setupView() {
         titleLabel.numberOfLines = 2
         
         setupAgreeAllAreaView()
         addSubviews(titleLabel, agreeAllAreaView, collectionView, startButton)
         
-        collectionView.dataSource = self
-        collectionView
-            .register(TermsItemCell.self, forCellWithReuseIdentifier: TermsItemCell.identifier)
-        
         startButton.isDisabled = true
+        
+        configureDataSource()
+        setupActions()
     }
     
     override func configure() {
-        let dummyURL = URL(string: "https://kean-docs.github.io/pulseui/documentation/pulseui/")!
-        configure(terms: [
-            TermsViewObject(title: "(필수)서비스 이용약관", url: dummyURL),
-            TermsViewObject(title: "(필수)개인정보처리방침", url: dummyURL),
-            TermsViewObject(title: "(필수)만 14세 이상입니다")
-        ])
+        
     }
     
     override func setupLayout() {
@@ -115,8 +114,29 @@ final class TermsView: BaseView {
         
         startButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(LayoutGuide.verticalPadding)
-            $0.bottom.equalToSuperview().inset(LayoutGuide.innerViewHPadding + 21) // 디자인팀이랑 하단 여백 다시 의논하기
+            $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom).inset(LayoutGuide.innerViewHPadding)
         }
+    }
+    
+    func update(with state: TermsViewModel.State) {
+        checkOnceBox.isChecked = state.isAllAgreed
+        startButton.isDisabled = !state.isStartButtonEnabled
+        
+        var snapshot = NSDiffableDataSourceSnapshot<Int, Term>()
+        snapshot.appendSections([0])
+        snapshot.appendItems(state.terms, toSection: 0)
+        dataSource.apply(snapshot, animatingDifferences: true)
+    }
+    
+    private func setupActions() {
+        let agreeAllTap = UITapGestureRecognizer(target: self, action: #selector(agreeAllAreaTapped))
+        agreeAllAreaView.addGestureRecognizer(agreeAllTap)
+        
+         startButton.addTarget(self, action: #selector(startButtonTapped), for: .touchUpInside)
+    }
+    
+    @objc private func agreeAllAreaTapped() {
+        events.send(.agreeAllTapped)
     }
     
     private func setupAgreeAllAreaView() {
@@ -130,10 +150,29 @@ final class TermsView: BaseView {
         agreeAllAreaView.addSubviews(checkOnceBox, agreeAllLabel)
     }
     
-    public func configure(terms: [TermsViewObject]) {
-        self.terms = terms
+    private func configureDataSource() {
+        let cellRegistration = UICollectionView.CellRegistration<TermsItemCell, Term> { (cell, indexPath, term) in
+            cell.configure(term)
+            
+            cell.onCheckTapped = { [weak self] in
+                self?.events.send(.termTapped(index: indexPath.item))
+            }
+            
+            cell.onDetailTapped = { [weak self] in
+                if let url = term.url {
+                    self?.events.send(.showTermDetail(url: url))
+                }
+            }
+        }
         
-        collectionView.reloadData()
+        dataSource = UICollectionViewDiffableDataSource<Int, Term>(collectionView: collectionView) {
+            (collectionView, indexPath, term) -> UICollectionViewCell? in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: term)
+        }
+    }
+    
+    @objc private func startButtonTapped() {
+        events.send(.startButtonTapped)
     }
     
 }
@@ -149,31 +188,5 @@ private extension TermsView {
         
         layout.configuration.interSectionSpacing = BKSpacing.spacing3
         return layout
-    }
-}
-
-extension TermsView: UICollectionViewDataSource {
-    func collectionView(
-        _ collectionView: UICollectionView,
-        numberOfItemsInSection section: Int
-    ) -> Int {
-        return terms.count
-    }
-    
-    func collectionView(
-        _ collectionView: UICollectionView,
-        cellForItemAt indexPath: IndexPath
-    ) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: TermsItemCell.identifier,
-            for: indexPath
-        ) as? TermsItemCell else {
-            assertionFailure("Failed to dequeue TermsItemCell")
-            return UICollectionViewCell()
-        }
-        
-        cell.configure(terms[indexPath.item])
-        
-        return cell
     }
 }
