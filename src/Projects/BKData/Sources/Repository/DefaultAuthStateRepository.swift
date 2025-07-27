@@ -1,5 +1,6 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import BKDomain
 import Combine
 import Foundation
@@ -30,4 +31,18 @@ public struct DefaultAuthStateRepository: AuthStateRepository {
         .map { _ in }
         .eraseToAnyPublisher()
     }
+    
+    public func putTermsAgreement(isAgreed: Bool) -> AnyPublisher<Bool, AuthError> {
+        networkProvider.request(
+            target: AuthAPI.termsAgreement(termsAgreed: isAgreed),
+            type: UserProfileResponseDTO.self
+        )
+        .mapError { networkError -> AuthError in
+            return .serverError(message: networkError.localizedDescription)
+        }
+        .debugError(logger: AppLogger.network)
+        .map { return $0.termsAgreed }
+        .eraseToAnyPublisher()
+    }
+    
 }
