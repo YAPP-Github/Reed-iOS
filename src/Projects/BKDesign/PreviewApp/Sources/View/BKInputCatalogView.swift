@@ -72,18 +72,30 @@ final class BKInputCatalogView: BaseView {
     
     private let textFieldDivider = BKDivider(type: .small)
     
-    private let textField = BKTextView(
+    private let textField = BKTextFieldView(
         labelText: "BKTextField",
         placeholder: "여기에 텍스트가 들어갑니다.",
         helpMessage: "Help message",
         isError: false
     )
     
-    private let textFieldWithError = BKTextView(
+    private let textFieldWithError = BKTextFieldView(
         labelText: "BKTextField",
         placeholder: "에러가 발생한 TextField.",
         helpMessage: "Help message",
         isError: true
+    )
+    
+    private let textViewDivider = BKDivider(type: .small)
+    
+    private let textView = BKTextView(
+        labelText: "BKTextView",
+        placeholder: "여기에 텍스트가 들어갑니다."
+    )
+    
+    private let textViewWithError = BKTextView(
+        labelText: "BKTextView",
+        placeholder: "여기에 텍스트가 들어갑니다."
     )
     
     override func setupView() {
@@ -114,6 +126,11 @@ final class BKInputCatalogView: BaseView {
         stackView.addArrangedSubview(textFieldDivider)
         stackView.addArrangedSubview(textField)
         stackView.addArrangedSubview(textFieldWithError)
+        
+        stackView.addArrangedSubview(textViewDivider)
+        stackView.addArrangedSubview(textView)
+        stackView.addArrangedSubview(textViewWithError)
+        textViewWithError.setErrorMessage("Help message")
     }
 
     override func configure() {
