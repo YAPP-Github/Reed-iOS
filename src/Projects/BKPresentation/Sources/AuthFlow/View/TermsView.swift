@@ -93,7 +93,7 @@ final class TermsView: BaseView {
     
     override func setupLayout() {
         titleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(LayoutGuide.titleTopInset)
+            $0.top.equalTo(self.safeAreaLayoutGuide.snp.top).offset(LayoutGuide.titleTopInset)
             $0.leading.trailing.equalToSuperview().inset(LayoutGuide.verticalPadding)
         }
         

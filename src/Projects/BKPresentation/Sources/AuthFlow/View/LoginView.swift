@@ -64,7 +64,7 @@ final class LoginView: BaseView {
         kakaoSignInButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
-            $0.bottom.equalToSuperview()
+            $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
                 .inset(LayoutConstants.bottomInset)
         }
         
