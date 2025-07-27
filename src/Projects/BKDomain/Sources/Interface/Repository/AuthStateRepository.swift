@@ -4,5 +4,8 @@ import Combine
 
 public protocol AuthStateRepository {
     func isLoggedIn() -> AnyPublisher<Bool, Never>
+    
     func validate() -> AnyPublisher<Void, AuthError>
+    
+    func putTermsAgreement(isAgreed: Bool) -> AnyPublisher<Bool, AuthError>
 }
