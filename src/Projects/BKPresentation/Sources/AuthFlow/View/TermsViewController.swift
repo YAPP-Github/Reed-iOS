@@ -24,6 +24,16 @@ final class TermsViewController: BaseViewController<TermsView> {
         return ""
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.navigationBar.isHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.navigationController?.navigationBar.isHidden = false
+    }
+    
     init(viewModel: TermsViewModel) {
         self.viewModel = AnyViewBindableViewModel(viewModel)
         super.init()
