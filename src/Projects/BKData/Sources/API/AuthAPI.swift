@@ -8,6 +8,7 @@ public enum AuthAPI {
     case logout
     case refresh(token: String)
     case me
+    case termsAgreement(termsAgreed: Bool)
 }
 
 extension AuthAPI: RequestTarget {
@@ -25,6 +26,8 @@ extension AuthAPI: RequestTarget {
             return "/refresh"
         case .me:
             return "/me"
+        case .termsAgreement:
+            return "/terms-agreement"
         }
     }
     
@@ -34,12 +37,14 @@ extension AuthAPI: RequestTarget {
             return .post
         case .me:
             return .get
+        case .termsAgreement:
+            return .put
         }
     }
     
     public var headers: [String: String] {
         switch self {
-        case .login, .refresh:
+        case .login, .refresh, .termsAgreement:
             return [
                 "Content-Type": "application/json"
             ]
@@ -61,12 +66,14 @@ extension AuthAPI: RequestTarget {
             )
         case .logout, .me:
             return nil
+        case .termsAgreement(let termsAgreed):
+            return  TermsAgreementRequestDTO(termsAgreed: termsAgreed)
         }
     }
     
     public var query: [String: Any] {
         switch self {
-        case .login, .logout, .refresh, .me:
+        case .login, .logout, .refresh, .me, .termsAgreement:
             return [:]
         }
     }
