@@ -14,7 +14,7 @@ public final class BKCheckBox: UIControl {
     private let imageView = UIImageView()
     private let type: CheckboxType
 
-    var isChecked: Bool = false {
+    public var isChecked: Bool = false {
         didSet {
             updateImage()
         }
