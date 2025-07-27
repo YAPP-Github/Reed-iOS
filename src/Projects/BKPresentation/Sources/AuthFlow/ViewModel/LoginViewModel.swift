@@ -48,7 +48,10 @@ final class LoginViewModel: BaseViewModel {
         effects.forEach { sideEffectSubject.send($0) }
     }
     
-    func reduce(action: Action, state: State) -> (State, [SideEffect]) {
+    func reduce(
+        action: Action,
+        state: State
+    ) -> (State, [SideEffect]) {
         var newState = state
         var effects: [SideEffect] = []
 

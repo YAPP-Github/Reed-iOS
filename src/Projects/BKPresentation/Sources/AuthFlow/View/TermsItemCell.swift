@@ -113,4 +113,3 @@ final class TermsItemCell: UICollectionViewListCell {
     }
 
 }
-
