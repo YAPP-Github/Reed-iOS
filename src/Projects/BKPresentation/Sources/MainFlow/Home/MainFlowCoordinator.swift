@@ -49,4 +49,13 @@ extension MainFlowCoordinator {
         childCoordinators.append(searchCoordinator)
         searchCoordinator.start()
     }
+    
+    func didTapNoteButton() {
+        let noteCoordinator = NoteCoordinator(
+            parentCoordinator: self,
+            navigationController: navigationController
+        )
+        childCoordinators.append(noteCoordinator)
+        noteCoordinator.start()
+    }
 }
