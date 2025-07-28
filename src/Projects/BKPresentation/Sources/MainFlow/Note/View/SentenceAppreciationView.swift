@@ -57,12 +57,6 @@ final class SentenceAppreciationView: BaseView {
         return button
     }()
     
-    func registrationForm() -> SentenceAppreciationForm {
-        return SentenceAppreciationForm(
-            appreciation: appreciationTextView.text
-        )
-    }
-    
     override func setupView() {
         addSubview(containerView)
         containerView.addSubviews(titleStack, appreciationTextView, registerButton)
@@ -99,6 +93,14 @@ final class SentenceAppreciationView: BaseView {
             $0.height.equalTo(38)
             $0.bottom.equalToSuperview()
         }
+    }
+}
+
+extension SentenceAppreciationView: RegistrationFormProvidable {
+    func registrationForm() -> RegistrationForm? {
+        return .appreciation(SentenceAppreciationForm(
+            appreciation: appreciationTextView.text
+        ))
     }
 }
 

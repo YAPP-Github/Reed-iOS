@@ -52,13 +52,6 @@ final class SentenceRegistrationView: BaseView {
         return button
     }()
     
-    func registrationForm() -> SentenceRegistrationForm {
-        return SentenceRegistrationForm(
-            page: pageField.text,
-            sentence: sentenceTextView.text
-        )
-    }
-    
     override func setupView() {
         addSubview(containerView)
         containerView.addSubviews(
@@ -106,6 +99,15 @@ final class SentenceRegistrationView: BaseView {
             $0.height.equalTo(LayoutConstants.buttonHeight)
             $0.bottom.equalToSuperview()
         }
+    }
+}
+
+extension SentenceRegistrationView: RegistrationFormProvidable {
+    func registrationForm() -> RegistrationForm? {
+        return .sentence(SentenceRegistrationForm(
+            page: pageField.text,
+            sentence: sentenceTextView.text
+        ))
     }
 }
 

@@ -4,6 +4,10 @@ import BKDesign
 import SnapKit
 import UIKit
 
+struct EmotionRegistrationForm {
+    let emotion: Emotion
+}
+
 enum Emotion {
     case someEmotion1
     case someEmotion2
@@ -87,9 +91,12 @@ final class EmotionRegistrationView: BaseView {
             $0.bottom.equalToSuperview()
         }
     }
-    
-    func registrationForm() -> Emotion? {
-        return selectedEmotion
+}
+
+extension EmotionRegistrationView: RegistrationFormProvidable {
+    func registrationForm() -> RegistrationForm? {
+        guard let selectedEmotion else { return nil }
+        return .emotion(.init(emotion: selectedEmotion))
     }
 }
 
