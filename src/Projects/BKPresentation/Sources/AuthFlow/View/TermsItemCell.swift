@@ -46,6 +46,7 @@ final class TermsItemCell: UICollectionViewListCell {
     }
     
     override func prepareForReuse() {
+        backgroundColor = .bkBaseColor(.primary)
         titleLabel.setText(text: "")
         chevronIconView.isHidden = true
         
