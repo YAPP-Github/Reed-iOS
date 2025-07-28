@@ -16,6 +16,12 @@ final class BKDialogTestViewController: UIViewController {
         button.setTitle("Present double button dialog", for: .normal)
         return button
     }()
+    
+    private let singleButtonWithImageDialog: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Present single button with image dialog", for: .normal)
+        return button
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,7 +34,8 @@ final class BKDialogTestViewController: UIViewController {
     private func configure() {
         let stack = UIStackView(arrangedSubviews: [
             singleButtonDialog,
-            doubleButtonDialog
+            doubleButtonDialog,
+            singleButtonWithImageDialog
         ])
         stack.axis = .vertical
         stack.spacing = 16
@@ -49,6 +56,11 @@ final class BKDialogTestViewController: UIViewController {
         doubleButtonDialog.addTarget(
             self,
             action: #selector(presentDoubleDialog),
+            for: .touchUpInside
+        )
+        singleButtonWithImageDialog.addTarget(
+            self,
+            action: #selector(presentDialogWithImage),
             for: .touchUpInside
         )
     }
@@ -82,6 +94,23 @@ final class BKDialogTestViewController: UIViewController {
                     self?.dismiss(animated: true)
                 }
             )
+        )
+        let dialogViewController = BKDialogViewController(dialog: dialog)
+        present(dialogViewController, animated: true)
+    }
+    
+    @objc private func presentDialogWithImage() {
+        let imageView = UIImageView(image: BKImage.Graphics.mascot)
+        let dialog = BKDialog(
+            title: "테스트트",
+            subtitle: "서브타이틀틀",
+            config: BKDialogConfiguration(
+                leftButtonTitle: "왼쪽",
+                leftButtonAction: { [weak self] in
+                    self?.dismiss(animated: true)
+                }
+            ),
+            suppliedContentStyle: .upper(imageView)
         )
         let dialogViewController = BKDialogViewController(dialog: dialog)
         present(dialogViewController, animated: true)
