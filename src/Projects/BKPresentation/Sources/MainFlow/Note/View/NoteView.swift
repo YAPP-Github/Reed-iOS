@@ -4,6 +4,16 @@ import BKDesign
 import SnapKit
 import UIKit
 
+enum RegistrationForm {
+    case sentence(SentenceRegistrationForm)
+    case emotion(EmotionRegistrationForm)
+    case appreciation(SentenceAppreciationForm)
+}
+
+protocol RegistrationFormProvidable {
+    func registrationForm() -> RegistrationForm?
+}
+
 final class NoteView: BaseView {
     private lazy var pageViews: [UIView] = [
         SentenceRegistrationView(),
