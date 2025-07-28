@@ -99,7 +99,6 @@ private extension BKTextView {
             addSubview(titleLabel)
         }
 
-        textView.addSubview(placeholderLabel)
         stackView.addArrangedSubview(textView)
         addSubviews(titleLabel, stackView)
     }
