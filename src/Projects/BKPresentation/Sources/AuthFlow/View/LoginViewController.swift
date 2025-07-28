@@ -63,12 +63,16 @@ final class LoginViewController: BaseViewController<LoginView> {
             .store(in: &cancellable)
         
         viewModel.statePublisher
-            .map { $0.isLoggedIn }
-            .removeDuplicates()
+            .map { ($0.isLoggedIn, $0.alreadyAgree) }
+            .removeDuplicates(by: { $0 == $1 })
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] isLoggedIn in
+            .sink { [weak self] (isLoggedIn, alreadyAgree) in
                 if isLoggedIn {
-                    self?.coordinator?.goToTermsViewController()
+                    if alreadyAgree {
+                        self?.coordinator?.goToMainFlow()
+                    } else {
+                        self?.coordinator?.goToTermsViewController()
+                    }
                 }
             }
             .store(in: &cancellable)
