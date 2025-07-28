@@ -22,13 +22,14 @@ public struct DefaultAuthStateRepository: AuthStateRepository {
             .eraseToAnyPublisher()
     }
     
-    public func validate() -> AnyPublisher<Void, AuthError> {
+    public func validate() -> AnyPublisher<UserProfile, AuthError> {
         networkProvider.request(
             target: AuthAPI.me,
-            type: EmptyResponse.self
+            type: UserProfileResponseDTO.self
         )
         .mapError { _ in AuthError.missingToken }
-        .map { _ in }
+        .debugError(logger: AppLogger.network)
+        .map { return $0.toUserProfile() }
         .eraseToAnyPublisher()
     }
     

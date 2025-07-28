@@ -9,4 +9,14 @@ public struct UserProfileResponseDTO: Decodable {
     public let nickname: String
     public let provider: String
     public let termsAgreed: Bool
+    
+    public func toUserProfile() -> UserProfile {
+        return UserProfile(
+            id: self.id,
+            email: self.email,
+            nickname: self.nickname,
+            provider: self.provider,
+            termsAgreed: self.termsAgreed
+        )
+    }
 }
