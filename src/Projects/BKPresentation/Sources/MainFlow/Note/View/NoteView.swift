@@ -104,20 +104,25 @@ private extension NoteView {
             innerContentView.addSubview(pageView)
             pageView.snp.makeConstraints {
                 $0.top.leading.trailing.equalToSuperview()
-                $0.bottom.equalToSuperview().priority(.low)
+                $0.bottom.equalToSuperview()
             }
             
             scrollView.snp.makeConstraints {
                 $0.width.equalTo(snp.width)
             }
+            
+            scrollView.setContentHuggingPriority(.defaultLow, for: .vertical)
+            scrollView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         }
     }
     
     func createFormData() -> NoteForm? {
-        let forms: [RegistrationForm] = pageViews.compactMap { view in
-            (view as? RegistrationFormProvidable)?.registrationForm()
-        }
-        return .makeNoteForm(from: forms)
+        // TODO: - 기능 연결 이후 수정
+//        let forms: [RegistrationForm] = pageViews.compactMap { view in
+//            (view as? RegistrationFormProvidable)?.registrationForm()
+//        }
+//        return .makeNoteForm(from: forms)
+        return NoteForm(page: "", sentence: "", emotion: .someEmotion1, appreciation: "")
     }
     
     @objc func pageControlChanged(_ sender: BKPageControl) {

@@ -9,7 +9,7 @@ enum NoteViewEvent {
 }
 
 final class NoteViewController: BaseViewController<NoteView> {
-    weak var delegate: NoteCoordinator?
+    weak var coordinator: NoteCoordinator?
     
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
         return .standard(viewController: self)
@@ -53,7 +53,7 @@ final class NoteViewController: BaseViewController<NoteView> {
             .sink { [weak self] _ in
                 // TODO: - ViewModel 구현 이후 추가
 //                self?.viewModel.send(.submitNoteForm(query))
-                self?.navigationController?.popViewController(animated: true)
+                self?.presentRegistrationCompletionDialog()
             }
             .store(in: &cancellable)
     }
@@ -67,5 +67,28 @@ private extension NoteViewController {
         } else {
             contentView.pageControl.currentPage -= 1
         }
+    }
+    
+    func presentRegistrationCompletionDialog() {
+        let imageView = UIImageView(image: BKImage.Graphics.mascot)
+        let dialog = BKDialog(
+            title: "기록이 저장되었어요!",
+            subtitle: "방금 남긴 기록을 확인해볼까요?",
+            config: .init(
+                leftButtonTitle: "닫기",
+                leftButtonAction: { [weak self] in
+                    self?.dismiss(animated: true)
+                    self?.navigationController?.popViewController(animated: true)
+                },
+                rightButtonTitle: "기록 보러가기",
+                rightButtonAction: { [weak self] in
+                    self?.dismiss(animated: true)
+                    self?.coordinator?.didCompleteNoteCreation()
+                }
+            ),
+            suppliedContentStyle: .upper(imageView)
+        )
+        let dialogViewController = BKDialogViewController(dialog: dialog)
+        present(dialogViewController, animated: true)
     }
 }
