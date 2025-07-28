@@ -22,8 +22,7 @@ final class SentenceAppreciationView: BaseView {
     )
     
     private let appreciationTextView = BKTextView(
-        labelText: "문장 기록",
-        placeholder: "기록하고 싶은 문장을 작성해보세요"
+        placeholder: "내용을 입력해주세요."
     )
     
     private let titleStack: UIStackView = {

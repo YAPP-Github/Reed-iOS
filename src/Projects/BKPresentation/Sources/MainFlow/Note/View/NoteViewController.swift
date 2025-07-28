@@ -50,7 +50,7 @@ final class NoteViewController: BaseViewController<NoteView> {
                 if case let .completeForm(form) = event { return form }
                 return nil
             }
-            .sink { [weak self] query in
+            .sink { [weak self] _ in
                 // TODO: - ViewModel 구현 이후 추가
 //                self?.viewModel.send(.submitNoteForm(query))
                 self?.navigationController?.popViewController(animated: true)
