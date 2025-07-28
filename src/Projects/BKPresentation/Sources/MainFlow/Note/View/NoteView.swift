@@ -113,13 +113,28 @@ private extension NoteView {
         }
     }
     
+    func createFormData() -> NoteForm? {
+        let forms: [RegistrationForm] = pageViews.compactMap { view in
+            (view as? RegistrationFormProvidable)?.registrationForm()
+        }
+        return .makeNoteForm(from: forms)
+    }
+    
     @objc func pageControlChanged(_ sender: BKPageControl) {
         let x = CGFloat(sender.currentPage) * contentScrollView.bounds.width
         contentScrollView.setContentOffset(.init(x: x, y: 0), animated: true)
     }
     
     @objc func nextButtonTapped() {
-        let next = min(pageControl.currentPage + 1, pageViews.count - 1)
+        var next = min(pageControl.currentPage + 1, pageViews.count - 1)
+        
+        if pageControl.currentPage + 1 == pageViews.count {
+            if let formData = createFormData() {
+                eventPublisher.send(.completeForm(formData))
+                return
+            } else { next = 0 }
+        }
+        
         pageControl.currentPage = next
         pageControlChanged(pageControl)
     }
