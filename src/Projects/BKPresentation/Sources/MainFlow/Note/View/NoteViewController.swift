@@ -4,6 +4,10 @@ import BKDesign
 import Combine
 import UIKit
 
+enum NoteViewEvent {
+    case completeForm(NoteForm)
+}
+
 final class NoteViewController: BaseViewController<NoteView> {
     weak var delegate: NoteCoordinator?
     
@@ -43,6 +47,11 @@ final class NoteViewController: BaseViewController<NoteView> {
 
 private extension NoteViewController {
     @objc func customBackButtonTapped() {
-        
+        let currentPage = contentView.pageControl.currentPage
+        if currentPage == 0 {
+            navigationController?.popViewController(animated: true)
+        } else {
+            contentView.pageControl.currentPage -= 1
+        }
     }
 }

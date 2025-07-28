@@ -1,6 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import Combine
 import SnapKit
 import UIKit
 
@@ -15,14 +16,16 @@ protocol RegistrationFormProvidable {
 }
 
 final class NoteView: BaseView {
+    let eventPublisher = PassthroughSubject<NoteViewEvent, Never>()
+    
     private lazy var pageViews: [UIView] = [
         SentenceRegistrationView(),
         EmotionRegistrationView(),
         SentenceAppreciationView()
     ]
     
+    let pageControl = BKPageControl()
     private let containerView = UIView()
-    private let pageControl = BKPageControl()
     private let contentScrollView = UIScrollView()
     private let contentStackView: UIStackView = {
         let stackView = UIStackView()
