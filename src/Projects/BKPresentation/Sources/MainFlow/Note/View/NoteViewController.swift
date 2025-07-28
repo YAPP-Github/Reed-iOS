@@ -43,6 +43,20 @@ final class NoteViewController: BaseViewController<NoteView> {
         super.viewWillDisappear(animated)
         self.tabBarController?.tabBar.isHidden = false
     }
+    
+    override func bindAction() {
+        contentView.eventPublisher
+            .compactMap { event -> NoteForm? in
+                if case let .completeForm(form) = event { return form }
+                return nil
+            }
+            .sink { [weak self] query in
+                // TODO: - ViewModel 구현 이후 추가
+//                self?.viewModel.send(.submitNoteForm(query))
+                self?.navigationController?.popViewController(animated: true)
+            }
+            .store(in: &cancellable)
+    }
 }
 
 private extension NoteViewController {
