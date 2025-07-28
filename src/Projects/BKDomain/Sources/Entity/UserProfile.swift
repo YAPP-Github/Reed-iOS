@@ -9,7 +9,13 @@ public struct UserProfile {
     public let provider: String
     public let termsAgreed: Bool
     
-    public init(id: String, email: String, nickname: String, provider: String, termsAgreed: Bool) {
+    public init(
+        id: String,
+        email: String,
+        nickname: String,
+        provider: String,
+        termsAgreed: Bool
+    ) {
         self.id = id
         self.email = email
         self.nickname = nickname
