@@ -11,7 +11,7 @@ public struct DefaultAuthStateUseCase: AuthStateUseCase {
         self.authStateRepository = authStateRepository
     }
     
-    public func execute() -> AnyPublisher<Void, AuthError> {
+    public func execute() -> AnyPublisher<UserProfile, AuthError> {
         authStateRepository
             .isLoggedIn()
             .flatMap { _ in
