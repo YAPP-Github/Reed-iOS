@@ -66,7 +66,6 @@ private extension SceneDelegate {
         appearance.backgroundColor = .bkBaseColor(.primary)
         appearance.shadowColor = .clear
         
-        navigationController.navigationBar.tintColor = .bkContentColor(.primary)
         navigationController.navigationBar.isTranslucent = false
         navigationController.navigationItem.largeTitleDisplayMode = .never
         navigationController.navigationBar.standardAppearance = appearance
