@@ -53,7 +53,7 @@ final class NoteViewController: BaseViewController<NoteView> {
             .sink { [weak self] _ in
                 // TODO: - ViewModel 구현 이후 추가
 //                self?.viewModel.send(.submitNoteForm(query))
-                self?.presentRegistrationCompletionDialog()
+                self?.presentRegistrationSuccessDialog()
             }
             .store(in: &cancellable)
     }
@@ -63,13 +63,13 @@ private extension NoteViewController {
     @objc func customBackButtonTapped() {
         let currentPage = contentView.pageControl.currentPage
         if currentPage == 0 {
-            navigationController?.popViewController(animated: true)
+            presentCancelConfirmationDialog()
         } else {
             contentView.pageControl.currentPage -= 1
         }
     }
     
-    func presentRegistrationCompletionDialog() {
+    func presentRegistrationSuccessDialog() {
         let imageView = UIImageView(image: BKImage.Graphics.mascot)
         let dialog = BKDialog(
             title: "기록이 저장되었어요!",
@@ -87,6 +87,26 @@ private extension NoteViewController {
                 }
             ),
             suppliedContentStyle: .upper(imageView)
+        )
+        let dialogViewController = BKDialogViewController(dialog: dialog)
+        present(dialogViewController, animated: true)
+    }
+    
+    func presentCancelConfirmationDialog() {
+        let dialog = BKDialog(
+            title: "기록을 그만하고 나가시겠어요?",
+            subtitle: "지금까지 기록한 내용은 저장되지 않습니다.",
+            config: .init(
+                leftButtonTitle: "취소",
+                leftButtonAction: { [weak self] in
+                    self?.dismiss(animated: true)
+                },
+                rightButtonTitle: "확인",
+                rightButtonAction: { [weak self] in
+                    self?.dismiss(animated: true)
+                    self?.navigationController?.popViewController(animated: true)
+                }
+            )
         )
         let dialogViewController = BKDialogViewController(dialog: dialog)
         present(dialogViewController, animated: true)
