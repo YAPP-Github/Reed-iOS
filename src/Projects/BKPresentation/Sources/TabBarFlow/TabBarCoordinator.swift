@@ -21,9 +21,8 @@ final class TabBarCoordinator: Coordinator, FinishNotifying {
     
     func start() {
         setupTabBarCoordinators()
-        navigationController.pushViewController(tabBarController, animated: true)
+        navigationController.setViewControllers([tabBarController], animated: true)
     }
-    
 }
 
 private extension TabBarCoordinator {
