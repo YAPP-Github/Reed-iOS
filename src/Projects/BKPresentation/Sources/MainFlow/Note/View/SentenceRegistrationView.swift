@@ -74,7 +74,7 @@ final class SentenceRegistrationView: BaseView {
     override func setupLayout() {
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.leading.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
         }
         
