@@ -50,15 +50,19 @@ final class SentenceAppreciationView: BaseView {
         )
         button.layer.borderWidth = LayoutConstants.buttonBorderWidth
         button.layer.borderColor = UIColor.bkBorderColor(.brand).cgColor
-        button.layer.cornerRadius = LayoutConstants.buttonHeight / 2
         button.leftIcon = BKImage.Icon.maximize
         button.title = "감상평 가이드"
         return button
     }()
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        registerButton.layer.cornerRadius = registerButton.bounds.height / 2
+        registerButton.layer.masksToBounds = true
+    }
+    
     override func setupView() {
-        addSubview(containerView)
-        containerView.addSubviews(titleStack, appreciationTextView, registerButton)
+        addSubviews(titleStack, appreciationTextView, registerButton)
         [titleLabel, subtitleLabel].forEach(titleStack.addArrangedSubview(_:))
     }
     
@@ -67,20 +71,16 @@ final class SentenceAppreciationView: BaseView {
     }
     
     override func setupLayout() {
-        containerView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
-        }
-        
         titleStack.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.horizontalEdges.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
         }
         
         appreciationTextView.snp.makeConstraints {
             $0.top.equalTo(titleStack.snp.bottom)
                 .offset(LayoutConstants.sentenceViewOffset)
-            $0.horizontalEdges.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
         }
         
@@ -89,7 +89,6 @@ final class SentenceAppreciationView: BaseView {
                 .offset(LayoutConstants.buttonOffset)
             $0.trailing.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
-            $0.height.equalTo(38)
             $0.bottom.equalToSuperview()
         }
     }
@@ -109,7 +108,6 @@ private extension SentenceAppreciationView {
         static let buttonBorderWidth = BKBorder.border1
         static let sentenceViewOffset: CGFloat = 40
         static let buttonOffset: CGFloat = 12
-        static let buttonHeight: CGFloat = 38
         static let titleStackSpacing = BKSpacing.spacing1
     }
 }

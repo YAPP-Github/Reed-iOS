@@ -74,7 +74,7 @@ final class EmotionRegistrationView: BaseView {
     
     override func setupLayout() {
         containerView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
+            $0.edges.equalToSuperview()
         }
         
         titleStack.snp.makeConstraints {
