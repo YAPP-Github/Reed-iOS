@@ -3,7 +3,7 @@
 import BKDesign
 import UIKit
 
-final class TabBarCoordinator: Coordinator {
+final class TabBarCoordinator: Coordinator, FinishNotifying {
     weak var parentCoordinator: Coordinator?
     var childCoordinators = [Coordinator]()
     var navigationController: UINavigationController
