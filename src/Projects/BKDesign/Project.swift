@@ -32,7 +32,8 @@ let project = Project.project(
                 swiftLintScript
             ],
             dependencies: [
-                .design() // BKDesign 모듈 의존성
+                .design(), // BKDesign 모듈 의존성
+                .external(dependency: .Kingfisher)
             ],
             settings: .settings(
                 base: [
