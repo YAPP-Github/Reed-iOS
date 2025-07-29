@@ -91,7 +91,8 @@ private extension NoteView {
     func makeInnerViews() {
         pageViews.forEach { pageView in
             let scrollView = UIScrollView()
-            scrollView.alwaysBounceVertical = true
+            scrollView.alwaysBounceVertical = false
+            scrollView.showsVerticalScrollIndicator = false
             contentStackView.addArrangedSubview(scrollView)
             
             scrollView.addSubview(pageView)
