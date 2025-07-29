@@ -27,6 +27,8 @@ extension NoteCoordinator {
         let viewController = NoteCompletionViewController()
         let noteNavigationController = UINavigationController(rootViewController: viewController)
         noteNavigationController.modalPresentationStyle = .fullScreen
-        navigationController.present(noteNavigationController, animated: true)
+        navigationController.present(noteNavigationController, animated: true) {
+            self.popAndFinish()
+        }
     }
 }
