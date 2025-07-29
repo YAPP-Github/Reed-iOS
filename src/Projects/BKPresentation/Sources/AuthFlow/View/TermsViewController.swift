@@ -83,7 +83,7 @@ final class TermsViewController: BaseViewController<TermsView> {
             .filter { $0 == true }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.coordinator?.goToMainFlow()
+                self?.coordinator?.popAndFinish()
             }
             .store(in: &cancellables)
     }

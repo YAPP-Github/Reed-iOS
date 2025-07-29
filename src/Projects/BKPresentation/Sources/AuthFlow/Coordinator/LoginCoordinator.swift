@@ -33,11 +33,6 @@ extension LoginCoordinator {
         navigationController.pushViewController(termsViewController, animated: true)
     }
     
-    /// MainFlow로 이동
-    func goToMainFlow() {
-        onFinish?()
-    }
-    
     /// webview 보여주기 -> 추후 WebView로 전환해도됨(현재 사파리)
     func showWebView(url: URL) {
         let safariViewController = SFSafariViewController(url: url)

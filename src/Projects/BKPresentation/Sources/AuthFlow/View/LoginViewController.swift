@@ -69,7 +69,7 @@ final class LoginViewController: BaseViewController<LoginView> {
             .sink { [weak self] (isLoggedIn, alreadyAgree) in
                 if isLoggedIn {
                     if alreadyAgree {
-                        self?.coordinator?.goToMainFlow()
+                        self?.coordinator?.popAndFinish()
                     } else {
                         self?.coordinator?.goToTermsViewController()
                     }
