@@ -9,7 +9,7 @@ final class TabBarCoordinator: Coordinator, FinishNotifying {
     var navigationController: UINavigationController
     var onFinish: (() -> Void)?
     
-    private let tabBarController: BottomTabBarController
+    private let tabBarController = BottomTabBarController()
     
     init(
         parentCoordinator: Coordinator?,
@@ -17,7 +17,6 @@ final class TabBarCoordinator: Coordinator, FinishNotifying {
     ) {
         self.parentCoordinator = parentCoordinator
         self.navigationController = navigationController
-        self.tabBarController = BottomTabBarController()
     }
     
     func start() {
@@ -25,49 +24,39 @@ final class TabBarCoordinator: Coordinator, FinishNotifying {
         navigationController.pushViewController(tabBarController, animated: true)
     }
     
-    private func setupTabBarCoordinators() {
-        var viewControllers: [UINavigationController] = []
-        
-        let homeNavigationController = UINavigationController()
-        let homeCoordinator = MainFlowCoordinator(
-            parentCoordinator: self,
-            navigationController: homeNavigationController)
-        
-        addChildCoordinator(homeCoordinator)
-        homeCoordinator.start()
-        
-        homeNavigationController.tabBarItem = setTabItem(.home)
-        viewControllers.append(homeNavigationController)
-        
-        let archiveNavigationController = UINavigationController()
-        let archiveCoordinator = ArchiveCoordinator(
-            parentCoordinator: self,
-            navigationController: archiveNavigationController
-        )
-        
-        addChildCoordinator(archiveCoordinator)
-        archiveCoordinator.start()
-        
-        archiveNavigationController.tabBarItem = setTabItem(.archive)
-        viewControllers.append(archiveNavigationController)
-        
+}
+
+private extension TabBarCoordinator {
+    func setupTabBarCoordinators() {
+        let viewControllers: [UINavigationController] = TabItem.allCases.map { item in
+            let navController = UINavigationController()
+            let coordinator = item.makeCoordinator(parent: self, navigationController: navController)
+
+            addChildCoordinator(coordinator)
+            coordinator.start()
+            
+            navController.tabBarItem = UITabBarItem(
+                title: item.title,
+                image: item.icon.withTintColor(.bkBackgroundColor(.disable)),
+                selectedImage: item.icon.withTintColor(.bkContentColor(.primary))
+            )
+            return navController
+        }
+
         tabBarController.viewControllers = viewControllers
     }
     
-    
-    private func setTabItem(_ item: TabItem) -> UITabBarItem {
+    func setTabItem(_ item: TabItem) -> UITabBarItem {
         return UITabBarItem(
             title: item.title,
             image: item.icon.withTintColor(.bkBackgroundColor(.disable)),
             selectedImage: item.icon.withTintColor(.bkContentColor(.primary))
         )
     }
-    
 }
 
 extension TabBarCoordinator: SessionExpirationHandling {
     func handleSessionExpired() {
-        navigationController.setViewControllers([], animated: false)
         didFinish()
     }
 }
