@@ -15,7 +15,8 @@ let project = Project.project(
             ],
             dependencies: [
                 .core(),
-                .external(dependency: .SnapKit)
+                .external(dependency: .SnapKit),
+                .external(dependency: .Kingfisher)
             ]
         ),
         Target.target(
@@ -32,8 +33,7 @@ let project = Project.project(
                 swiftLintScript
             ],
             dependencies: [
-                .design(), // BKDesign 모듈 의존성
-                .external(dependency: .Kingfisher)
+                .design() // BKDesign 모듈 의존성
             ],
             settings: .settings(
                 base: [
