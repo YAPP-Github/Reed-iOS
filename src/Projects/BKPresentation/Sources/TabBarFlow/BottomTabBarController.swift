@@ -47,11 +47,19 @@ private extension BottomTabBarController {
     }
     
     func setupTabBarTextAttributes(appearance: UITabBarAppearance) {
-        let normalAttrs: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.bkContentColor(.secondary)]
-        let selectedAttrs: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.bkContentColor(.primary)]
-        
+        let normalAttrs: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.bkContentColor(.secondary),
+            .font: BKTextStyle.caption2(weight: .regular).uiFont
+        ]
+        let selectedAttrs: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.bkContentColor(.primary),
+            .font: BKTextStyle.caption2(weight: .regular).uiFont
+        ]
+
         appearance.stackedLayoutAppearance.normal.titleTextAttributes = normalAttrs
         appearance.stackedLayoutAppearance.selected.titleTextAttributes = selectedAttrs
+        appearance.stackedLayoutAppearance.normal.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -6)
+        appearance.stackedLayoutAppearance.selected.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -6)
     }
     
     func setupTabBarIconColors(appearance: UITabBarAppearance) {
@@ -60,14 +68,16 @@ private extension BottomTabBarController {
     }
     
     func setupTabBarFrame() {
-        let height: CGFloat = 92
-        
+        let baseHeight: CGFloat = 58
+        let bottomInset = view.safeAreaInsets.bottom
+        let height = baseHeight + bottomInset
+
         var tabFrame = tabBar.frame
         tabFrame.size.height = height
         tabFrame.origin.y = view.frame.height - height
         tabBar.frame = tabFrame
-        
-        tabBar.layer.sublayers?.removeAll(where: { $0.name == "customTabBarLayer" })
+
+        tabBar.layer.sublayers?.removeAll { $0.name == "customTabBarLayer" }
     }
     
     func createCustomTabBarLayer() -> CAShapeLayer {
