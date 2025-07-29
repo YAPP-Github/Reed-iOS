@@ -40,7 +40,6 @@ final class NoteView: BaseView {
         addSubview(containerView)
         containerView.addSubviews(pageControl, contentScrollView, nextButton)
         contentScrollView.addSubview(contentStackView)
-        makeInnerViews()
     }
     
     override func configure() {
@@ -83,6 +82,8 @@ final class NoteView: BaseView {
                 .multipliedBy(pageViews.count)
             $0.height.equalTo(contentScrollView.frameLayoutGuide)
         }
+        
+        makeInnerViews()
     }
 }
 
@@ -91,33 +92,31 @@ private extension NoteView {
         pageViews.forEach { pageView in
             let scrollView = UIScrollView()
             scrollView.alwaysBounceVertical = false
+            scrollView.showsVerticalScrollIndicator = false
             contentStackView.addArrangedSubview(scrollView)
             
-            let innerContentView = UIView()
-            scrollView.addSubview(innerContentView)
-            
-            innerContentView.snp.makeConstraints {
+            scrollView.addSubview(pageView)
+            scrollView.snp.makeConstraints {
+                $0.width.equalTo(scrollView.frameLayoutGuide)
+                $0.top.bottom.equalToSuperview()
+            }
+            pageView.snp.makeConstraints {
                 $0.edges.equalTo(scrollView.contentLayoutGuide)
                 $0.width.equalTo(scrollView.frameLayoutGuide)
             }
             
-            innerContentView.addSubview(pageView)
-            pageView.snp.makeConstraints {
-                $0.top.leading.trailing.equalToSuperview()
-                $0.bottom.equalToSuperview().priority(.low)
-            }
-            
-            scrollView.snp.makeConstraints {
-                $0.width.equalTo(snp.width)
-            }
+            scrollView.setContentHuggingPriority(.defaultLow, for: .vertical)
+            scrollView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         }
     }
     
     func createFormData() -> NoteForm? {
-        let forms: [RegistrationForm] = pageViews.compactMap { view in
-            (view as? RegistrationFormProvidable)?.registrationForm()
-        }
-        return .makeNoteForm(from: forms)
+        // TODO: - 기능 연결 이후 수정
+//        let forms: [RegistrationForm] = pageViews.compactMap { view in
+//            (view as? RegistrationFormProvidable)?.registrationForm()
+//        }
+//        return .makeNoteForm(from: forms)
+        return NoteForm(page: "", sentence: "", emotion: .someEmotion1, appreciation: "")
     }
     
     @objc func pageControlChanged(_ sender: BKPageControl) {

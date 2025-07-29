@@ -113,8 +113,8 @@ public extension BKBottomSheetViewController {
         agreementText: String,
         cancelTitle: String = "취소",
         confirmTitle: String = "탈퇴하기",
-        cancelAction: @escaping ()->Void,
-        confirmAction: @escaping ()->Void
+        cancelAction: @escaping () ->Void,
+        confirmAction: @escaping () ->Void
     ) -> BKBottomSheetViewController {
         let checkBox = BKCheckBoxLabel(
             checkboxType: .rectangle,

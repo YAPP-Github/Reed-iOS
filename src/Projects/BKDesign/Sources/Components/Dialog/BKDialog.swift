@@ -23,10 +23,21 @@ public struct BKDialogConfiguration {
 }
 
 public final class BKDialog: UIView {
+    public var suppliedContentStyle: SuppliedContentStyle?
+    private var contentAspectRatio: CGFloat?
+    
     private let titleStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.spacing = BKSpacing.spacing2
+        stackView.spacing = LayoutConstants.titleStackSpacing
+        stackView.alignment = .center
+        return stackView
+    }()
+    
+    private let rootStack: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = LayoutConstants.rootStackSpacing
         stackView.alignment = .center
         return stackView
     }()
@@ -51,16 +62,20 @@ public final class BKDialog: UIView {
     public init(
         title: String,
         subtitle: String,
-        config: BKDialogConfiguration
+        config: BKDialogConfiguration,
+        suppliedContentStyle: SuppliedContentStyle? = nil
     ) {
         self.titleText = title
         self.subtitleText = subtitle
         self.buttonGroup = Self.makeButtonGroup(config: config)
+        self.suppliedContentStyle = suppliedContentStyle
         super.init(frame: .zero)
         
         setup()
         configure()
         layout()
+        calculateRatioIfNeeded()
+        makeLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -92,7 +107,7 @@ private extension BKDialog {
 
 private extension BKDialog {
     func setup() {
-        addSubviews(titleStack, buttonGroup)
+        addSubviews(rootStack, buttonGroup)
         [titleLabel, subtitleLabel].forEach(titleStack.addArrangedSubview(_:))
     }
     
@@ -107,7 +122,7 @@ private extension BKDialog {
     }
     
     func layout() {
-        titleStack.snp.makeConstraints {
+        rootStack.snp.makeConstraints {
             $0.top.equalToSuperview()
                 .inset(LayoutConstants.titleTopInset)
             $0.leading.trailing.equalToSuperview()
@@ -115,11 +130,51 @@ private extension BKDialog {
         }
         
         buttonGroup.snp.makeConstraints {
-            $0.top.equalTo(titleStack.snp.bottom)
+            $0.top.equalTo(rootStack.snp.bottom)
                 .offset(LayoutConstants.buttonTopInset)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(84)
             $0.bottom.equalToSuperview()
+        }
+    }
+    
+    func makeLayout() {
+        switch suppliedContentStyle {
+        case .upper(let contentView):
+            rootStack.addArrangedSubview(contentView)
+            rootStack.addArrangedSubview(titleStack)
+            applyRatioIfNeeded(to: contentView)
+        case .lower(let contentView):
+            rootStack.addArrangedSubview(titleStack)
+            rootStack.addArrangedSubview(contentView)
+            applyRatioIfNeeded(to: contentView)
+        case .none:
+            rootStack.addArrangedSubview(titleStack)
+        }
+    }
+    
+    func calculateRatioIfNeeded() {
+        guard let style = suppliedContentStyle else { return }
+
+        let targetView: UIView
+        switch style {
+        case .upper(let view), .lower(let view):
+            targetView = view
+        }
+
+        if let imageView = targetView as? UIImageView,
+           let image = imageView.image {
+            contentAspectRatio = image.size.height / image.size.width
+            imageView.contentMode = .scaleAspectFit
+        }
+    }
+    
+    func applyRatioIfNeeded(to view: UIView) {
+        if let ratio = contentAspectRatio {
+            view.snp.makeConstraints {
+                $0.width.equalToSuperview()
+                $0.height.equalTo(view.snp.width).multipliedBy(ratio)
+            }
         }
     }
 }
@@ -130,5 +185,7 @@ private extension BKDialog {
         static let buttonTopInset = BKInset.inset6
         static let horizontalInset = BKInset.inset5
         static let buttonBottomInset = BKInset.inset5
+        static let titleStackSpacing = BKSpacing.spacing2
+        static let rootStackSpacing = BKSpacing.spacing6
     }
 }

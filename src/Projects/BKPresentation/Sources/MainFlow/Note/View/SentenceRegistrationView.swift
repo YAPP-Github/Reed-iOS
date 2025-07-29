@@ -46,15 +46,20 @@ final class SentenceRegistrationView: BaseView {
         )
         button.layer.borderWidth = LayoutConstants.buttonBorderWidth
         button.layer.borderColor = UIColor.bkBorderColor(.brand).cgColor
-        button.layer.cornerRadius = LayoutConstants.buttonHeight / 2
         button.leftIcon = BKImage.Icon.maximize
         button.title = "문장 스캔하기"
         return button
     }()
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        registerButton.layer.cornerRadius = registerButton.bounds.height / 2
+        registerButton.layer.masksToBounds = true
+        registerButton.clipsToBounds = true
+    }
+    
     override func setupView() {
-        addSubview(containerView)
-        containerView.addSubviews(
+        addSubviews(
             titleLabel,
             pageField,
             sentenceTextView,
@@ -67,27 +72,23 @@ final class SentenceRegistrationView: BaseView {
     }
     
     override func setupLayout() {
-        containerView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
-        }
-        
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.horizontalEdges.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
         }
         
         pageField.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom)
                 .offset(LayoutConstants.pageFieldOffset)
-            $0.horizontalEdges.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
         }
         
         sentenceTextView.snp.makeConstraints {
             $0.top.equalTo(pageField.snp.bottom)
                 .offset(LayoutConstants.sentenceViewOffset)
-            $0.horizontalEdges.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
         }
         
@@ -96,7 +97,6 @@ final class SentenceRegistrationView: BaseView {
                 .offset(LayoutConstants.buttonOffset)
             $0.trailing.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
-            $0.height.equalTo(LayoutConstants.buttonHeight)
             $0.bottom.equalToSuperview()
         }
     }
