@@ -14,6 +14,6 @@
 ///     }
 /// }
 /// ```
-protocol FinishNotifying {
+protocol FinishNotifying: AnyObject {
     var onFinish: (() -> Void)? { get set }
 }
