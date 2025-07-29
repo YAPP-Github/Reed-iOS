@@ -209,6 +209,15 @@ public class BKButton: UIButton, BKButtonProtocol {
         customTitleLabel.textColor = foregroundColor
         leftIconView.tintColor = foregroundColor
         rightIconView.tintColor = foregroundColor
+        
+        if style == .stroke && isDisabled == false {
+            let borderColors = style.foregroundColors
+            layer.borderColor = borderColors.color(for: currentState).cgColor
+            layer.borderWidth = 1
+        } else {
+            layer.borderWidth = 0
+            layer.borderColor = nil
+        }
     }
     
     private func updateCornerRadius() {

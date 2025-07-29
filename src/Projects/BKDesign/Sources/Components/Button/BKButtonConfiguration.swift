@@ -28,6 +28,8 @@ public struct BKButtonConfiguration {
 
     /// 가로로 꽉 차는지 여부 (기본값: `false`)
     var isFullWidth: Bool
+    
+    var hasStroke: Bool
 
     /// 초기화 메서드
     ///
@@ -55,54 +57,55 @@ public struct BKButtonConfiguration {
         self.rightIcon = rightIcon
         self.isEnabled = isEnabled
         self.isFullWidth = isFullWidth
+        self.hasStroke = style == .stroke ? true : false
     }
 
     // MARK: - Immutable Modifier Helpers
 
     /// 스타일을 변경한 새로운 설정 반환
-    public func withStyle(_ style: BKButtonStyle) -> BKButtonConfiguration {
+    public func withStyle(_ style: BKButtonStyle) -> Self {
         var config = self
         config.style = style
         return config
     }
 
     /// 사이즈를 변경한 새로운 설정 반환
-    public func withSize(_ size: BKButtonSize) -> BKButtonConfiguration {
+    public func withSize(_ size: BKButtonSize) -> Self {
         var config = self
         config.size = size
         return config
     }
 
     /// 타이틀을 변경한 새로운 설정 반환
-    public func withTitle(_ title: String?) -> BKButtonConfiguration {
+    public func withTitle(_ title: String?) -> Self {
         var config = self
         config.title = title
         return config
     }
 
     /// 왼쪽 아이콘을 변경한 새로운 설정 반환
-    public func withLeftIcon(_ icon: UIImage?) -> BKButtonConfiguration {
+    public func withLeftIcon(_ icon: UIImage?) -> Self {
         var config = self
         config.leftIcon = icon
         return config
     }
 
     /// 오른쪽 아이콘을 변경한 새로운 설정 반환
-    public func withRightIcon(_ icon: UIImage?) -> BKButtonConfiguration {
+    public func withRightIcon(_ icon: UIImage?) -> Self {
         var config = self
         config.rightIcon = icon
         return config
     }
 
     /// 사용 가능 여부를 변경한 새로운 설정 반환
-    public func withEnabled(_ enabled: Bool) -> BKButtonConfiguration {
+    public func withEnabled(_ enabled: Bool) -> Self {
         var config = self
         config.isEnabled = enabled
         return config
     }
 
     /// 가로 채우기 여부를 변경한 새로운 설정 반환
-    public func withFullWidth(_ fullWidth: Bool) -> BKButtonConfiguration {
+    public func withFullWidth(_ fullWidth: Bool) -> Self {
         var config = self
         config.isFullWidth = fullWidth
         return config

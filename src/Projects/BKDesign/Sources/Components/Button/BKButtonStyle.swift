@@ -16,6 +16,9 @@ public enum BKButtonStyle: Equatable {
     /// 가장 낮은 강조의 텍스트 중심 스타일
     case tertiary
     
+    /// 윤곽선이 강조된 스타일(new)
+    case stroke
+    
     /// 직접 색상을 정의하는 커스텀 스타일
     case custom(background: BKButtonColorSet, foreground: BKButtonColorSet)
     
@@ -45,6 +48,13 @@ public enum BKButtonStyle: Equatable {
                 disabled: .bkBackgroundColor(.disable)
             )
             
+        case .stroke:
+            return BKButtonColorSet(
+                normal: .bkBaseColor(.primary),
+                pressed: .bkBaseColor(.primary),
+                disabled: .bkBackgroundColor(.disable)
+            )
+            
         case .custom(let background, _):
             return background
         }
@@ -70,6 +80,13 @@ public enum BKButtonStyle: Equatable {
             )
             
         case .tertiary:
+            return BKButtonColorSet(
+                normal: .bkContentColor(.brand),
+                pressed: .bkContentColor(.brand),
+                disabled: .bkContentColor(.disable)
+            )
+            
+        case .stroke:
             return BKButtonColorSet(
                 normal: .bkContentColor(.brand),
                 pressed: .bkContentColor(.brand),

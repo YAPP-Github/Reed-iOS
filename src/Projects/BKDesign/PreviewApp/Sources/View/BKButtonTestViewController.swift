@@ -58,6 +58,8 @@ public final class BKButtonTestViewController: UIViewController {
         addButton("Primary", style: .primary, size: size)
         addButton("Secondary", style: .secondary, size: size)
         addButton("Tertiary", style: .tertiary, size: size)
+        addButton("Stroke", style: .stroke, size: size)
+        addDisabledButton("Stroke-Dis", style: .stroke, size: size)
 
         addIconButton("Apple 로그인", style: .primary, size: size, left: BKImage.Icon.apple)
         addIconButton("카카오 로그인", style: .primary, size: size, right: BKImage.Icon.kakao)
@@ -69,6 +71,13 @@ public final class BKButtonTestViewController: UIViewController {
     private func addButton(_ title: String, style: BKButtonStyle, size: BKButtonSize) {
         let button = BKButton(style: style, size: size)
         button.title = "[\(size.label)] \(title)"
+        containerView.addArrangedSubview(button)
+    }
+    
+    private func addDisabledButton(_ title: String, style: BKButtonStyle, size: BKButtonSize) {
+        let button = BKButton(style: style, size: size)
+        button.title = "[\(size.label)] \(title)"
+        button.isDisabled = true
         containerView.addArrangedSubview(button)
     }
 
