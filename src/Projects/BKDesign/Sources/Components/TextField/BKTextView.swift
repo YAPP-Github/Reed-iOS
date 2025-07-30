@@ -16,6 +16,7 @@ public final class BKTextView: UIView {
         textView.backgroundColor = .bkBackgroundColor(.secondary)
         textView.isScrollEnabled = true
         textView.font = BKTextStyle.body2(weight: .regular).uiFont
+        textView.textColor = .bkContentColor(.primary)
         textView.textContainerInset = UIEdgeInsets(
             top: LayoutConstants.contentTitleInset,
             left: LayoutConstants.contentTitleInset,
@@ -85,6 +86,11 @@ public final class BKTextView: UIView {
     
     public func setErrorMessage(_ errorMessage: String) {
         self.errorMessage = errorMessage
+    }
+    
+    public func setText(_ text: String) {
+        self.textView.text = text
+        textViewDidChange(textView)
     }
 }
 

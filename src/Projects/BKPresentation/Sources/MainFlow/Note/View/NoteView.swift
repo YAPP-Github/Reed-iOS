@@ -18,12 +18,16 @@ protocol RegistrationFormProvidable {
 final class NoteView: BaseView {
     let eventPublisher = PassthroughSubject<NoteViewEvent, Never>()
     
+    private lazy var sentenceView = SentenceRegistrationView()
+    private lazy var emotionView = EmotionRegistrationView()
+    private lazy var appreciationView = SentenceAppreciationView { [weak self] in
+        self?.guideButtonTapped()
+    }
+
     private lazy var pageViews: [UIView] = [
-        SentenceRegistrationView(),
-        EmotionRegistrationView(),
-        SentenceAppreciationView { [weak self] in
-            self?.guideButtonTapped()
-        }
+        sentenceView,
+        emotionView,
+        appreciationView
     ]
     
     let pageControl = BKPageControl()
@@ -86,6 +90,10 @@ final class NoteView: BaseView {
         }
         
         makeInnerViews()
+    }
+    
+    func setAppreciationText(_ text: String) {
+        appreciationView.setText(text)
     }
 }
 

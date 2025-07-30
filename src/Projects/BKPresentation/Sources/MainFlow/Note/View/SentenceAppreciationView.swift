@@ -78,6 +78,10 @@ final class SentenceAppreciationView: BaseView {
             $0.bottom.equalToSuperview()
         }
     }
+    
+    func setText(_ content: String) {
+        appreciationTextView.setText(content)
+    }
 }
 
 extension SentenceAppreciationView: RegistrationFormProvidable {
