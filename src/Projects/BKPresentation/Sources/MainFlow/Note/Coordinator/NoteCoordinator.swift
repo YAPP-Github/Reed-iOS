@@ -20,10 +20,9 @@ final class NoteCoordinator: Coordinator, SessionExpirationNotifying {
     }
     
     func start() {
-        showOCRScanner()
-//        let viewController = NoteViewController(viewModel: NoteViewModel())
-//        viewController.coordinator = self
-//        navigationController.pushViewController(viewController, animated: true)
+        let viewController = NoteViewController(viewModel: NoteViewModel())
+        viewController.coordinator = self
+        navigationController.pushViewController(viewController, animated: true)
     }
 }
 
@@ -37,18 +36,17 @@ extension NoteCoordinator {
         }
     }
     
-    //
     func showOCRScanner() {
         let viewModel = OCRScannerViewModel()
         let ocrViewController = OCRScannerViewController(viewModel: viewModel)
         ocrViewController.coordinator = self
-        
         bindOCRViewModelSideEffects(viewModel)
         
+        ocrViewController.modalPresentationStyle = .fullScreen
         navigationController.present(ocrViewController, animated: true)
     }
     
-    /// 스캔하기 버튼 눌렀을 때, 
+    /// 스캔하기 버튼 눌렀을 때,
     private func bindOCRViewModelSideEffects(_ viewModel: OCRScannerViewModel) {
         viewModel.sideEffectPublisher
             .sink { [weak self] sideEffect in
@@ -67,7 +65,6 @@ extension NoteCoordinator {
         }
     }
     
-    /// 인식된 텍스트 확인 화면으로 이동
     private func showRecognizedTextViewController(with text: String) {
         let textViewController = RecognizedTextViewController(recognizedText: text)
         
@@ -85,10 +82,15 @@ extension NoteCoordinator {
         // 다시 촬영하기 콜백 처리
         textViewController.onRetake = { [weak self] in
             // 현재 텍스트 선택 화면만 닫고 OCR 스캐너로 돌아가기
-            self?.navigationController.dismiss(animated: true)
+            textViewController.dismiss(animated: true)
         }
         
-        navigationController.present(textViewController, animated: true)
+        if let presentedViewController = navigationController.presentedViewController {
+            presentedViewController.present(textViewController, animated: true)
+        } else {
+            // 만약 OCR 스캐너가 없다면 navigationController에서 직접 present
+            navigationController.present(textViewController, animated: true)
+        }
     }
     
     /// OCR 스캐너 화면 닫기
