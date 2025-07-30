@@ -21,7 +21,9 @@ final class NoteView: BaseView {
     private lazy var pageViews: [UIView] = [
         SentenceRegistrationView(),
         EmotionRegistrationView(),
-        SentenceAppreciationView()
+        SentenceAppreciationView { [weak self] in
+            self?.guideButtonTapped()
+        }
     ]
     
     let pageControl = BKPageControl()
@@ -117,6 +119,10 @@ private extension NoteView {
 //        }
 //        return .makeNoteForm(from: forms)
         return NoteForm(page: "", sentence: "", emotion: .someEmotion1, appreciation: "")
+    }
+    
+    func guideButtonTapped() {
+        eventPublisher.send(.didTapGuideButton)
     }
     
     @objc func pageControlChanged(_ sender: BKPageControl) {
