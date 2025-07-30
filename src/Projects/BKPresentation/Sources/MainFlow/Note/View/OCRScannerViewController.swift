@@ -1,10 +1,10 @@
 // Copyright © 2025 Booket. All rights reserved
 
-import VisionKit
-import UIKit
-import SnapKit
 import BKDesign
 import Combine
+import SnapKit
+import UIKit
+import VisionKit
 
 final class OCRScannerViewController: UIViewController {
     
@@ -16,12 +16,14 @@ final class OCRScannerViewController: UIViewController {
     private var scannerViewController: DataScannerViewController?
     private let scanAreaView = UIView()
     private let overlayView = UIView()
+    
     private let guideLabel = BKLabel(
         text: "수집할 문장을 중앙에 맞춰 \n캡처 버튼을 눌러주세요",
         fontStyle: .headline2(weight: .medium),
         color: .bkContentColor(.inverse),
         alignment: .center
     )
+    
     private let captureButton = UIButton()
     private let closeButton = UIButton()
     
@@ -68,14 +70,22 @@ final class OCRScannerViewController: UIViewController {
         // 닫기 버튼
         closeButton.setImage(BKImage.Icon.x, for: .normal)
         closeButton.tintColor = .bkContentColor(.inverse)
-        closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+        closeButton.addTarget(
+            self,
+            action: #selector(closeButtonTapped),
+            for: .touchUpInside
+        )
         
         // 캡처 버튼
         captureButton.backgroundColor = .bkBackgroundColor(.primary)
         captureButton.layer.cornerRadius = 36
         captureButton.setImage(BKImage.Icon.maximize, for: .normal)
         captureButton.tintColor = .bkBaseColor(.primary)
-        captureButton.addTarget(self, action: #selector(captureButtonTapped), for: .touchUpInside)
+        captureButton.addTarget(
+            self,
+            action: #selector(captureButtonTapped),
+            for: .touchUpInside
+        )
         
         // 스캔 영역 뷰 (초록색 테두리)
         scanAreaView.layer.borderColor = UIColor.green.cgColor
@@ -88,11 +98,7 @@ final class OCRScannerViewController: UIViewController {
         overlayView.backgroundColor = .clear
         overlayView.isUserInteractionEnabled = false
         
-        view.addSubview(overlayView)
-        view.addSubview(scanAreaView)
-        view.addSubview(guideLabel)
-        view.addSubview(closeButton)
-        view.addSubview(captureButton)
+        view.addSubviews(overlayView, scanAreaView, guideLabel, closeButton, captureButton)
         
         setupConstraints()
     }
@@ -190,12 +196,6 @@ final class OCRScannerViewController: UIViewController {
     }
     
     private func render(_ state: OCRScannerViewModel.State) {
-        // 성공 애니메이션 표시
-        if state.shouldShowSuccessAnimation {
-            showSuccessAnimation()
-            viewModel.send(.successAnimationCompleted)
-        }
-        
         // 알림 표시
         if state.shouldShowAlert {
             showAlert(message: state.alertMessage)
@@ -220,29 +220,15 @@ final class OCRScannerViewController: UIViewController {
     }
     
     // MARK: - Actions
-    @objc private func closeButtonTapped() {
+    @objc
+    private func closeButtonTapped() {
         viewModel.send(.closeButtonTapped)
     }
     
-    @objc private func captureButtonTapped() {
+    @objc
+    private func captureButtonTapped() {
         let scanAreaFrame = scanAreaView.frame
         viewModel.send(.captureButtonTapped(scanAreaFrame: scanAreaFrame))
-    }
-    
-    // MARK: - UI Helpers
-    private func showSuccessAnimation() {
-        let successView = UIView()
-        successView.backgroundColor = .green.withAlphaComponent(0.3)
-        successView.frame = scanAreaView.frame
-        successView.layer.cornerRadius = 12
-        
-        view.insertSubview(successView, belowSubview: scanAreaView)
-        
-        UIView.animate(withDuration: 0.3, animations: {
-            successView.alpha = 0
-        }) { _ in
-            successView.removeFromSuperview()
-        }
     }
     
     private func showAlert(message: String) {

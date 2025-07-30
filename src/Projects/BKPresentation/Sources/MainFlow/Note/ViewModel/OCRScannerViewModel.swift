@@ -13,7 +13,6 @@ final class OCRScannerViewModel: BaseViewModel {
         var isScanning: Bool = false
         var errorMessage: String?
         var capturedText: String?
-        var shouldShowSuccessAnimation: Bool = false
         var shouldShowAlert: Bool = false
         var alertMessage: String = ""
     }
@@ -28,7 +27,6 @@ final class OCRScannerViewModel: BaseViewModel {
         case captureButtonTapped(scanAreaFrame: CGRect)
         case closeButtonTapped
         case textCaptured(String)
-        case successAnimationCompleted
         case alertDismissed
     }
     
@@ -72,7 +70,6 @@ final class OCRScannerViewModel: BaseViewModel {
         // 기본적으로 에러나 알림 상태 초기화
         newState.errorMessage = nil
         newState.shouldShowAlert = false
-        newState.shouldShowSuccessAnimation = false
         
         switch action {
         case .viewDidLoad:
@@ -102,7 +99,6 @@ final class OCRScannerViewModel: BaseViewModel {
             if !capturedTexts.isEmpty {
                 let combinedText = capturedTexts.joined(separator: "\n")
                 newState.capturedText = combinedText
-                newState.shouldShowSuccessAnimation = true
                 effects.append(.showRecognizedText(combinedText))
             } else {
                 newState.shouldShowAlert = true
@@ -114,9 +110,6 @@ final class OCRScannerViewModel: BaseViewModel {
             
         case .textCaptured(let text):
             newState.capturedText = text
-            
-        case .successAnimationCompleted:
-            newState.shouldShowSuccessAnimation = false
             
         case .alertDismissed:
             newState.shouldShowAlert = false

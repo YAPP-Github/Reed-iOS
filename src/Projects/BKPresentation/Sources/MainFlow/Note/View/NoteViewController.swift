@@ -108,6 +108,7 @@ private extension NoteViewController {
                 }
             )
         )
+        
         let dialogViewController = BKDialogViewController(dialog: dialog)
         present(dialogViewController, animated: true)
     }
