@@ -55,7 +55,7 @@ final class RecognizedTextViewController: UIViewController {
     // MARK: - Setup
     private func setupUI() {
         view.backgroundColor = .bkBaseColor(.primary)
-        
+        collectionView.showsVerticalScrollIndicator = false
         setupTitleAndCloseButton()
         setupCollectionView()
         setupConstraints()
@@ -113,18 +113,32 @@ final class RecognizedTextViewController: UIViewController {
         }
         
         buttonGroup.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
         }
     }
     
     // MARK: - Collection View Layout & DataSource
     private func createLayout() -> UICollectionViewLayout {
-        var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
-        configuration.backgroundColor = .clear
-        configuration.showsSeparators = false
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(72)
+        )
         
-        return UICollectionViewCompositionalLayout.list(using: configuration)
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(80)
+        )
+        
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = 8
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+        
+        return UICollectionViewCompositionalLayout(section: section)
     }
     
     private func createDataSource() -> UICollectionViewDiffableDataSource<Int, RecognizedTextViewModel.SentenceItem> {

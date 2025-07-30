@@ -16,6 +16,7 @@ final class OCRScannerViewController: UIViewController {
     private var scannerViewController: DataScannerViewController?
     private let scanAreaView = UIView()
     private let overlayView = UIView()
+    private let scanOverlayView = UIImageView(image: UIImage(named: "dim"))
     
     private let guideLabel = BKLabel(
         text: "수집할 문장을 중앙에 맞춰 \n캡처 버튼을 눌러주세요",
@@ -88,9 +89,9 @@ final class OCRScannerViewController: UIViewController {
         )
         
         // 스캔 영역 뷰 (초록색 테두리)
-        scanAreaView.layer.borderColor = UIColor.green.cgColor
-        scanAreaView.layer.borderWidth = 3
-        scanAreaView.layer.cornerRadius = 12
+//        scanAreaView.layer.borderColor = UIColor.bkBackgroundColor(.primary).cgColor
+//        scanAreaView.layer.borderWidth = 1
+//        scanAreaView.layer.cornerRadius = 12
         scanAreaView.backgroundColor = .clear
         scanAreaView.isUserInteractionEnabled = false
         
@@ -98,7 +99,7 @@ final class OCRScannerViewController: UIViewController {
         overlayView.backgroundColor = .clear
         overlayView.isUserInteractionEnabled = false
         
-        view.addSubviews(overlayView, scanAreaView, guideLabel, closeButton, captureButton)
+        view.addSubviews(overlayView, scanAreaView, scanOverlayView, guideLabel, closeButton, captureButton)
         
         setupConstraints()
     }
@@ -112,6 +113,11 @@ final class OCRScannerViewController: UIViewController {
             $0.center.equalToSuperview()
             $0.width.equalToSuperview()
             $0.height.equalTo(scanAreaView.snp.width)
+        }
+        
+        scanOverlayView.snp.makeConstraints {
+            $0.leading.trailing.equalTo(scanAreaView)
+            $0.top.bottom.equalTo(scanAreaView)
         }
         
         guideLabel.snp.makeConstraints {
@@ -174,7 +180,7 @@ final class OCRScannerViewController: UIViewController {
         
         // 스캔 영역에 해당하는 부분을 뚫음
         let scanAreaFrame = scanAreaView.frame
-        let scanPath = UIBezierPath(roundedRect: scanAreaFrame, cornerRadius: 12)
+        let scanPath = UIBezierPath(roundedRect: scanAreaFrame, cornerRadius: 0)
         path.append(scanPath)
         path.usesEvenOddFillRule = true
         
