@@ -34,17 +34,41 @@ public final class BKLabel: UILabel {
         set { super.font = newValue }
     }
     
+    public var highlightedWord: String? {
+        didSet {
+            apply()
+        }
+    }
+    
+    public var highlightColor: UIColor {
+        didSet {
+            apply()
+        }
+    }
+    
+    public var highlightFont: UIFont? {
+        didSet {
+            apply()
+        }
+    }
+    
     public init(
         frame: CGRect = .zero,
         text: String = "",
         fontStyle: BKTextStyle = .body1(weight: .medium),
         color: UIColor = .bkContentColor(.primary),
-        alignment: NSTextAlignment = .justified
+        alignment: NSTextAlignment = .justified,
+        highlightedWord: String? = nil,
+        highlightColor: UIColor = .bkContentColor(.brand),
+        highlightFont: UIFont? = nil
     ) {
         self.labelText = text
         self.fontStyle = fontStyle
         self.labelColor = color
         self.alignment = alignment
+        self.highlightedWord = highlightedWord
+        self.highlightColor = highlightColor
+        self.highlightFont = highlightFont
         super.init(frame: frame)
         apply()
     }
@@ -104,6 +128,16 @@ private extension BKLabel {
             value: paragraphStyle,
             range: range
         )
+        
+        if let word = highlightedWord, !word.isEmpty {
+            let wordRange = (labelText as NSString).range(of: word)
+            if wordRange.location != NSNotFound {
+                attributedString.addAttribute(.foregroundColor, value: highlightColor, range: wordRange)
+                if let highlightFont = highlightFont {
+                    attributedString.addAttribute(.font, value: highlightFont, range: wordRange)
+                }
+            }
+        }
         
         attributedText = attributedString
     }

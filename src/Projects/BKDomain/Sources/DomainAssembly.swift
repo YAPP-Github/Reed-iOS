@@ -105,5 +105,19 @@ public struct DomainAssembly: Assembly {
             @Autowired var repository: RecentSearchRepository
             return DefaultDeleteRecentSearchUseCase(repository: repository)
         }
+        
+        container.register(
+            type: OnboardingCheckUseCase.self
+        ) { _ in
+            @Autowired var repository: OnboardingRepository
+            return DefaultOnboardingCheckUseCase(repository: repository)
+        }
+        
+        container.register(
+            type: MarkOnboardingSeenUseCase.self
+        ) { _ in
+            @Autowired var repository: OnboardingRepository
+            return DefaultMarkOnboardingSeenUseCase(repository: repository)
+        }
     }
 }
