@@ -65,6 +65,17 @@ final class NoteViewController: BaseViewController<NoteView> {
             }
             .store(in: &cancellable)
     }
+    
+    override func bindState() {
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates()
+            .map { $0.selectedGuideText }
+            .sink { [weak self] selectedText in
+                self?.contentView.setAppreciationText(selectedText)
+            }
+            .store(in: &cancellable)
+    }
 }
 
 private extension NoteViewController {
@@ -123,8 +134,7 @@ private extension NoteViewController {
     func presentAppreciationGuide() {
         let sheet = BKBottomSheetViewController.makeAppreciationGuideSheet(
             confirmAction: { [weak self] selectedGuide in
-                print("\(selectedGuide.rawValue)")
-//                viewModel.send(.appreciationGuideSelected(selectedGuide))
+                self?.viewModel.send(.appreciationGuideSelected(selectedGuide.rawValue))
                 self?.dismiss(animated: true)
             }
         )

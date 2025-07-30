@@ -4,10 +4,12 @@ import Combine
 import Foundation
 
 final class NoteViewModel: BaseViewModel {
-    struct State {
+    struct State: Equatable {
+        var selectedGuideText: String = ""
     }
     
     enum Action {
+        case appreciationGuideSelected(String)
     }
     
     enum SideEffect {
@@ -36,6 +38,8 @@ final class NoteViewModel: BaseViewModel {
         var effects: [SideEffect] = []
         
         switch action {
+        case .appreciationGuideSelected(let guideText):
+            newState.selectedGuideText = guideText
         }
         
         return (newState, effects)
