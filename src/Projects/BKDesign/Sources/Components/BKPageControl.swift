@@ -65,7 +65,7 @@ private extension BKPageControl {
     func updateIndicators() {
         indicatorViews.enumerated().forEach { index, view in
             view.backgroundColor =
-                index == currentPage ? .bkBackgroundColor(.primary) : .bkBackgroundColor(.disable)
+                index <= currentPage ? .bkBackgroundColor(.primary) : .bkBackgroundColor(.disable)
         }
     }
 }
