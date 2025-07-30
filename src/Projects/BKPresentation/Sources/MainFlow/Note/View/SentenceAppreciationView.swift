@@ -33,41 +33,27 @@ final class SentenceAppreciationView: BaseView {
         return stackView
     }()
     
-    private let registerButton: BKButton = {
-        let button = BKButton(
-            style: .custom(
-                background: BKButtonColorSet(
-                    normal: .bkBaseColor(.primary),
-                    pressed: .bkBaseColor(.primary),
-                    disabled: .bkBaseColor(.primary)
-                ),
-                foreground: BKButtonColorSet(
-                    normal: .bkContentColor(.brand),
-                    pressed: .bkContentColor(.brand),
-                    disabled: .bkContentColor(.brand)
-                )
-            )
-        )
-        button.layer.borderWidth = LayoutConstants.buttonBorderWidth
-        button.layer.borderColor = UIColor.bkBorderColor(.brand).cgColor
-        button.leftIcon = BKImage.Icon.maximize
-        button.title = "감상평 가이드"
-        return button
-    }()
+    private let guideButton = BKButton(
+        style: .stroke,
+        size: .rounded
+    )
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        registerButton.layer.cornerRadius = registerButton.bounds.height / 2
-        registerButton.layer.masksToBounds = true
+    init(guideButtonAction: @escaping () -> Void) {
+        super.init(frame: .zero)
+        guideButton.addAction(UIAction { _ in
+            guideButtonAction()
+        }, for: .touchUpInside)
     }
     
     override func setupView() {
-        addSubviews(titleStack, appreciationTextView, registerButton)
+        addSubviews(titleStack, appreciationTextView, guideButton)
         [titleLabel, subtitleLabel].forEach(titleStack.addArrangedSubview(_:))
     }
     
     override func configure() {
         titleLabel.numberOfLines = .zero
+        guideButton.leftIcon = BKImage.Icon.bookOpen
+        guideButton.title = "감상평 가이드"
     }
     
     override func setupLayout() {
@@ -84,7 +70,7 @@ final class SentenceAppreciationView: BaseView {
                 .inset(LayoutConstants.horizontalInset)
         }
         
-        registerButton.snp.makeConstraints {
+        guideButton.snp.makeConstraints {
             $0.top.equalTo(appreciationTextView.snp.bottom)
                 .offset(LayoutConstants.buttonOffset)
             $0.trailing.equalToSuperview()
