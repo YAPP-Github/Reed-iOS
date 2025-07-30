@@ -2,7 +2,7 @@
 
 import Foundation
 
-struct NoteForm {
+struct NoteForm: Equatable {
     let page: String
     let sentence: String
     let emotion: Emotion
