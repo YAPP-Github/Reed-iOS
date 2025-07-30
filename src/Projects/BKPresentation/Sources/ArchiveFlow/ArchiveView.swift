@@ -101,7 +101,6 @@ final class ArchiveView: BaseView {
     }
     
     private func setupChipActions() {
-        // View는 단순히 이벤트만 전달
         allChips.enumerated().forEach { index, chip in
             chip.onTap = { [weak self] in
                 self?.eventPublisher.send(.chipTapped(index: index))
@@ -113,10 +112,9 @@ final class ArchiveView: BaseView {
         chipScrollView.addSubview(chipStackView)
         chipStackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
-            $0.height.equalTo(36)
+            $0.height.equalTo(ArchiveLayoutGuide.chipViewHeight)
         }
         
-        // 패딩 추가
         let leadingPadding = UIView()
         let trailingPadding = UIView()
         
@@ -132,7 +130,7 @@ final class ArchiveView: BaseView {
         chipScrollView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).offset(BKSpacing.spacing3)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(36)
+            $0.height.equalTo(ArchiveLayoutGuide.chipViewHeight)
         }
         
         bookCollectionView.snp.makeConstraints {
@@ -147,7 +145,6 @@ final class ArchiveView: BaseView {
     }
     
     func updateData(chips: [ChipData], books: [ArchiveBook]) {
-        // View는 받은 데이터를 그대로 표시만 함
         chips.enumerated().forEach { index, chipData in
             guard index < allChips.count else { return }
             allChips[index].title = chipData.title
@@ -207,6 +204,7 @@ extension ArchiveView: UICollectionViewDelegateFlowLayout {
 // MARK: - Layout Metrics
 enum ArchiveLayoutGuide {
     static let chipSpacing: CGFloat = BKSpacing.spacing2
+    static let chipViewHeight: CGFloat = 32
     static let chipSectionInset = NSDirectionalEdgeInsets(
         top: BKSpacing.spacing3,
         leading: BKSpacing.spacing5,
