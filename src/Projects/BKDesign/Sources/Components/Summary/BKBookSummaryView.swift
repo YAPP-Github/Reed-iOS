@@ -150,7 +150,7 @@ private extension BKBookSummaryView {
         [authorLabel, separatorLabel, publisherLabel].forEach(descriptionStack.addArrangedSubview(_:))
     }
     
-    func setupforRecord() {
+    func setupForRecord() {
         addSubviews(thumbnail, textContainer)
         textContainer.addSubviews(labelStack, recordView)
         
@@ -188,7 +188,7 @@ private extension BKBookSummaryView {
         publisherLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
     }
     
-    func layoutforRecord() {
+    func layoutForRecord() {
         thumbnail.snp.makeConstraints {
             $0.leading.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
