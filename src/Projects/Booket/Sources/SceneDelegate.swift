@@ -49,9 +49,11 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 private extension SceneDelegate {
     func startScene() {
         @Autowired var authStateUseCase: AuthStateUseCase
+        @Autowired var onboardingCheckUseCase: OnboardingCheckUseCase
         self.coordinator = AppCoordinator(
             navigationController: navigationController,
-            authStateUseCase: authStateUseCase
+            authStateUseCase: authStateUseCase,
+            onboardingCheckUseCase: onboardingCheckUseCase
         )
         coordinator?.start()
     }

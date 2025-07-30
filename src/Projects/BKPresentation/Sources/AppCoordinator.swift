@@ -11,30 +11,34 @@ public final class AppCoordinator: Coordinator {
     public var navigationController: UINavigationController
     
     private let authStateUseCase: AuthStateUseCase
+    private let onboardingCheckUseCase: OnboardingCheckUseCase
     private var cancellable: Set<AnyCancellable> = []
     
     public init(
         navigationController: UINavigationController,
-        authStateUseCase: AuthStateUseCase
+        authStateUseCase: AuthStateUseCase,
+        onboardingCheckUseCase: OnboardingCheckUseCase
     ) {
         self.navigationController = navigationController
         self.authStateUseCase = authStateUseCase
+        self.onboardingCheckUseCase = onboardingCheckUseCase
     }
     
     public func start() {
-        authStateUseCase.execute()
+        onboardingCheckUseCase.execute()
             .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                switch completion {
-                case .finished:
-                    self?.startMainFlow()
-                case .failure:
-                    self?.startAuthFlow()
+            .sink { [weak self] didSeeOnboarding in
+                if didSeeOnboarding {
+                    self?.checkAuthAndRoute()
+                } else {
+                    self?.startOnboardingFlow()
                 }
-            }, receiveValue: { _ in })
+            }
             .store(in: &cancellable)
     }
-    
+}
+
+private extension AppCoordinator {
     func startAuthFlow() {
         let loginCoordinator = LoginCoordinator(
             parentCoordinator: self,
@@ -61,5 +65,31 @@ public final class AppCoordinator: Coordinator {
         
         addChildCoordinator(tabBarCoordinator)
         tabBarCoordinator.start()
+    }
+    
+    func startOnboardingFlow() {
+        let onboardingCoordinator = OnboardingCoordinator(
+            parentCoordinator: self,
+            navigationController: navigationController
+        )
+        onboardingCoordinator.onFinish = { [weak self] in
+            self?.checkAuthAndRoute()
+        }
+        childCoordinators.append(onboardingCoordinator)
+        onboardingCoordinator.start()
+    }
+    
+    func checkAuthAndRoute() {
+        authStateUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { [weak self] completion in
+                switch completion {
+                case .finished:
+                    self?.startMainFlow()
+                case .failure:
+                    self?.startAuthFlow()
+                }
+            }, receiveValue: { _ in })
+            .store(in: &cancellable)
     }
 }
