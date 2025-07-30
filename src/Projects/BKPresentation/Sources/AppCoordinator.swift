@@ -76,10 +76,10 @@ private extension AppCoordinator {
             navigationController: navigationController
         )
         onboardingCoordinator.onFinish = { [weak self] in
-            self?.checkAuthAndRoute()
             self?.markOnboardingSeenUseCase.execute()
+            self?.checkAuthAndRoute()
         }
-        childCoordinators.append(onboardingCoordinator)
+        addChildCoordinator(onboardingCoordinator)
         onboardingCoordinator.start()
     }
     
