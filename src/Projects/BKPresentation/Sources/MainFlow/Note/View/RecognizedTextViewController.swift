@@ -1,0 +1,206 @@
+// Copyright © 2025 Booket. All rights reserved
+
+import UIKit
+import SnapKit
+import BKDesign
+import Combine
+
+final class RecognizedTextViewController: UIViewController {
+    
+    // MARK: - Properties
+    private let viewModel: RecognizedTextViewModel
+    private let recognizedText: String
+    private var cancellables = Set<AnyCancellable>()
+    
+    // UI Components
+    private let titleLabel = BKLabel(
+        text: "기록할 문장 선택",
+        fontStyle: .headline2(weight: .semiBold),
+        color: .bkContentColor(.primary),
+        alignment: .center
+    )
+    
+    private let closeButton = UIButton()
+    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+    private lazy var dataSource = createDataSource()
+    private let buttonGroup = BKButtonGroup.twoButtonGroup(
+        leftTitle: "다시 촬영하기",
+        rightTitle: "선택 완료"
+    )
+    
+    // Callbacks
+    var onConfirm: ((String) -> Void)?
+    var onRetake: (() -> Void)?
+    
+    // MARK: - Lifecycle
+    init(recognizedText: String) {
+        self.recognizedText = recognizedText
+        self.viewModel = RecognizedTextViewModel()
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUI()
+        setupButtonActions()
+        bindViewModel()
+        viewModel.send(.viewDidLoad(recognizedText: recognizedText))
+    }
+    
+    // MARK: - Setup
+    private func setupUI() {
+        view.backgroundColor = .bkBaseColor(.primary)
+        
+        setupTitleAndCloseButton()
+        setupCollectionView()
+        setupConstraints()
+    }
+    
+    private func setupTitleAndCloseButton() {
+        closeButton.setImage(BKImage.Icon.x, for: .normal)
+        closeButton.tintColor = .bkContentColor(.primary)
+        closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+        
+        view.addSubviews(titleLabel, closeButton)
+    }
+    
+    private func setupCollectionView() {
+        collectionView.backgroundColor = .clear
+        collectionView.delegate = self
+        
+        view.addSubviews(collectionView, buttonGroup)
+    }
+    
+    private func setupButtonActions() {
+        let buttons = buttonGroup.subviews.first?.subviews.compactMap { $0 as? BKButton } ?? []
+        
+        // 다시 촬영하기 버튼 (왼쪽)
+        buttons.first?.addAction(UIAction { [weak self] _ in
+            self?.viewModel.send(.retakeButtonTapped)
+        }, for: .touchUpInside)
+        
+        // 선택 완료 버튼 (오른쪽)
+        buttons.last?.addAction(UIAction { [weak self] _ in
+            self?.viewModel.send(.confirmButtonTapped)
+        }, for: .touchUpInside)
+    }
+    
+    private func setupConstraints() {
+        titleLabel.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(18)
+            $0.centerX.equalToSuperview()
+        }
+        
+        closeButton.snp.makeConstraints {
+            $0.centerY.equalTo(titleLabel)
+            $0.trailing.equalToSuperview().inset(20)
+            $0.size.equalTo(24)
+        }
+        
+        collectionView.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(30)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.bottom.equalTo(buttonGroup.snp.top)
+        }
+        
+        buttonGroup.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
+        }
+    }
+    
+    // MARK: - Collection View Layout & DataSource
+    private func createLayout() -> UICollectionViewLayout {
+        var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
+        configuration.backgroundColor = .clear
+        configuration.showsSeparators = false
+        
+        return UICollectionViewCompositionalLayout.list(using: configuration)
+    }
+    
+    private func createDataSource() -> UICollectionViewDiffableDataSource<Int, RecognizedTextViewModel.SentenceItem> {
+        let cellRegistration = UICollectionView.CellRegistration<SentenceListCell, RecognizedTextViewModel.SentenceItem> { cell, indexPath, item in
+            cell.configure(with: item)
+        }
+        
+        return UICollectionViewDiffableDataSource<Int, RecognizedTextViewModel.SentenceItem>(
+            collectionView: collectionView
+        ) { collectionView, indexPath, item in
+            return collectionView.dequeueConfiguredReusableCell(
+                using: cellRegistration,
+                for: indexPath,
+                item: item
+            )
+        }
+    }
+    
+    private func updateDataSource(with sentences: [RecognizedTextViewModel.SentenceItem]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Int, RecognizedTextViewModel.SentenceItem>()
+        snapshot.appendSections([0])
+        snapshot.appendItems(sentences)
+        
+        dataSource.apply(snapshot, animatingDifferences: true)
+    }
+    
+    private func bindViewModel() {
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                self?.render(state)
+            }
+            .store(in: &cancellables)
+        
+        viewModel.sideEffectPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] sideEffect in
+                self?.handleSideEffect(sideEffect)
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func render(_ state: RecognizedTextViewModel.State) {
+        updateDataSource(with: state.sentences)
+        
+        // 확인 버튼 상태 업데이트
+        buttonGroup.setPrimaryButtonState(state.isConfirmButtonEnabled)
+        
+        // 에러 메시지 표시
+        if let errorMessage = state.errorMessage {
+            showAlert(message: errorMessage)
+        }
+    }
+    
+    private func handleSideEffect(_ sideEffect: RecognizedTextViewModel.SideEffect) {
+        switch sideEffect {
+        case .confirmWithSelectedText(let selectedText):
+            onConfirm?(selectedText)
+            
+        case .dismissToRetake:
+            onRetake?()
+        }
+    }
+    
+    // MARK: - Actions
+    @objc private func closeButtonTapped() {
+        dismiss(animated: true)
+    }
+    
+    // MARK: - Helpers
+    private func showAlert(message: String) {
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default))
+        present(alert, animated: true)
+    }
+}
+
+// MARK: - UICollectionViewDelegate
+extension RecognizedTextViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        viewModel.send(.sentenceToggled(index: indexPath.item))
+    }
+}
