@@ -1,8 +1,8 @@
 // Copyright © 2025 Booket. All rights reserved
 
-import UIKit
-import SnapKit
 import BKDesign
+import SnapKit
+import UIKit
 
 final class SentenceListCell: UICollectionViewListCell {
     
@@ -30,7 +30,7 @@ final class SentenceListCell: UICollectionViewListCell {
     
     // MARK: - Setup
     private func setupUI() {
-        backgroundColor = .clear
+        backgroundColor = .bkBaseColor(.primary)
         contentView.backgroundColor = .bkBackgroundColor(.secondary)
         contentView.layer.cornerRadius = 8
         
