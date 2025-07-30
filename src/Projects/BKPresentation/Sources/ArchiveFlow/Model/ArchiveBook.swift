@@ -11,8 +11,7 @@ struct ArchiveBook: Hashable, Equatable {
     let recordCount: Int
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(title)
-        hasher.combine(author)
+        hasher.combine(isbn)
     }
     
     static func == (
