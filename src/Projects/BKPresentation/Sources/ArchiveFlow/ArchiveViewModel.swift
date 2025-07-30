@@ -10,31 +10,6 @@ enum ArchiveItem: Hashable {
     case book(ArchiveBook)
 }
 
-enum ChipType: Int, CaseIterable {
-    case total = 0
-    case toRead = 1
-    case reading = 2
-    case completed = 3
-    
-    var title: String {
-        switch self {
-        case .total: return "전체"
-        case .toRead: return "읽기 전"
-        case .reading: return "읽는 중"
-        case .completed: return "완독"
-        }
-    }
-    
-    var bookStatus: BookStatus? {
-        switch self {
-        case .total: return .total
-        case .toRead: return .toRead
-        case .reading: return .reading
-        case .completed: return .completed
-        }
-    }
-}
-
 final class ArchiveViewModel: BaseViewModel {
     enum ArchiveState: Equatable {
         case empty([ChipData])
@@ -234,7 +209,7 @@ final class ArchiveViewModel: BaseViewModel {
         }
     }
     
-    // MARK: - Mock Data (실제 구현에서는 제거)
+    // MARK: - Mock Data -> API 연결 후 삭제
     
     private func createMockChips() -> [ChipData] {
         return [
@@ -246,7 +221,7 @@ final class ArchiveViewModel: BaseViewModel {
     }
     
     private func createMockBooks(for status: BookStatus?) -> [ArchiveBook] {
-        // 임시 Mock 데이터
+        // 임시 Mock 데이터 -> API 연결 후 삭제
         switch status {
         case .total: // 전체 (4개)
             return [
@@ -331,11 +306,4 @@ final class ArchiveViewModel: BaseViewModel {
             return []
         }
     }
-}
-
-enum BookStatus: String, CaseIterable {
-    case total = "전체"
-    case toRead = "읽기 전"
-    case reading = "읽는 중"
-    case completed = "완독"
 }
