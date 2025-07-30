@@ -22,9 +22,9 @@ public enum BKButtonSize {
     var height: CGFloat {
         switch self {
         case .small, .rounded:
-            40
+            38
         case .medium:
-            48
+            46
         case .large:
             52
         }
