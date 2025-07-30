@@ -107,6 +107,7 @@ public final class BKBottomSheetViewController: UIViewController {
 }
 
 public extension BKBottomSheetViewController {
+    // TODO: - Presentation Layer로 분리
     static func makeWithdrawalSheet(
         title: String,
         subtitle: String,
