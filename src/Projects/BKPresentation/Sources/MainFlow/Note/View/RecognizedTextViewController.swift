@@ -1,9 +1,9 @@
 // Copyright © 2025 Booket. All rights reserved
 
-import UIKit
-import SnapKit
 import BKDesign
 import Combine
+import SnapKit
+import UIKit
 
 final class RecognizedTextViewController: UIViewController {
     
@@ -23,6 +23,7 @@ final class RecognizedTextViewController: UIViewController {
     private let closeButton = UIButton()
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
     private lazy var dataSource = createDataSource()
+    
     private let buttonGroup = BKButtonGroup.twoButtonGroup(
         leftTitle: "다시 촬영하기",
         rightTitle: "선택 완료"
@@ -63,7 +64,11 @@ final class RecognizedTextViewController: UIViewController {
     private func setupTitleAndCloseButton() {
         closeButton.setImage(BKImage.Icon.x, for: .normal)
         closeButton.tintColor = .bkContentColor(.primary)
-        closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+        closeButton.addTarget(
+            self,
+            action: #selector(closeButtonTapped),
+            for: .touchUpInside
+        )
         
         view.addSubviews(titleLabel, closeButton)
     }
@@ -185,13 +190,19 @@ final class RecognizedTextViewController: UIViewController {
     }
     
     // MARK: - Actions
-    @objc private func closeButtonTapped() {
+    @objc
+    private func closeButtonTapped() {
         dismiss(animated: true)
     }
     
     // MARK: - Helpers
     private func showAlert(message: String) {
-        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        let alert = UIAlertController(
+            title: nil,
+            message: message,
+            preferredStyle: .alert
+        )
+        
         alert.addAction(UIAlertAction(title: "확인", style: .default))
         present(alert, animated: true)
     }
@@ -199,8 +210,13 @@ final class RecognizedTextViewController: UIViewController {
 
 // MARK: - UICollectionViewDelegate
 extension RecognizedTextViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
         collectionView.deselectItem(at: indexPath, animated: true)
         viewModel.send(.sentenceToggled(index: indexPath.item))
     }
+    
 }

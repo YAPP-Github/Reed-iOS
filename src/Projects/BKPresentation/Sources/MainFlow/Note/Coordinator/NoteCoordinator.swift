@@ -20,9 +20,10 @@ final class NoteCoordinator: Coordinator, SessionExpirationNotifying {
     }
     
     func start() {
-        let viewController = NoteViewController(viewModel: NoteViewModel())
-        viewController.coordinator = self
-        navigationController.pushViewController(viewController, animated: true)
+        showOCRScanner()
+//        let viewController = NoteViewController(viewModel: NoteViewModel())
+//        viewController.coordinator = self
+//        navigationController.pushViewController(viewController, animated: true)
     }
 }
 
@@ -36,17 +37,18 @@ extension NoteCoordinator {
         }
     }
     
+    //
     func showOCRScanner() {
         let viewModel = OCRScannerViewModel()
         let ocrViewController = OCRScannerViewController(viewModel: viewModel)
         ocrViewController.coordinator = self
         
-        // ViewModel의 SideEffect 구독
         bindOCRViewModelSideEffects(viewModel)
         
         navigationController.present(ocrViewController, animated: true)
     }
     
+    /// 스캔하기 버튼 눌렀을 때, 
     private func bindOCRViewModelSideEffects(_ viewModel: OCRScannerViewModel) {
         viewModel.sideEffectPublisher
             .sink { [weak self] sideEffect in
@@ -98,6 +100,6 @@ extension NoteCoordinator {
     private func saveRecognizedText(_ text: String) {
         // TODO: 새 노트 생성하거나 기존 노트에 추가하는 로직
         // 예: createNewNote(with: text) 또는 addToCurrentNote(text)
-        print("💾 텍스트 저장: \(text)")
+        print("텍스트 저장: \(text)")
     }
 }

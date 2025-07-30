@@ -9,6 +9,10 @@ struct SentenceRegistrationForm {
     let sentence: String
 }
 
+enum SentenceRegistrationEvent {
+    case ocrScanTapped
+}
+
 final class SentenceRegistrationView: BaseView {
     private let containerView = UIView()
     private let titleLabel = BKLabel(
