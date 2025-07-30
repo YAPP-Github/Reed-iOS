@@ -88,8 +88,8 @@ public class BKBookSummaryView: UIView {
         super.init(frame: frame)
         
         if style == .record {
-            setupforRecord()
-            layoutforRecord()
+            setupForRecord()
+            layoutForRecord()
         } else {
             setup()
             layout()
