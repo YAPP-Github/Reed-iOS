@@ -7,10 +7,12 @@ import UIKit
 public enum BKBookSummaryViewStyle {
     case regular
     case compact
+    case record
     
     var thumbnailSize: CGSize {
         switch self {
         case .regular: return CGSize(width: 68, height: 100)
+        case .record: return CGSize(width: 68, height: 100)
         case .compact: return CGSize(width: 46, height: 68)
         }
     }
@@ -18,6 +20,7 @@ public enum BKBookSummaryViewStyle {
     var placeholderImage: URL? {
         switch self {
         case .regular: return URL(string: "https://dummyimage.com/68x100/2f9647/ffffff")
+        case .record: return URL(string: "https://dummyimage.com/68x100/2f9647/ffffff")
         case .compact: return URL(string: "https://dummyimage.com/46x68/2f9647/ffffff")
         }
     }
@@ -27,6 +30,8 @@ public enum BKBookSummaryViewStyle {
 /// 사용되는 곳에 따라서 Height이 계속 바뀌므로 사용 시 Constraints를 잘 설정하거나, Size를 명시적으로 제공하세요.
 public class BKBookSummaryView: UIView {
     private let thumbnail = UIImageView()
+    private let textContainer = UIView()
+    
     private let labelStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -60,6 +65,19 @@ public class BKBookSummaryView: UIView {
         return stackView
     }()
     
+    private let recordView = UIView()
+    
+    private let recordLabel = BKLabel(
+        text: "남긴 기록",
+        fontStyle: .label2(weight: .regular),
+        color: .bkContentColor(.primary)
+    )
+    
+    private let recordCountLabel = BKLabel(
+        fontStyle: .label2(weight: .semiBold),
+        color: .bkContentColor(.brand)
+    )
+    
     private let style: BKBookSummaryViewStyle
     
     public init(
@@ -68,8 +86,14 @@ public class BKBookSummaryView: UIView {
     ) {
         self.style = style
         super.init(frame: frame)
-        setup()
-        layout()
+        
+        if style == .record {
+            setupforRecord()
+            layoutforRecord()
+        } else {
+            setup()
+            layout()
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -80,6 +104,7 @@ public class BKBookSummaryView: UIView {
         title: String,
         author: String,
         publisher: String,
+        recordCount: Int? = nil,
         image: URL? = nil
     ) {
         titleLabel.numberOfLines = 1
@@ -99,6 +124,11 @@ public class BKBookSummaryView: UIView {
         thumbnail.clipsToBounds = true
         thumbnail.layer.masksToBounds = true
         thumbnail.layer.cornerRadius = LayoutConstants.imageRadius
+        
+        if let recordCount {
+            recordCountLabel.setText(text: "\(recordCount)")
+            recordView.isHidden = false
+        }
     }
     
     public func clearView() {
@@ -106,13 +136,26 @@ public class BKBookSummaryView: UIView {
         titleLabel.setText(text: "")
         authorLabel.setText(text: "")
         publisherLabel.setText(text: "")
+        recordCountLabel.setText(text: "")
+        
+        recordView.isHidden = true
     }
 }
 
 private extension BKBookSummaryView {
     func setup() {
         addSubviews(thumbnail, labelStack)
+        
         [titleLabel, descriptionStack].forEach(labelStack.addArrangedSubview(_:))
+        [authorLabel, separatorLabel, publisherLabel].forEach(descriptionStack.addArrangedSubview(_:))
+    }
+    
+    func setupforRecord() {
+        addSubviews(thumbnail, textContainer)
+        textContainer.addSubviews(labelStack, recordView)
+        
+        [titleLabel, descriptionStack].forEach(labelStack.addArrangedSubview(_:))
+        recordView.addSubviews(recordLabel, recordCountLabel)
         [authorLabel, separatorLabel, publisherLabel].forEach(descriptionStack.addArrangedSubview(_:))
     }
     
@@ -144,12 +187,64 @@ private extension BKBookSummaryView {
         publisherLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
         publisherLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
     }
+    
+    func layoutforRecord() {
+        thumbnail.snp.makeConstraints {
+            $0.leading.equalToSuperview()
+                .inset(LayoutConstants.horizontalInset)
+            $0.centerY.equalToSuperview()
+            $0.size.equalTo(style.thumbnailSize)
+        }
+        
+        textContainer.snp.makeConstraints {
+            $0.leading.equalTo(thumbnail.snp.trailing)
+                .offset(LayoutConstants.labelStackOffset)
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview()
+                .inset(LayoutConstants.horizontalInset)
+        }
+        
+        labelStack.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview()
+            $0.top.equalToSuperview()
+        }
+        
+        recordView.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview()
+            $0.top.equalTo(labelStack.snp.bottom).offset(LayoutConstants.textStackSpacing)
+            $0.bottom.equalToSuperview()
+        }
+        
+        recordLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview()
+            $0.top.bottom.equalToSuperview()
+        }
+        
+        recordCountLabel.snp.makeConstraints {
+            $0.leading.equalTo(recordLabel.snp.trailing).offset(LayoutConstants.labelStackSpacing)
+            $0.top.bottom.equalToSuperview()
+        }
+        
+        
+        authorLabel.snp.makeConstraints {
+            $0.width.lessThanOrEqualTo(descriptionStack.snp.width)
+                .multipliedBy(LayoutConstants.authorMaxRatio)
+        }
+        
+        authorLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        authorLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        separatorLabel.setContentHuggingPriority(.required, for: .horizontal)
+        separatorLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        publisherLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        publisherLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+    }
 }
 
 private extension BKBookSummaryView {
     enum LayoutConstants {
         static let labelStackOffset: CGFloat = BKInset.inset4
         static let labelStackSpacing: CGFloat = BKSpacing.spacing1
+        static let textStackSpacing: CGFloat = BKSpacing.spacing4
         static let horizontalInset: CGFloat = BKInset.inset5
         static let authorMaxRatio: CGFloat = 0.65
         static let imageRadius = BKRadius.xsmall

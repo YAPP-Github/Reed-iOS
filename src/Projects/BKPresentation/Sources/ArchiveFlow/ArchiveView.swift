@@ -7,8 +7,6 @@ import SnapKit
 import UIKit
 
 final class ArchiveView: BaseView {
-    typealias ArchiveResultCell = SearchResultCell
-    
     private var eventPublisher = PassthroughSubject<ArchiveViewEvent, Never>()
     var events: AnyPublisher<ArchiveViewEvent, Never> {
         eventPublisher.eraseToAnyPublisher()
@@ -47,8 +45,8 @@ final class ArchiveView: BaseView {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(
-            SearchResultCell.self,
-            forCellWithReuseIdentifier: SearchResultCell.archiveReuseIdentifier
+            ArchiveCell.self,
+            forCellWithReuseIdentifier: ArchiveCell.identifier
         )
         return collectionView
     }()
@@ -174,14 +172,14 @@ extension ArchiveView: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: ArchiveResultCell.archiveReuseIdentifier,
+            withReuseIdentifier: ArchiveCell.identifier,
             for: indexPath
-        ) as? ArchiveResultCell else {
+        ) as? ArchiveCell else {
             return UICollectionViewCell()
         }
         
         let book = books[indexPath.item]
-        cell.configureWithRecord(
+        cell.configure(
             title: book.title,
             description: .init(
                 author: book.author,
