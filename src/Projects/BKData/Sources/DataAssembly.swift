@@ -71,6 +71,13 @@ public struct DataAssembly: Assembly {
         }
         
         container.register(
+            type: OnboardingRepository.self
+        ) { _ in
+            @Autowired(name: "UserDefaults") var storage: KeyValueStorage
+            return DefaultOnboardingRepository(storage: storage)
+        }
+        
+        container.register(
             type: RefreshHandler.self
         ) { _ in
             @Autowired var repository: DefaultAuthRepository
