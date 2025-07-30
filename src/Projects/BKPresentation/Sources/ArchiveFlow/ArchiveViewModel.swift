@@ -73,8 +73,10 @@ final class ArchiveViewModel: BaseViewModel {
     }
     
     @Published private var state = State()
+    
     private var cancellables = Set<AnyCancellable>()
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
+    
     private var allBooks: [ArchiveBook] = []
     private var currentPage = 1
     private var currentStatus: BookStatus? = .total
