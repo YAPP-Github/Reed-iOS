@@ -105,6 +105,7 @@ private extension UINavigationController {
         let searchButton = makeIconButton(BKImage.Icon.search, target: target, action: searchAction)
         let gearButton = makeIconButton(BKImage.Icon.settings, target: target, action: gearAction)
         
+        navigationBar.tintColor = .bkContentColor(.primary)
         viewController.navigationItem.title = nil
         viewController.navigationItem.largeTitleDisplayMode = .never
         viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: makeLeadingTitle(title))

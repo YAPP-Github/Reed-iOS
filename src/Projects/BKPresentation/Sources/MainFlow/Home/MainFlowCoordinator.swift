@@ -24,13 +24,6 @@ final class MainFlowCoordinator: Coordinator, FinishNotifying {
     }
 }
 
-extension MainFlowCoordinator: SessionExpirationHandling {
-    func handleSessionExpired() {
-        navigationController.setViewControllers([], animated: false)
-        didFinish()
-    }
-}
-
 extension MainFlowCoordinator {
     func didTapSettingButton() {
         let settingCoordinator = SettingCoordinator(

@@ -20,4 +20,22 @@ enum TabItem: CaseIterable {
         case .archive: return BKImage.Icon.archive
         }
     }
+    
+    func makeCoordinator(
+        parent: Coordinator,
+        navigationController: UINavigationController
+    ) -> Coordinator {
+        switch self {
+        case .home:
+            return MainFlowCoordinator(
+                parentCoordinator: parent,
+                navigationController: navigationController
+            )
+        case .archive:
+            return ArchiveCoordinator(
+                parentCoordinator: parent,
+                navigationController: navigationController
+            )
+        }
+    }
 }
