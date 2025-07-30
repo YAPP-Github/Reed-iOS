@@ -8,6 +8,7 @@ import UIKit
 
 final class ArchiveView: BaseView {
     private var eventPublisher = PassthroughSubject<ArchiveViewEvent, Never>()
+    
     var events: AnyPublisher<ArchiveViewEvent, Never> {
         eventPublisher.eraseToAnyPublisher()
     }
@@ -68,7 +69,9 @@ final class ArchiveView: BaseView {
             alignment: .center
         )
         
-        let stackView = UIStackView(arrangedSubviews: [titleLabel, descriptionLabel])
+        let stackView = UIStackView(
+            arrangedSubviews: [titleLabel, descriptionLabel]
+        )
         stackView.axis = .vertical
         stackView.spacing = BKSpacing.spacing2
         stackView.alignment = .center
@@ -118,8 +121,12 @@ final class ArchiveView: BaseView {
         let leadingPadding = UIView()
         let trailingPadding = UIView()
         
-        leadingPadding.snp.makeConstraints { $0.width.equalTo(BKSpacing.spacing5) }
-        trailingPadding.snp.makeConstraints { $0.width.equalTo(BKSpacing.spacing5) }
+        leadingPadding.snp.makeConstraints {
+            $0.width.equalTo(BKSpacing.spacing5)
+        }
+        trailingPadding.snp.makeConstraints {
+            $0.width.equalTo(BKSpacing.spacing5)
+        }
         
         chipStackView.addArrangedSubview(leadingPadding)
         allChips.forEach { chipStackView.addArrangedSubview($0) }
@@ -188,27 +195,34 @@ extension ArchiveView: UICollectionViewDataSource {
         
         return cell
     }
+    
+    enum ArchiveLayoutGuide {
+        static let cellHeight: CGFloat = 132
+        static let chipSpacing: CGFloat = BKSpacing.spacing2
+        static let chipViewHeight: CGFloat = 32
+        static let chipSectionInset = NSDirectionalEdgeInsets(
+            top: BKSpacing.spacing3,
+            leading: BKSpacing.spacing5,
+            bottom: BKSpacing.spacing3,
+            trailing: BKSpacing.spacing5
+        )
+    }
 }
 
 extension ArchiveView: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: 132)
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: ArchiveLayoutGuide.cellHeight)
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
         let book = books[indexPath.item]
         eventPublisher.send(.bookTapped(book: book))
     }
-}
-
-// MARK: - Layout Metrics
-enum ArchiveLayoutGuide {
-    static let chipSpacing: CGFloat = BKSpacing.spacing2
-    static let chipViewHeight: CGFloat = 32
-    static let chipSectionInset = NSDirectionalEdgeInsets(
-        top: BKSpacing.spacing3,
-        leading: BKSpacing.spacing5,
-        bottom: BKSpacing.spacing3,
-        trailing: BKSpacing.spacing5
-    )
 }

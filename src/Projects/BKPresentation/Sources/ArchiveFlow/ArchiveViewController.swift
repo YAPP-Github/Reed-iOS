@@ -82,12 +82,14 @@ final class ArchiveViewController: BaseViewController<ArchiveView> {
     }
     
     // MARK: - Navigation Actions
-    @objc private func searchButtonTapped() {
+    @objc
+    private func searchButtonTapped() {
         //        coordinator?.didTapSearchButton()
         print("검색 버튼 눌림")
     }
     
-    @objc private func settingsButtonTapped() {
+    @objc
+    private func settingsButtonTapped() {
         //        coordinator?.didTapSettingButton()
         print("세팅 버튼 눌림")
     }

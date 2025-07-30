@@ -15,7 +15,10 @@ struct ArchiveBook: Hashable, Equatable {
         hasher.combine(author)
     }
     
-    static func == (lhs: ArchiveBook, rhs: ArchiveBook) -> Bool {
+    static func == (
+        lhs: ArchiveBook,
+        rhs: ArchiveBook
+    ) -> Bool {
         lhs.isbn == rhs.isbn
     }
 }
