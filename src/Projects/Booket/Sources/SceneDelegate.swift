@@ -50,10 +50,13 @@ private extension SceneDelegate {
     func startScene() {
         @Autowired var authStateUseCase: AuthStateUseCase
         @Autowired var onboardingCheckUseCase: OnboardingCheckUseCase
+        @Autowired var markOnboardingSeenUseCase: MarkOnboardingSeenUseCase
+        
         self.coordinator = AppCoordinator(
             navigationController: navigationController,
             authStateUseCase: authStateUseCase,
-            onboardingCheckUseCase: onboardingCheckUseCase
+            onboardingCheckUseCase: onboardingCheckUseCase,
+            markOnboardingSeenUseCase: markOnboardingSeenUseCase
         )
         coordinator?.start()
     }

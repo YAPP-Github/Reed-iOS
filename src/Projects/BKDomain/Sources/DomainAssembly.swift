@@ -112,5 +112,12 @@ public struct DomainAssembly: Assembly {
             @Autowired var repository: OnboardingRepository
             return DefaultOnboardingCheckUseCase(repository: repository)
         }
+        
+        container.register(
+            type: MarkOnboardingSeenUseCase.self
+        ) { _ in
+            @Autowired var repository: OnboardingRepository
+            return DefaultMarkOnboardingSeenUseCase(repository: repository)
+        }
     }
 }

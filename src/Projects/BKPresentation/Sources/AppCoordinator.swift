@@ -12,16 +12,19 @@ public final class AppCoordinator: Coordinator {
     
     private let authStateUseCase: AuthStateUseCase
     private let onboardingCheckUseCase: OnboardingCheckUseCase
+    private let markOnboardingSeenUseCase: MarkOnboardingSeenUseCase
     private var cancellable: Set<AnyCancellable> = []
     
     public init(
         navigationController: UINavigationController,
         authStateUseCase: AuthStateUseCase,
-        onboardingCheckUseCase: OnboardingCheckUseCase
+        onboardingCheckUseCase: OnboardingCheckUseCase,
+        markOnboardingSeenUseCase: MarkOnboardingSeenUseCase
     ) {
         self.navigationController = navigationController
         self.authStateUseCase = authStateUseCase
         self.onboardingCheckUseCase = onboardingCheckUseCase
+        self.markOnboardingSeenUseCase = markOnboardingSeenUseCase
     }
     
     public func start() {
@@ -74,6 +77,7 @@ private extension AppCoordinator {
         )
         onboardingCoordinator.onFinish = { [weak self] in
             self?.checkAuthAndRoute()
+            self?.markOnboardingSeenUseCase.execute()
         }
         childCoordinators.append(onboardingCoordinator)
         onboardingCoordinator.start()
