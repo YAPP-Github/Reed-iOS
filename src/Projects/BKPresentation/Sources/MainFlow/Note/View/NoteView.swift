@@ -55,6 +55,8 @@ final class NoteView: BaseView {
         pageControl.numberOfPages = pageViews.count
         pageControl.addTarget(self, action: #selector(pageControlChanged), for: .valueChanged)
         nextButton.primaryButton?.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        addGestureRecognizer(tapGesture)
     }
     
     override func setupLayout() {
@@ -150,6 +152,10 @@ private extension NoteView {
         
         pageControl.currentPage = next
         pageControlChanged(pageControl)
+    }
+    
+    @objc private func dismissKeyboard() {
+        endEditing(true)
     }
 }
 
