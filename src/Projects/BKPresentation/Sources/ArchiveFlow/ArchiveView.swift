@@ -99,7 +99,7 @@ final class ArchiveView: BaseView {
         setupChipActions()
         setupScrollView()
         addSubviews(chipScrollView, bookCollectionView, emptyStateView)
-        setupConstraints()
+        setupLayout()
         updateEmptyState()
     }
     
@@ -122,10 +122,15 @@ final class ArchiveView: BaseView {
         let trailingPadding = UIView()
         
         leadingPadding.snp.makeConstraints {
-            $0.width.equalTo(BKSpacing.spacing5)
+            $0.width
+                .equalTo(
+                    ArchiveLayoutGuide.chipSectionInset.leading - ArchiveLayoutGuide.chipSpacing
+                )
         }
+        
         trailingPadding.snp.makeConstraints {
-            $0.width.equalTo(BKSpacing.spacing5)
+            $0.width
+                .equalTo(ArchiveLayoutGuide.chipSectionInset.leading - ArchiveLayoutGuide.chipSpacing)
         }
         
         chipStackView.addArrangedSubview(leadingPadding)
@@ -133,7 +138,7 @@ final class ArchiveView: BaseView {
         chipStackView.addArrangedSubview(trailingPadding)
     }
     
-    private func setupConstraints() {
+    override func setupLayout() {
         chipScrollView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).offset(BKSpacing.spacing3)
             $0.horizontalEdges.equalToSuperview()
@@ -199,7 +204,7 @@ extension ArchiveView: UICollectionViewDataSource {
     enum ArchiveLayoutGuide {
         static let cellHeight: CGFloat = 132
         static let chipSpacing: CGFloat = BKSpacing.spacing2
-        static let chipViewHeight: CGFloat = 32
+        static let chipViewHeight: CGFloat = 36
         static let chipSectionInset = NSDirectionalEdgeInsets(
             top: BKSpacing.spacing3,
             leading: BKSpacing.spacing5,

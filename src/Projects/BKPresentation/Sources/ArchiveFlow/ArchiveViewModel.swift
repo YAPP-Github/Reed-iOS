@@ -190,14 +190,8 @@ final class ArchiveViewModel: BaseViewModel {
     // MARK: - Helper Methods
     
     private func bookStatusForChipIndex(_ index: Int) -> BookStatus? {
-        switch index {
-        case 0: return .total
-        case 1: return .toRead // 읽기 전
-        case 2: return .reading // 읽는 중
-        case 3: return .completed // 완독
-        default:
-            return nil
-        }
+        guard index < ChipType.allCases.count else { return nil }
+        return ChipType.allCases[index].bookStatus
     }
     
     private func getCurrentChips(from archiveState: ArchiveState) -> [ChipData] {
