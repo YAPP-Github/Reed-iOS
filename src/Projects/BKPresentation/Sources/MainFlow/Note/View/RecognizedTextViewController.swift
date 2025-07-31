@@ -9,7 +9,7 @@ final class RecognizedTextViewController: UIViewController {
     
     // MARK: - Properties
     private let viewModel: RecognizedTextViewModel
-    private let recognizedText: String
+    private let recognizedTexts: [String]
     private var cancellables = Set<AnyCancellable>()
     
     // UI Components
@@ -34,9 +34,9 @@ final class RecognizedTextViewController: UIViewController {
     var onRetake: (() -> Void)?
     
     // MARK: - Lifecycle
-    init(recognizedText: String) {
-        self.recognizedText = recognizedText
-        self.viewModel = RecognizedTextViewModel()
+    init(recognizedTexts: [String], viewModel: RecognizedTextViewModel) {
+        self.recognizedTexts = recognizedTexts
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -49,7 +49,8 @@ final class RecognizedTextViewController: UIViewController {
         setupUI()
         setupButtonActions()
         bindViewModel()
-        viewModel.send(.viewDidLoad(recognizedText: recognizedText))
+        
+        viewModel.send(.viewDidLoad(recognizedTexts))
     }
     
     // MARK: - Setup

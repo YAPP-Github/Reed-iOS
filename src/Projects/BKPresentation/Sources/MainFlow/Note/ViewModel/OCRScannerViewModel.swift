@@ -13,6 +13,7 @@ final class OCRScannerViewModel: BaseViewModel {
         var isScanning: Bool = false
         var errorMessage: String?
         var capturedText: String?
+        var capturedSentences: [String] = []
         var shouldShowAlert: Bool = false
         var alertMessage: String = ""
     }
@@ -31,13 +32,13 @@ final class OCRScannerViewModel: BaseViewModel {
     }
     
     enum SideEffect {
-        case showRecognizedText(String)
+        case showRecognizedSentences([String])
         case dismissScanner
     }
     
     // MARK: - Properties
     @Published private var state = State()
-    private var currentRecognizedItems: [RecognizedItem] = [] // 별도 관리
+    private var currentRecognizedItems: [RecognizedItem] = []
     private var cancellables = Set<AnyCancellable>()
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
     
@@ -95,11 +96,23 @@ final class OCRScannerViewModel: BaseViewModel {
                 items: currentRecognizedItems,
                 scanAreaFrame: scanAreaFrame
             )
-            
             if !capturedTexts.isEmpty {
+                // 각 캡처된 텍스트를 문장별로 파싱
+                var allSentences: [String] = []
+                
+                for capturedText in capturedTexts {
+                    let parsedSentences = parseSentencesToStrings(from: capturedText)
+                    allSentences.append(contentsOf: parsedSentences)
+                }
+                
+                newState.capturedSentences = allSentences
+                
+                // 기존 방식도 유지 (호환성을 위해)
                 let combinedText = capturedTexts.joined(separator: "\n")
                 newState.capturedText = combinedText
-                effects.append(.showRecognizedText(combinedText))
+                
+                // 문장 배열로 전달
+                effects.append(.showRecognizedSentences(allSentences))
             } else {
                 newState.shouldShowAlert = true
                 newState.alertMessage = "스캔 영역에서 텍스트를 찾을 수 없습니다.\n텍스트가 초록색 테두리 안에 있는지 확인해주세요."
@@ -121,12 +134,10 @@ final class OCRScannerViewModel: BaseViewModel {
     
     func handle(_ effect: SideEffect) -> AnyPublisher<Action, Never> {
         switch effect {
-        case .showRecognizedText(let text):
-            // 이 경우는 Coordinator에서 처리하므로 빈 Publisher 반환
+        case .showRecognizedSentences(let textList):
             return Empty().eraseToAnyPublisher()
             
         case .dismissScanner:
-            // 이 경우도 Coordinator에서 처리하므로 빈 Publisher 반환
             return Empty().eraseToAnyPublisher()
         }
     }
@@ -176,5 +187,33 @@ final class OCRScannerViewModel: BaseViewModel {
             width: maxX - minX,
             height: maxY - minY
         )
+    }
+    
+    private func parseSentencesToStrings(from text: String) -> [String] {
+        var sentences: [String] = []
+        var currentSentence = ""
+        
+        for char in text {
+            currentSentence.append(char)
+            
+            // 문장 부호를 만나면 문장 완성
+            if char == "." || char == "!" || char == "?" {
+                let trimmedSentence = currentSentence.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !trimmedSentence.isEmpty {
+                    sentences.append(trimmedSentence)
+                }
+                currentSentence = ""
+            }
+        }
+        
+        // 마지막에 문장 부호가 없는 경우 처리
+        if !currentSentence.isEmpty {
+            let trimmedSentence = currentSentence.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmedSentence.isEmpty {
+                sentences.append(trimmedSentence)
+            }
+        }
+        
+        return sentences
     }
 }
