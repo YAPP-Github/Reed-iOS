@@ -38,4 +38,23 @@ public struct DefaultBookRepository: BookRepository {
         .catch { _ in Just(([], 0)) }
         .eraseToAnyPublisher()
     }
+    
+    public func upsert(
+        _ bookIsbn: String,
+        _ status: BookStatus
+    ) -> AnyPublisher<BookInfo, Error> {
+        networkProvider.request(
+            target: BookAPI.upsert(
+                dto: UserBookRegisterRequestDTO(
+                    bookIsbn: bookIsbn,
+                    bookStatus: status
+                )
+            ),
+            type: UserBookResponseDTO.self
+        )
+        .mapError { return $0 as Error }
+        .debugError(logger: AppLogger.network)
+        .map { return $0.toBookInfo() }
+        .eraseToAnyPublisher()
+    }
 }

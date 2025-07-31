@@ -7,7 +7,7 @@ enum BookAPI {
     case detail
     case myLibrary
     case search(dto: SearchBookRequestDTO)
-    case upsert
+    case upsert(dto: UserBookRegisterRequestDTO)
 }
 
 extension BookAPI: RequestTarget {
@@ -52,8 +52,8 @@ extension BookAPI: RequestTarget {
         switch self {
         case .detail, .myLibrary, .search:
             return nil
-        case .upsert:
-            return nil
+        case .upsert(let dto):
+            return dto
         }
     }
     
