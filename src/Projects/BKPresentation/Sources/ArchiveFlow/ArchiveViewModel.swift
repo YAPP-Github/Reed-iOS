@@ -207,10 +207,10 @@ final class ArchiveViewModel: BaseViewModel {
     
     private func createMockChips() -> [ChipData] {
         return [
-            ChipData(title: "전체", count: 4),
-            ChipData(title: "읽기 전", count: 2),
-            ChipData(title: "읽는 중", count: 2),
-            ChipData(title: "완독", count: 0)
+            ChipData(title: "전체", count: 432342),
+            ChipData(title: "읽기 전", count: 2123),
+            ChipData(title: "읽는 중", count: 234),
+            ChipData(title: "완독", count: 100)
         ]
     }
     
