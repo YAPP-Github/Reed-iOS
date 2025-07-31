@@ -28,9 +28,6 @@ final class OCRScannerViewController: UIViewController {
     private let captureButton = UIButton()
     private let closeButton = UIButton()
     
-    // 스캔 영역 비율 (화면 대비)
-    private let scanAreaRatio: CGFloat = 0.7
-    
     // MARK: - Lifecycle
     init(viewModel: OCRScannerViewModel) {
         self.viewModel = viewModel
@@ -65,10 +62,8 @@ final class OCRScannerViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .black
         
-        // 가이드 라벨 추가 설정
         guideLabel.numberOfLines = 2
         
-        // 닫기 버튼
         closeButton.setImage(BKImage.Icon.x, for: .normal)
         closeButton.tintColor = .bkContentColor(.inverse)
         closeButton.addTarget(
@@ -77,7 +72,6 @@ final class OCRScannerViewController: UIViewController {
             for: .touchUpInside
         )
         
-        // 캡처 버튼
         captureButton.backgroundColor = .bkBackgroundColor(.primary)
         captureButton.layer.cornerRadius = 36
         captureButton.setImage(BKImage.Icon.maximize, for: .normal)
@@ -89,9 +83,6 @@ final class OCRScannerViewController: UIViewController {
         )
         
         // 스캔 영역 뷰 (초록색 테두리)
-//        scanAreaView.layer.borderColor = UIColor.bkBackgroundColor(.primary).cgColor
-//        scanAreaView.layer.borderWidth = 1
-//        scanAreaView.layer.cornerRadius = 12
         scanAreaView.backgroundColor = .clear
         scanAreaView.isUserInteractionEnabled = false
         
@@ -217,7 +208,13 @@ final class OCRScannerViewController: UIViewController {
     // MARK: - Scanner Control
     private func startScanning() {
         Task {
-            try? await scannerViewController?.startScanning()
+            do {
+                try scannerViewController?.startScanning()
+            } catch {
+                // 추후 vm로 연결
+                print(error)
+            }
+            
         }
     }
     

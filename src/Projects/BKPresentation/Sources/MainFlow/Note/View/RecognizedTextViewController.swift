@@ -81,17 +81,14 @@ final class RecognizedTextViewController: UIViewController {
     }
     
     private func setupButtonActions() {
-        let buttons = buttonGroup.subviews.first?.subviews.compactMap { $0 as? BKButton } ?? []
-        
-        // 다시 촬영하기 버튼 (왼쪽)
-        buttons.first?.addAction(UIAction { [weak self] _ in
-            self?.viewModel.send(.retakeButtonTapped)
-        }, for: .touchUpInside)
-        
-        // 선택 완료 버튼 (오른쪽)
-        buttons.last?.addAction(UIAction { [weak self] _ in
-            self?.viewModel.send(.confirmButtonTapped)
-        }, for: .touchUpInside)
+        buttonGroup.bindTwoButtonsAction(
+            leftAction: { [weak self] in
+                self?.viewModel.send(.retakeButtonTapped)
+            },
+            rightAction: { [weak self] in
+                self?.viewModel.send(.confirmButtonTapped)
+            }
+        )
     }
     
     private func setupConstraints() {
@@ -129,7 +126,7 @@ final class RecognizedTextViewController: UIViewController {
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(80)
+            heightDimension: .estimated(72)
         )
         
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])

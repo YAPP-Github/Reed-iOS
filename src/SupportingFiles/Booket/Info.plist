@@ -87,6 +87,6 @@
 		<string>Pretendard-Bold.otf</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>&quot;OCR 카메라 접근 허용&quot;</string>
+	<string>OCR 카메라 접근 허용</string>
 </dict>
 </plist>
