@@ -28,7 +28,7 @@ final class RecognizedTextViewModel: BaseViewModel {
     }
     
     enum Action {
-        case viewDidLoad(recognizedText: String)
+        case viewDidLoad([String])
         case sentenceToggled(index: Int)
         case confirmButtonTapped
         case retakeButtonTapped
@@ -73,8 +73,10 @@ final class RecognizedTextViewModel: BaseViewModel {
         newState.errorMessage = nil
         
         switch action {
-        case .viewDidLoad(let recognizedText):
-            newState.sentences = parseSentences(from: recognizedText)
+        case .viewDidLoad(let sentenceStrings):
+            newState.sentences = sentenceStrings.enumerated().map { index, sentence in
+                SentenceItem(id: index, text: sentence)
+            }
             
         case .sentenceToggled(let index):
             guard index < newState.sentences.count else { break }
@@ -123,19 +125,5 @@ final class RecognizedTextViewModel: BaseViewModel {
             }
             .sink(receiveValue: send)
             .store(in: &cancellables)
-    }
-    
-    // MARK: - Private Methods
-    private func parseSentences(from text: String) -> [SentenceItem] {
-        // 텍스트를 마침표로 분리하되, 빈 문장은 제외
-        let sentences = text.components(separatedBy: ".")
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
-            .enumerated()
-            .map { index, sentence in
-                SentenceItem(id: index, text: sentence)
-            }
-        
-        return sentences
     }
 }
