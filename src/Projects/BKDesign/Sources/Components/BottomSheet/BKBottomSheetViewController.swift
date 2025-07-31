@@ -40,22 +40,21 @@ public final class BKBottomSheetViewController: UIViewController {
     
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        guard isBeingDismissed || isMovingFromParent else { return }
 
         if let coordinator = transitionCoordinator {
             coordinator.animate(alongsideTransition: { _ in
                 self.dimView?.alpha = .zero
-            }, completion: { _ in
-                self.dimView?.removeFromSuperview()
-                self.dimView = nil
+            }, completion: { context in
+                if !context.isCancelled {
+                    self.dimView?.removeFromSuperview()
+                    self.dimView = nil
+                }
             })
         } else {
             dimView?.removeFromSuperview()
             dimView = nil
         }
-    }
-    
-    public override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
     }
     
     public override func viewDidLayoutSubviews() {
