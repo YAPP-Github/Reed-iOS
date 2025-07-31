@@ -132,6 +132,29 @@ public class BKButtonGroup: UIView {
 
         updateLayout()
     }
+    
+    /// 두 개 버튼으로 구성된 그룹의 액션을 나중에 설정하거나 교체합니다.
+    /// - Warning: 이 함수는 내부에 버튼이 2개 있을 때만 정상 동작합니다. 기존에 설정된 모든 액션은 제거됩니다.
+    public func bindTwoButtonsAction(leftAction: (() -> Void)?, rightAction: (() -> Void)?) {
+        guard buttons.count == 2 else {
+            print("Warning: bindTwoButtonsAction() called on a button group that does not have 2 buttons.")
+            return
+        }
+        
+        let leftButton = buttons[0]
+        let rightButton = buttons[1]
+        
+        leftButton.removeTarget(nil, action: nil, for: .allEvents)
+        rightButton.removeTarget(nil, action: nil, for: .allEvents)
+        
+        if let action = leftAction {
+            leftButton.addAction(UIAction { _ in action() }, for: .touchUpInside)
+        }
+        
+        if let action = rightAction {
+            rightButton.addAction(UIAction { _ in action() }, for: .touchUpInside)
+        }
+    }
 
 }
 
