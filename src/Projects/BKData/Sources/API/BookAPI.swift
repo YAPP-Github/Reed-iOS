@@ -5,7 +5,7 @@ import Foundation
 
 enum BookAPI {
     case detail
-    case myLibrary
+    case myLibrary(parameter: LibraryRequestDTO)
     case search(dto: SearchBookRequestDTO)
     case upsert(dto: UserBookRegisterRequestDTO)
 }
@@ -61,8 +61,8 @@ extension BookAPI: RequestTarget {
         switch self {
         case .detail:
             return [:]
-        case .myLibrary:
-            return [:]
+        case .myLibrary(let parameter):
+            return parameter.dictionary
         case .search(let dto):
             return dto.dictionary
         case .upsert:

@@ -39,6 +39,25 @@ public struct DefaultBookRepository: BookRepository {
         .eraseToAnyPublisher()
     }
     
+    public func myLibrary(_ parameters: MyLibraryParameters) -> AnyPublisher<LibraryInfo, any Error> {
+        networkProvider.request(
+            target: BookAPI.myLibrary(
+                parameter: LibraryRequestDTO(parameters)
+            ),
+            type: UserLibraryResponseDTO.self
+        )
+        .mapError { return $0 as Error }
+        .debugError(logger: AppLogger.network)
+        .map {
+            return LibraryInfo(
+                currentPage: $0.nextPageNumber(),
+                count: $0.toBookCountSet(),
+                books: $0.getBooks()
+            )
+        }
+        .eraseToAnyPublisher()
+    }
+    
     public func upsert(
         _ bookIsbn: String,
         _ status: BookStatus
