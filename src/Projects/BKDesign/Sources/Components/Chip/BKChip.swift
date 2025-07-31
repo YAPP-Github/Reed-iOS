@@ -81,7 +81,7 @@ public final class BKChip: UIView {
         
         self.snp.makeConstraints {
             $0.width.equalTo(labelContainer.snp.width).offset(BKSpacing.spacing3 * 2)
-            $0.height.equalTo(labelContainer.snp.height).offset(BKSpacing.spacing2 * 2)
+            $0.height.equalTo(36)
         }
     }
     
