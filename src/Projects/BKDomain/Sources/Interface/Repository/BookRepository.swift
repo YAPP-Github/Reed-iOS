@@ -8,7 +8,11 @@ public protocol BookRepository {
     ) -> AnyPublisher<([Book], totalResults: Int), Never>
     
 //    func detail() -> AnyPublisher<Void, Never>
-//    func myLibrary() -> AnyPublisher<[Book], Never>
+    
+    /// 내 서재를 조회하고 검색합니다.
+    func myLibrary(
+        _ parameters: MyLibraryParameters
+    ) -> AnyPublisher<LibraryInfo, Error>
     
     /// 내 서재에 도서를 등록합니다
     func upsert(
