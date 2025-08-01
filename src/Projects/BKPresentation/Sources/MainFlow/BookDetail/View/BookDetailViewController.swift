@@ -6,7 +6,7 @@ import UIKit
 
 enum BookDetailViewEvent: Equatable {
     case didTapStatusButton
-    case didTapSortMenuButton
+    case didTapSortMenuButton(SortOption)
 }
 
 final class BookDetailViewController: BaseViewController<BookDetailView> {
@@ -49,9 +49,12 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
             .store(in: &cancellable)
         
         contentView.eventPublisher
-            .filter { $0 == .didTapSortMenuButton }
-            .sink { [weak self] _ in
-                self?.presentBookDetailSortMenu()
+            .compactMap { event -> SortOption? in
+                if case let .didTapSortMenuButton(option) = event { return option }
+                return nil
+            }
+            .sink { [weak self] option in
+                self?.presentBookDetailSortMenu(option)
             }
             .store(in: &cancellable)
     }
@@ -106,9 +109,9 @@ private extension BookDetailViewController {
         sheet.show(from: self, animated: true)
     }
     
-    func presentBookDetailSortMenu() {
+    func presentBookDetailSortMenu(_ currentOption: SortOption) {
         let sheet = BKBottomSheetViewController.makeBookDetailSortMenuSheet(
-            selectedOption: .newest,
+            selectedOption: currentOption,
             confirmAction: { [weak self] option in
                 self?.viewModel.send(.changeSortOption(option))
                 self?.dismiss(animated: true)

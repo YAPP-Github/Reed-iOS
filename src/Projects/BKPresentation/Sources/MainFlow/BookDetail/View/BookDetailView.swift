@@ -19,8 +19,8 @@ struct BookDetailItem: Hashable {
 }
 
 enum SortOption: String, CaseIterable {
-    case newest = "페이지순"
-    case pageDescending = "최신 등록순"
+    case newest = "최신 등록순"
+    case pageDescending = "페이지순"
     
     var sortingFunction: (BookDetailItem, BookDetailItem) -> Bool {
         switch self {
@@ -92,6 +92,8 @@ final class BookDetailView: BaseView {
         """)
         return label
     }()
+    
+    private var currentSortOption: SortOption = .pageDescending
 
     override func setupView() {
         addSubview(scrollView)
@@ -185,18 +187,18 @@ final class BookDetailView: BaseView {
         animating: Bool = true
     ) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, BookDetailItem>()
-        let sortedItems = items.sorted(by: SortOption.pageDescending.sortingFunction)
+        let sortedItems = items.sorted(by: currentSortOption.sortingFunction)
         snapshot.appendSections([.main])
         
-        let isEmpty = items.isEmpty
+        let isEmpty = sortedItems.isEmpty
         collectionView.isHidden = isEmpty
         emptyContainerView.isHidden = !isEmpty
         
         if !isEmpty {
-            snapshot.appendItems(items, toSection: .main)
+            snapshot.appendItems(sortedItems, toSection: .main)
         }
         
-        header.applyHeaderTitle(count: items.count)
+        header.applyHeaderTitle(count: sortedItems.count)
         dataSource.apply(snapshot, animatingDifferences: animating) { [weak self] in
             guard let self = self else { return }
             self.collectionView.reloadData()
@@ -206,13 +208,14 @@ final class BookDetailView: BaseView {
             )
         }
         
-        seedReportView.applyReport(with: items.map(\.emotion))
+        seedReportView.applyReport(with: sortedItems.map(\.emotion))
     }
     
     func applySort(option: SortOption) {
         var snapshot = dataSource.snapshot()
         let currentItems = snapshot.itemIdentifiers(inSection: .main)
         let sortedItems = currentItems.sorted(by: option.sortingFunction)
+        currentSortOption = option
         
         snapshot.deleteAllItems()
         snapshot.appendSections([.main])
@@ -308,13 +311,13 @@ extension BookDetailView: UICollectionViewDelegateFlowLayout {
         
         return CGSize(width: width, height: fittingSize.height)
     }
-    
-    @objc func readingStateButtonTapped() {
-        eventPublisher.send(.didTapStatusButton)
-    }
 }
 
 private extension BookDetailView {
+    @objc func readingStateButtonTapped() {
+        eventPublisher.send(.didTapStatusButton)
+    }
+    
     enum LayoutConstants {
         static let horizontalInset = BKInset.inset5
         static let summaryViewTopInset = BKInset.inset2
