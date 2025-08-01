@@ -18,7 +18,7 @@ final class MainFlowCoordinator: Coordinator, FinishNotifying {
     }
     
     func start() {
-        let homeViewController = HomeViewController()
+        let homeViewController = RealHomeViewController()
         homeViewController.coordinator = self
         navigationController.pushViewController(homeViewController, animated: true)
     }

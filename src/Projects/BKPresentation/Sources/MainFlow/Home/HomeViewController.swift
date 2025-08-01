@@ -3,6 +3,7 @@
 import SnapKit
 import UIKit
 
+/// 삭제 예정 -> HomeViewController 삭제 후, RealHomeViewController 이름 변경 필요
 final class HomeViewController: UIViewController, BKNavigationBarStylable {
     weak var coordinator: MainFlowCoordinator?    
     var bkNavigationTitle: String = "홈"
