@@ -50,6 +50,7 @@ final class SearchSectionHeaderView: UIView {
                         count: count
                     )
                 )
+                heightConstraint?.update(offset: LayoutConstants.selfHeight)
             } else {
                 titleLabel.isHidden = true
                 heightConstraint?.update(offset: 0)
