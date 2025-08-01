@@ -28,6 +28,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         setupNavigationBar()
         window = PulseWindow(windowScene: windowScene)
         window?.rootViewController = navigationController
+        window?.backgroundColor = .bkBaseColor(.primary)
         window?.makeKeyAndVisible()
         
         assembleDependencies()
