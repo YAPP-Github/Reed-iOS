@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct RecordInfo {
+public struct RecordInfo: Decodable {
     public let recordId: String
     public let bookId: String
     public let pageNumber: Int
