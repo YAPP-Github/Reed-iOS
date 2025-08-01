@@ -12,11 +12,19 @@ extension UINavigationController {
             viewController: UIViewController,
             rightButton: StandardRightButton? = nil
         )
+        
         /// 검색 버튼과 기어(설정) 버튼에 대해 `addTarget(_:)`을 하기 위한 파라미터들입니다.
         case main(
             viewController: UIViewController,
             target: Any?,
             searchAction: Selector,
+            gearAction: Selector
+        )
+        
+        /// 홈 화면 전용 스타일
+        case home(
+            viewController: UIViewController,
+            target: Any?,
             gearAction: Selector
         )
     }
@@ -26,7 +34,7 @@ extension UINavigationController {
         let isEnabled: Bool
         weak var target: AnyObject?
         let action: Selector?
-
+        
         init(
             image: UIImage = BKImage.Icon.moreVertical,
             isEnabled: Bool = true,
@@ -59,6 +67,7 @@ extension UINavigationController {
                 for: viewController,
                 rightButton: rightButton
             )
+            
         case .main(
             let viewController,
             let target,
@@ -70,6 +79,18 @@ extension UINavigationController {
                 for: viewController,
                 target: target,
                 searchAction: searchAction,
+                gearAction: gearAction
+            )
+            
+        case .home(
+            let viewController,
+            let target,
+            let gearAction
+        ):
+            makeHomeStyle(
+                title: title,
+                for: viewController,
+                target: target,
                 gearAction: gearAction
             )
         }
@@ -85,9 +106,9 @@ private extension UINavigationController {
         let appearance = makeStandardAppearance()
         configureBackButton(in: appearance)
         applyStandardRightButton(rightButton, to: viewController)
-
+        
         viewController.navigationItem.title = title
-
+        
         navigationBar.tintColor = .bkContentColor(.primary)
         navigationBar.standardAppearance = appearance
         navigationBar.scrollEdgeAppearance = appearance
@@ -114,6 +135,41 @@ private extension UINavigationController {
         viewController.navigationItem.rightBarButtonItem = makeRightButtons([searchButton, gearButton])
     }
     
+    func makeHomeStyle(
+        title: String,
+        for viewController: UIViewController,
+        target: Any?,
+        gearAction: Selector
+    ) {
+        let gearButton = makeIconButton(BKImage.Icon.settings, target: target, action: gearAction)
+        gearButton.tintColor = .bkContentColor(.primary)
+        
+        navigationBar.tintColor = .bkContentColor(.primary)
+        viewController.navigationItem.title = nil
+        viewController.navigationItem.largeTitleDisplayMode = .never
+        viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: makeHomeTitleView(title))
+        viewController.navigationItem.rightBarButtonItem = makeRightButtons([gearButton])
+    }
+    
+    func makeHomeTitleView(_ text: String) -> UIView {
+        let label = BKLabel()
+        let font = BKTextStyle.title1(weight: .bold).uiFont!
+        let attr = NSMutableAttributedString(string: text, attributes: [
+            .font: font,
+            .foregroundColor: UIColor.bkContentColor(.brand)
+        ])
+        label.attributedText = attr
+        label.sizeToFit()
+        
+        let wrapper = UIView()
+        wrapper.addSubview(label)
+        label.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(BKInset.inset1)
+            $0.centerY.equalToSuperview()
+        }
+        return wrapper
+    }
+    
     func makeLeadingTitle(_ text: String) -> UIView {
         let label = BKLabel()
         let font = BKTextStyle.heading1(weight: .bold).uiFont!
@@ -123,7 +179,7 @@ private extension UINavigationController {
         ])
         label.attributedText = attr
         label.sizeToFit()
-
+        
         let wrapper = UIView()
         wrapper.addSubview(label)
         label.snp.makeConstraints {
@@ -132,13 +188,13 @@ private extension UINavigationController {
         }
         return wrapper
     }
-
+    
     func makeRightButtons(_ buttons: [UIButton]) -> UIBarButtonItem {
         let stack = UIStackView(arrangedSubviews: buttons)
         stack.axis = .horizontal
         stack.spacing = BKSpacing.spacing5
         stack.alignment = .center
-
+        
         let wrapper = UIView()
         wrapper.addSubview(stack)
         stack.snp.makeConstraints {
@@ -148,7 +204,7 @@ private extension UINavigationController {
         }
         return UIBarButtonItem(customView: wrapper)
     }
-
+    
     func makeIconButton(_ image: UIImage, target: Any?, action: Selector) -> UIButton {
         let button = UIButton(type: .system)
         button.setImage(image, for: .normal)
@@ -159,14 +215,14 @@ private extension UINavigationController {
     func makeStandardAppearance() -> UINavigationBarAppearance {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithDefaultBackground()
-
+        
         if let font = BKTextStyle.headline2(weight: .semiBold).uiFont {
             appearance.titleTextAttributes = [
                 .foregroundColor: UIColor.bkContentColor(.primary),
                 .font: font
             ]
         }
-
+        
         appearance.backgroundColor = .bkBaseColor(.primary)
         appearance.shadowColor = .clear
         return appearance
@@ -176,7 +232,7 @@ private extension UINavigationController {
         let barButtonAppearance = UIBarButtonItemAppearance()
         barButtonAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.clear]
         appearance.backButtonAppearance = barButtonAppearance
-
+        
         let backImage = BKImage.Icon.chevronLeft
             .withRenderingMode(.alwaysTemplate)
             .withAlignmentRectInsets(
@@ -196,15 +252,15 @@ private extension UINavigationController {
             viewController.navigationItem.rightBarButtonItem = nil
             return
         }
-
+        
         let button = makeIconButton(
             info.image,
             target: info.target,
             action: action
         )
         button.isEnabled = info.isEnabled
-
+        
         viewController.navigationItem.rightBarButtonItem =
-            makeRightButtons([button])
+        makeRightButtons([button])
     }
 }

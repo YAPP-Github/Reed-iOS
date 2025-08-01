@@ -56,6 +56,7 @@ public enum BKImage {
     public enum Graphics {
         public static let mascot = BKDesignAsset.mascot.image
         public static let onboarding2 = BKDesignAsset.onboarding2.image
+        public static let homeChar = BKDesignAsset.homeCharacter.image
         public static let empty = BKDesignAsset.empty.image
     }
 }
