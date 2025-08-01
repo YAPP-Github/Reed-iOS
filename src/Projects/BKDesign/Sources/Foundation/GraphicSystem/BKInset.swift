@@ -3,6 +3,7 @@
 import Foundation
 
 public enum BKInset {
+    public static let inset05: CGFloat = 2
     public static let inset1: CGFloat = 4
     public static let inset2: CGFloat = 8
     public static let inset3: CGFloat = 12

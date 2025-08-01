@@ -121,4 +121,46 @@ public enum BKSemanticColor {
             }
         }
     }
+    
+    public enum Emotion {
+        case warmth
+        case joy
+        case tension
+        case sadness
+
+        public func resolve(for mode: BKColorMode) -> UIColor {
+            switch mode {
+            case .light:
+                switch self {
+                case .warmth: return UIColor(hex: "#E3931B")
+                case .joy: return UIColor(hex: "#EE6B33")
+                case .tension: return UIColor(hex: "#9A55E4")
+                case .sadness: return UIColor(hex: "#2872E9")
+                }
+            // case .dark:
+                // switch self { /* dark mode colors */ }
+            }
+        }
+    }
+
+    public enum EmotionBase {
+        case warmth
+        case joy
+        case tension
+        case sadness
+
+        public func resolve(for mode: BKColorMode) -> UIColor {
+            switch mode {
+            case .light:
+                switch self {
+                case .warmth: return UIColor(hex: "#FFF5D3")
+                case .joy: return UIColor(hex: "#FFEBE3")
+                case .tension: return UIColor(hex: "#F3E8FF")
+                case .sadness: return UIColor(hex: "#E1ECFF")
+                }
+            // case .dark:
+                // switch self { /* dark mode colors */ }
+            }
+        }
+    }
 }

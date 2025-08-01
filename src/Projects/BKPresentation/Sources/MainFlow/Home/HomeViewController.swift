@@ -33,6 +33,12 @@ final class HomeViewController: UIViewController, BKNavigationBarStylable {
         return button
     }()
     
+    private let bookDetailButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("BookDetailViewController", for: .normal)
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .bkBaseColor(.primary)
@@ -49,7 +55,8 @@ final class HomeViewController: UIViewController, BKNavigationBarStylable {
         let stack = UIStackView(arrangedSubviews: [
             settingButton,
             searchButton,
-            noteButton
+            noteButton,
+            bookDetailButton
         ])
         stack.axis = .vertical
         stack.spacing = 16
@@ -67,6 +74,7 @@ final class HomeViewController: UIViewController, BKNavigationBarStylable {
         settingButton.addTarget(self, action: #selector(openSettings), for: .touchUpInside)
         searchButton.addTarget(self, action: #selector(openSearch), for: .touchUpInside)
         noteButton.addTarget(self, action: #selector(openNote), for: .touchUpInside)
+        bookDetailButton.addTarget(self, action: #selector(openBookDetail), for: .touchUpInside)
     }
     
     @objc private func dummyFunc() {
@@ -83,5 +91,9 @@ final class HomeViewController: UIViewController, BKNavigationBarStylable {
     
     @objc private func openNote() {
         coordinator?.didTapNoteButton()
+    }
+    
+    @objc private func openBookDetail() {
+        coordinator?.didTapBookDetailButton()
     }
 }
