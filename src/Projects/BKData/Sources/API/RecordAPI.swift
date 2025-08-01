@@ -3,17 +3,17 @@
 import BKDomain
 import Foundation
 
-public enum RecordAPI {
-    case createRecord(userBookId: String, dto: Data)
+enum RecordAPI {
+    case createRecord(userBookId: String, dto: RecordPostDTO)
     case readRecord(userBookId: String, dto: Data)
 }
 
 extension RecordAPI: RequestTarget {
-    public var baseURL: String {
+    var baseURL: String {
         return "\(APIConfig.baseURL)/reading-records"
     }
 
-    public var path: String {
+    var path: String {
         switch self {
         case .createRecord(let userBookId, _):
             return "\(userBookId)"
@@ -22,7 +22,7 @@ extension RecordAPI: RequestTarget {
         }
     }
 
-    public var method: HTTPMethod {
+    var method: HTTPMethod {
         switch self {
         case .createRecord:
             return .post
@@ -31,7 +31,7 @@ extension RecordAPI: RequestTarget {
         }
     }
 
-    public var headers: [String : String] {
+    var headers: [String : String] {
         switch self {
         default:
             return [
@@ -40,7 +40,7 @@ extension RecordAPI: RequestTarget {
         }
     }
 
-    public var body: (any Encodable)? {
+    var body: (any Encodable)? {
         switch self {
         case .createRecord(_, let dto):
             return dto
@@ -49,7 +49,7 @@ extension RecordAPI: RequestTarget {
         }
     }
 
-    public var query: [String : Any] {
+    var query: [String : Any] {
         switch self {
         case .createRecord:
             return [:]
