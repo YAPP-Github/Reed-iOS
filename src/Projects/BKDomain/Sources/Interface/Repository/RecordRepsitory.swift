@@ -4,7 +4,10 @@ import Combine
 import UIKit
 
 public protocol RecordRepsitory {
-    func createRecord(data: RecordVO) -> AnyPublisher<RecordInfo, Error>
+    func create(
+        bookId: String,
+        data: RecordVO
+    ) -> AnyPublisher<RecordInfo, Error>
     
-    func fetch() -> AnyPublisher<[RecordInfo], Error>
+//    func fetch() -> AnyPublisher<[RecordInfo], Error>
 }
