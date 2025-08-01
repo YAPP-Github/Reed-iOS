@@ -97,6 +97,16 @@ final class SearchViewController: BaseViewController<SearchView> {
                 )
             }
             .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates { $0.noteReadied == $1.noteReadied }
+            .filter { $0.noteReadied }
+            .compactMap { $0.bookId }
+            .sink { [weak self] bookId in
+                self?.coordinator?.didBookRegistered(bookId: bookId)
+            }
+            .store(in: &cancellable)
     }
 }
 
@@ -122,10 +132,11 @@ private extension SearchViewController {
         sheet.show(from: self, animated: true)
     }
     
-    func handleRegistrationSelection(status: BookRegistrationStatus, isbn: String) {
-        Log.debug("선택된 책: \(isbn), 상태: \(status.rawValue)", logger: AppLogger.ui)
-//        viewModel.send(.upsertBook(isbn))
-        // TODO: - upsert 성공 시 따라오는 동작으로 변경해야 함
+    func handleRegistrationSelection(
+        status: BookRegistrationStatus,
+        isbn: String
+    ) {
+        viewModel.send(.upsertBook(isbn: isbn, status: status))
         presentNoteSuggestion(with: isbn)
     }
     
@@ -145,8 +156,8 @@ private extension SearchViewController {
                     self?.dismiss(animated: true)
                 },
                 rightAction: { [weak self] in
-                    Log.debug("선택된 책 \(isbn), 등록 시작", logger: AppLogger.ui)
                     self?.dismiss(animated: true)
+                    self?.viewModel.send(.loadNoteFlow)
                 }
             )
         )

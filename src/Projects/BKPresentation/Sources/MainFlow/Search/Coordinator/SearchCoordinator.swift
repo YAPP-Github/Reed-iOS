@@ -21,3 +21,15 @@ final class SearchCoordinator: Coordinator {
         navigationController.pushViewController(searchViewController, animated: true)
     }
 }
+
+extension SearchCoordinator {
+    func didBookRegistered(bookId: String) {
+        let noteCoordinator = NoteCoordinator(
+            parentCoordinator: self,
+            navigationController: navigationController,
+            bookId: bookId
+        )
+        addChildCoordinator(noteCoordinator)
+        noteCoordinator.start()
+    }
+}

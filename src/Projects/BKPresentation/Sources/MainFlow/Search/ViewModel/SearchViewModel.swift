@@ -18,6 +18,8 @@ final class SearchViewModel: BaseViewModel {
     
     struct State: Equatable {
         var searchState: SearchState = .recent([])
+        var bookId: String?
+        var noteReadied = false
         var isLoading = false
         var hasMoreData = true
         var totalResults = 0
@@ -27,11 +29,13 @@ final class SearchViewModel: BaseViewModel {
         case onAppear
         case search(String)
         case loadNextPage
+        case loadNoteFlow
         case deleteRecentQuery(String)
-//        case upsertBook(String)
+        case upsertBook(isbn: String, status: BookRegistrationStatus)
         case fetchRecentQueriesSuccessed([String])
         case fetchSearchResultSuccessed((books: [Book], totalResults: Int))
         case fetchNextPageSuccessed([Book])
+        case upsertBookSuccessed(String)
     }
     
     enum SideEffect {
@@ -39,7 +43,7 @@ final class SearchViewModel: BaseViewModel {
         case deleteRecentQuery(String)
         case searchResult(String)
         case loadNextPage
-//        case upsert(Book)
+        case upsert(isbn: String, status: BookRegistrationStatus)
     }
     
     @Published private var state = State()
@@ -54,6 +58,7 @@ final class SearchViewModel: BaseViewModel {
     @Autowired var storeRecentSearchUseCase: StoreRecentSearchUseCase
     @Autowired var deleteRecentSearchUseCase: DeleteRecentSearchUseCase
     @Autowired var searchBookUseCase: SearchBookUseCase
+    @Autowired var upsertUseCase: BookUpsertUseCase
     
     var statePublisher: AnyPublisher<State, Never> {
         $state.eraseToAnyPublisher()
@@ -100,6 +105,11 @@ final class SearchViewModel: BaseViewModel {
             currentPage += 1
             effects.append(.loadNextPage)
             
+        case .loadNoteFlow:
+            if let bookId = state.bookId {
+                newState.noteReadied = true
+            }
+            
         case .fetchNextPageSuccessed(let books):
             let unique = books.filter { book in
                 !allBooks.contains { $0.isbn == book.isbn }
@@ -112,6 +122,12 @@ final class SearchViewModel: BaseViewModel {
             
         case .deleteRecentQuery(let query):
             effects.append(.deleteRecentQuery(query))
+            
+        case .upsertBook(let isbn, let status):
+            effects.append(.upsert(isbn: isbn, status: status))
+            
+        case .upsertBookSuccessed(let bookId):
+            newState.bookId = bookId
         }
         
         return (newState, effects)
@@ -154,6 +170,15 @@ final class SearchViewModel: BaseViewModel {
                 startIndex: currentPage
             )
             .map { Action.fetchNextPageSuccessed($0.books) }
+            .eraseToAnyPublisher()
+            
+        case .upsert(let isbn, let status):
+            return upsertUseCase.execute(
+                isbn: isbn,
+                status: status.toBookStatus()
+            )
+            .map { Action.upsertBookSuccessed($0.bookId) }
+            .catch { _ in Empty() }
             .eraseToAnyPublisher()
         }
     }
