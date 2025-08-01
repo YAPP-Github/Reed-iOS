@@ -114,7 +114,7 @@ final class BookDetailView: BaseView {
     override func configure() {
         readingStateButton.addTarget(self, action: #selector(readingStateButtonTapped), for: .touchUpInside)
         header.onTapSortButton = { [weak self] in
-            self?.eventPublisher.send(.didTapSortMenuButton)
+            self?.eventPublisher.send(.didTapSortMenuButton(self?.currentSortOption))
         }
     }
 

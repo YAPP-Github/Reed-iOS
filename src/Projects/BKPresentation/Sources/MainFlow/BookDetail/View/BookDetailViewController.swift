@@ -6,7 +6,7 @@ import UIKit
 
 enum BookDetailViewEvent: Equatable {
     case didTapStatusButton
-    case didTapSortMenuButton(SortOption)
+    case didTapSortMenuButton(SortOption?)
 }
 
 final class BookDetailViewController: BaseViewController<BookDetailView> {
