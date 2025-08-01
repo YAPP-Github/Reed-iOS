@@ -3,10 +3,10 @@
 import Foundation
 
 public enum LibrarySortType: String, Encodable, CustomStringConvertible {
-    case title_asc = "TITLE_ASC"
-    case title_desc = "TITLE_DESC"
-    case date_asc = "CREATED_DATE_ASC"
-    case date_desc = "CREATED_DATE_DESC"
+    case titleAsc = "TITLE_ASC"
+    case titleDesc = "TITLE_DESC"
+    case dateAsc = "CREATED_DATE_ASC"
+    case dateDesc = "CREATED_DATE_DESC"
     
     public var description: String { rawValue }
 }
