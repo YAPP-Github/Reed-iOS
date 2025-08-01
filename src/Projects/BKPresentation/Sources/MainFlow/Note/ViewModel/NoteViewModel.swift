@@ -1,29 +1,39 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
+import BKDomain
 import Combine
 import Foundation
 
 final class NoteViewModel: BaseViewModel {
     struct State: Equatable {
         var selectedGuideText: String = ""
+        var createCompleted: Bool = false
     }
     
     enum Action {
         case appreciationGuideSelected(String)
+        case submitNoteForm(NoteForm)
+        case submitNoteFormSuccessed
     }
     
     enum SideEffect {
+        case submit(NoteForm)
     }
     
-    @Published private var state = State()
+    @Published private var state: State = State()
     private var cancellables = Set<AnyCancellable>()
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
+    private let bookId: String
+    
+    @Autowired var createRecordUseCase: CreateRecordUseCase
     
     var statePublisher: AnyPublisher<State, Never> {
         $state.eraseToAnyPublisher()
     }
     
-    init() {
+    init(bookId: String) {
+        self.bookId = bookId
         bindSideEffects()
     }
     
@@ -40,6 +50,12 @@ final class NoteViewModel: BaseViewModel {
         switch action {
         case .appreciationGuideSelected(let guideText):
             newState.selectedGuideText = guideText
+            
+        case .submitNoteForm(let noteForm):
+            effects.append(.submit(noteForm))
+            
+        case .submitNoteFormSuccessed:
+            newState.createCompleted = true
         }
         
         return (newState, effects)
@@ -47,6 +63,14 @@ final class NoteViewModel: BaseViewModel {
     
     func handle(_ effect: SideEffect) -> AnyPublisher<Action, Never> {
         switch effect {
+        case .submit(let noteForm):
+            return createRecordUseCase.execute(
+                bookId: bookId,
+                record: noteForm.toRecordVO()
+            )
+            .map { Action.submitNoteFormSuccessed }
+            .catch { _ in Empty() }
+            .eraseToAnyPublisher()
         }
     }
     

@@ -7,6 +7,7 @@ import UIKit
 enum NoteViewEvent: Equatable {
     case completeForm(NoteForm)
     case didTapGuideButton
+    case didTapOCRButton
 }
 
 final class NoteViewController: BaseViewController<NoteView> {
@@ -51,10 +52,8 @@ final class NoteViewController: BaseViewController<NoteView> {
                 if case let .completeForm(form) = event { return form }
                 return nil
             }
-            .sink { [weak self] _ in
-                // TODO: - ViewModel 구현 이후 추가
-//                self?.viewModel.send(.submitNoteForm(query))
-                self?.presentRegistrationSuccessDialog()
+            .sink { [weak self] form in
+                self?.viewModel.send(.submitNoteForm(form))
             }
             .store(in: &cancellable)
         
@@ -62,6 +61,13 @@ final class NoteViewController: BaseViewController<NoteView> {
             .filter { $0 == .didTapGuideButton }
             .sink { [weak self] _ in
                 self?.presentAppreciationGuide()
+            }
+            .store(in: &cancellable)
+        
+        contentView.eventPublisher
+            .filter { $0 == .didTapOCRButton }
+            .sink { [weak self] _ in
+                self?.coordinator?.showOCRScanner()
             }
             .store(in: &cancellable)
     }
@@ -73,6 +79,15 @@ final class NoteViewController: BaseViewController<NoteView> {
             .map { $0.selectedGuideText }
             .sink { [weak self] selectedText in
                 self?.contentView.setAppreciationText(selectedText)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates { $0.createCompleted == $1.createCompleted }
+            .filter { $0.createCompleted }
+            .sink { [weak self] _ in
+                self?.presentRegistrationSuccessDialog()
             }
             .store(in: &cancellable)
     }
