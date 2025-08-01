@@ -1,9 +1,9 @@
 // Copyright © 2025 Booket. All rights reserved
 
-import Foundation
+import BKDomain
 
 struct NoteForm: Equatable {
-    let page: String
+    let page: Int
     let sentence: String
     let emotion: Emotion
     let appreciation: String
@@ -11,7 +11,7 @@ struct NoteForm: Equatable {
     
 extension NoteForm {
     static func makeNoteForm(from forms: [RegistrationForm]) -> NoteForm? {
-        var page: String?
+        var page: Int?
         var sentence: String?
         var emotion: Emotion?
         var appreciation: String?
@@ -40,6 +40,15 @@ extension NoteForm {
             sentence: finalSentence,
             emotion: finalEmotion,
             appreciation: finalAppreciation
+        )
+    }
+    
+    func toRecordVO() -> RecordVO {
+        return RecordVO(
+            pageNumber: page,
+            quote: sentence,
+            review: appreciation,
+            emotionTags: [emotion.rawValue]
         )
     }
 }

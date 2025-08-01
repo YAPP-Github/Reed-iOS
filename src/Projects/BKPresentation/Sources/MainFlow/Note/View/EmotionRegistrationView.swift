@@ -1,6 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import Combine
 import SnapKit
 import UIKit
 
@@ -8,11 +9,11 @@ struct EmotionRegistrationForm {
     let emotion: Emotion
 }
 
-enum Emotion {
-    case someEmotion1
-    case someEmotion2
-    case someEmotion3
-    case someEmotion4
+enum Emotion: String, CaseIterable {
+    case someEmotion1 = "1"
+    case someEmotion2 = "2"
+    case someEmotion3 = "3"
+    case someEmotion4 = "4"
     
     var emotionView: UIView {
         let tmpView = UIView()
@@ -37,6 +38,8 @@ enum Emotion {
 }
 
 final class EmotionRegistrationView: BaseView {
+    private let inputChangedSubject = PassthroughSubject<Void, Never>()
+    
     private let containerView = UIView()
     private let titleLabel = BKLabel(
         text: "문장에 대해 어떤 감정이 드셨나요?",
@@ -64,6 +67,11 @@ final class EmotionRegistrationView: BaseView {
         stackView.spacing = LayoutConstants.emotionStackSpacing
         return stackView
     }()
+    
+    private lazy var emotion1View = makeEmotionView(for: .someEmotion1)
+    private lazy var emotion2View = makeEmotionView(for: .someEmotion2)
+    private lazy var emotion3View = makeEmotionView(for: .someEmotion3)
+    private lazy var emotion4View = makeEmotionView(for: .someEmotion4)
     
     override func setupView() {
         addSubview(containerView)
@@ -93,7 +101,20 @@ final class EmotionRegistrationView: BaseView {
     }
 }
 
-extension EmotionRegistrationView: RegistrationFormProvidable {
+extension EmotionRegistrationView: RegistrationFormProvidable, FormInputNotifiable {
+    var inputChangedPublisher: AnyPublisher<Void, Never> {
+        inputChangedSubject.eraseToAnyPublisher()
+    }
+
+    private var emotionButtons: [Emotion: UIView] {
+        [
+            .someEmotion1: emotion1View,
+            .someEmotion2: emotion2View,
+            .someEmotion3: emotion3View,
+            .someEmotion4: emotion4View
+        ]
+    }
+    
     func registrationForm() -> RegistrationForm? {
         guard let selectedEmotion else { return nil }
         return .emotion(.init(emotion: selectedEmotion))
@@ -111,13 +132,42 @@ private extension EmotionRegistrationView {
             $0.distribution = .fillEqually
         }
         
-        [Emotion.someEmotion1.emotionView, Emotion.someEmotion2.emotionView]
+        [emotion1View, emotion2View]
             .forEach(firstStack.addArrangedSubview(_:))
         
-        [Emotion.someEmotion3.emotionView, Emotion.someEmotion4.emotionView]
+        [emotion3View, emotion4View]
             .forEach(secondStack.addArrangedSubview(_:))
         
         [firstStack, secondStack].forEach(emotionVStack.addArrangedSubview(_:))
+    }
+    
+    func makeEmotionView(for emotion: Emotion) -> UIView {
+        let view = emotion.emotionView
+        view.isUserInteractionEnabled = true
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(emotionTapped(_:)))
+        view.addGestureRecognizer(gesture)
+        view.tag = emotion.hashValue
+        return view
+    }
+    
+    @objc func emotionTapped(_ sender: UITapGestureRecognizer) {
+        guard let tappedView = sender.view,
+              let emotion = Emotion.allCases.first(where: { $0.hashValue == tappedView.tag }) else {
+            return
+        }
+
+        selectedEmotion = emotion
+        updateSelectionUI()
+        inputChangedSubject.send(())
+    }
+    
+    func updateSelectionUI() {
+        emotionButtons.forEach { emotion, view in
+            view.layer.borderWidth = (emotion == selectedEmotion)
+                ? 2 : 0
+            view.layer.borderColor = (emotion == selectedEmotion)
+                ? UIColor.bkBorderColor(.brand).cgColor : nil
+        }
     }
 }
 

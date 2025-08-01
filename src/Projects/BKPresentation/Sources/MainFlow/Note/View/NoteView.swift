@@ -15,8 +15,13 @@ protocol RegistrationFormProvidable {
     func registrationForm() -> RegistrationForm?
 }
 
+protocol FormInputNotifiable: AnyObject {
+    var inputChangedPublisher: AnyPublisher<Void, Never> { get }
+}
+
 final class NoteView: BaseView {
     let eventPublisher = PassthroughSubject<NoteViewEvent, Never>()
+    private var cancellables = Set<AnyCancellable>()
     
     private lazy var sentenceView = SentenceRegistrationView()
     private lazy var emotionView = EmotionRegistrationView()
@@ -55,8 +60,15 @@ final class NoteView: BaseView {
         pageControl.numberOfPages = pageViews.count
         pageControl.addTarget(self, action: #selector(pageControlChanged), for: .valueChanged)
         nextButton.primaryButton?.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+        sentenceView.onTextScanTapped = { [weak self] in self?.eventPublisher.send(.didTapOCRButton) }
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         addGestureRecognizer(tapGesture)
+        
+        if let notifiable = currentView as? FormInputNotifiable {
+            notifiable.inputChangedPublisher
+                .sink { [weak self] in self?.updateNextButtonEnabled() }
+                .store(in: &cancellables)
+        }
     }
     
     override func setupLayout() {
@@ -100,6 +112,10 @@ final class NoteView: BaseView {
 }
 
 private extension NoteView {
+    var currentView: UIView {
+        pageViews[pageControl.currentPage]
+    }
+    
     func makeInnerViews() {
         pageViews.forEach { pageView in
             let scrollView = UIScrollView()
@@ -119,25 +135,40 @@ private extension NoteView {
             
             scrollView.setContentHuggingPriority(.defaultLow, for: .vertical)
             scrollView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+            updateNextButtonEnabled()
         }
     }
     
     func createFormData() -> NoteForm? {
-        // TODO: - 기능 연결 이후 수정
-//        let forms: [RegistrationForm] = pageViews.compactMap { view in
-//            (view as? RegistrationFormProvidable)?.registrationForm()
-//        }
-//        return .makeNoteForm(from: forms)
-        return NoteForm(page: "", sentence: "", emotion: .someEmotion1, appreciation: "")
+        let forms: [RegistrationForm] = pageViews.compactMap { view in
+            (view as? RegistrationFormProvidable)?.registrationForm()
+        }
+        return .makeNoteForm(from: forms)
     }
     
     func guideButtonTapped() {
         eventPublisher.send(.didTapGuideButton)
     }
     
+    func updateNextButtonEnabled() {
+        guard pageControl.currentPage < pageViews.count else { return }
+        let isValid = (currentView as? RegistrationFormProvidable)?.registrationForm() != nil
+        nextButton.primaryButton?.isEnabled = isValid
+    }
+    
     @objc func pageControlChanged(_ sender: BKPageControl) {
-        let x = CGFloat(sender.currentPage) * contentScrollView.bounds.width
-        contentScrollView.setContentOffset(.init(x: x, y: 0), animated: true)
+        let xpos = CGFloat(sender.currentPage) * contentScrollView.bounds.width
+        contentScrollView.setContentOffset(.init(x: xpos, y: 0), animated: true)
+        
+        cancellables.removeAll()
+
+        if let notifiable = currentView as? FormInputNotifiable {
+            notifiable.inputChangedPublisher
+                .sink { [weak self] in self?.updateNextButtonEnabled() }
+                .store(in: &cancellables)
+        }
+        
+        updateNextButtonEnabled()
     }
     
     @objc func nextButtonTapped() {
