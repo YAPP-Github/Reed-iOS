@@ -14,7 +14,6 @@ public struct DefaultBookUpsertUseCase: BookUpsertUseCase {
         status: BookStatus
     ) -> AnyPublisher<BookInfo, Error> {
         return repository.upsert(isbn, status)
-            .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
 }
