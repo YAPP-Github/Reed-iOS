@@ -28,18 +28,18 @@ final class NoteCompletionView: BaseView {
     /// 임시로 넣어둔 데이터들입니다.
     override func configure() {
         resultView.configure(
-            title: "title",
-            author: "author",
-            publisher: "publisher"
+            title: "여름은 오래 그곳에 남아",
+            author: "마쓰이에 마사시",
+            publisher: "비채"
         )
         
         collectedSentenceView.apply(sentence: """
         “소설가들은 늘 소재를 찾아 떠도는 존재 같지만, 실은 그 반대인 경우가 더 잦다.”
-        """, page: 100)
+        """, page: 99)
         
         appreciationResultView.apply(
             emotion: .someEmotion1,
-            creationDate: "2025.07.28",
+            creationDate: "2025.06.25",
             appreciation: """
             소설가들은 늘 소재를 찾아 떠도는 존재 같지만, 실은 그 반대인 경우가 더 잦다.
             """

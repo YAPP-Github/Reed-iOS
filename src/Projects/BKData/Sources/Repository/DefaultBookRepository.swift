@@ -39,7 +39,7 @@ public struct DefaultBookRepository: BookRepository {
         .eraseToAnyPublisher()
     }
     
-    public func myLibrary(_ parameters: MyLibraryParameters) -> AnyPublisher<LibraryInfo, any Error> {
+    public func myLibrary(_ parameters: MyLibraryParameters) -> AnyPublisher<LibraryInfo, Error> {
         networkProvider.request(
             target: BookAPI.myLibrary(
                 parameter: LibraryRequestDTO(parameters)

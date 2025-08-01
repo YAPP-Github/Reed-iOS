@@ -5,10 +5,10 @@ import SnapKit
 import UIKit
 
 enum EmotionSeed: String, CaseIterable {
-    case warmth = "따뜻함"
-    case joy = "즐거움"
-    case tension = "긴장감"
-    case sadness = "슬픔"
+    case warmth = "#따뜻함"
+    case joy = "#즐거움"
+    case tension = "#긴장감"
+    case sadness = "#슬픔"
     
     var image: UIImage {
         return BKImage.Graphics.empty
