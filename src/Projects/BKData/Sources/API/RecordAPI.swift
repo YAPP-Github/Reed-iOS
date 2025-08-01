@@ -4,8 +4,8 @@ import BKDomain
 import Foundation
 
 enum RecordAPI {
-    case createRecord(userBookId: String, dto: RecordPostDTO)
-    case readRecord(userBookId: String, dto: Data)
+    case insert(userBookId: String, recordData: RecordVO)
+    case fetch(userBookId: String, dto: FetchRecordRequestDTO)
 }
 
 extension RecordAPI: RequestTarget {
@@ -15,18 +15,18 @@ extension RecordAPI: RequestTarget {
 
     var path: String {
         switch self {
-        case .createRecord(let userBookId, _):
-            return "\(userBookId)"
-        case .readRecord(let userBookId, _):
-            return "\(userBookId)"
+        case .insert(let userBookId, _):
+            return "/\(userBookId)"
+        case .fetch(let userBookId, _):
+            return "/\(userBookId)"
         }
     }
 
     var method: HTTPMethod {
         switch self {
-        case .createRecord:
+        case .insert:
             return .post
-        case .readRecord:
+        case .fetch:
             return .get
         }
     }
@@ -42,19 +42,19 @@ extension RecordAPI: RequestTarget {
 
     var body: (any Encodable)? {
         switch self {
-        case .createRecord(_, let dto):
-            return dto
-        case .readRecord:
+        case .insert(_, let data):
+            return InsertRecordRequestDTO(data: data)
+        case .fetch:
             return nil
         }
     }
 
-    var query: [String : Any] {
+    var query: [String: Any] {
         switch self {
-        case .createRecord:
+        case .insert:
             return [:]
-        case .readRecord(_, let dto):
-            return [:]
+        case .fetch(_, let dto):
+            return dto.toDictionary()
         }
     }
     

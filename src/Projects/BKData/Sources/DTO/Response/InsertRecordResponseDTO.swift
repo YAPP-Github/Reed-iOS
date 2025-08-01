@@ -3,7 +3,7 @@
 import BKDomain
 import Foundation
 
-public struct RecordDetailResponseDTO: Decodable {
+public struct InsertRecordResponseDTO: Decodable {
     let id: String
     let userBookId: String
     let pageNumber: Int
@@ -31,7 +31,7 @@ public struct RecordDetailResponseDTO: Decodable {
     }
 }
 
-public extension RecordDetailResponseDTO {
+public extension InsertRecordResponseDTO {
     func toRecordInfo() -> RecordInfo {
         return RecordInfo(
             recordId: id,
