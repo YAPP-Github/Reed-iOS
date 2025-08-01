@@ -5,7 +5,7 @@ import BKDomain
 import Combine
 import Foundation
 
-public final class DefaultRecordRepository: RecordRepsitory{
+public final class DefaultRecordRepository: RecordRepository {
     private let networkProvider: NetworkProvider
     
     public init(networkProvider: NetworkProvider) {
