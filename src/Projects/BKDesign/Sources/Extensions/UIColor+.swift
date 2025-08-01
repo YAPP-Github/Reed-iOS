@@ -100,6 +100,32 @@ public extension UIColor {
             }
         }
     }
+    
+    static func bkEmotionColor(
+        _ semanticColor: BKSemanticColor.Emotion
+    ) -> UIColor {
+        return UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark:
+                return semanticColor.resolve(for: .light)
+            default:
+                return semanticColor.resolve(for: .light)
+            }
+        }
+    }
+    
+    static func bkEmotionBaseColor(
+        _ semanticColor: BKSemanticColor.EmotionBase
+    ) -> UIColor {
+        return UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark:
+                return semanticColor.resolve(for: .light)
+            default:
+                return semanticColor.resolve(for: .light)
+            }
+        }
+    }
 }
 
 // UIColor 비교를 위한 확장

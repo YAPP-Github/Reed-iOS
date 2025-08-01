@@ -51,4 +51,13 @@ extension MainFlowCoordinator {
         childCoordinators.append(noteCoordinator)
         noteCoordinator.start()
     }
+    
+    func didTapBookDetailButton() {
+        let bookDetailCoordinator = BookDetailCoordinator(
+            parentCoordinator: self,
+            navigationController: navigationController
+        )
+        childCoordinators.append(bookDetailCoordinator)
+        bookDetailCoordinator.start()
+    }
 }
