@@ -3,7 +3,7 @@
 import Combine
 import UIKit
 
-public protocol RecordRepsitory {
+public protocol RecordRepository {
     func create(
         bookId: String,
         data: RecordVO

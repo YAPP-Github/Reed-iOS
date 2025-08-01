@@ -5,7 +5,21 @@ import Foundation
 public struct MyLibraryParameters {
     public var status: BookStatus
     public var sortType: LibrarySortType
-    public var pageNumber: Int? = 0
-    public var pageSize: Int? = 10
+    public var pageNumber: Int?
+    public var pageSize: Int?
     public var title: String?
+    
+    init(
+        status: BookStatus,
+        sortType: LibrarySortType,
+        pageNumber: Int? = 0,
+        pageSize: Int? = 10,
+        title: String? = nil
+    ) {
+        self.status = status
+        self.sortType = sortType
+        self.pageNumber = pageNumber
+        self.pageSize = pageSize
+        self.title = title
+    }
 }
