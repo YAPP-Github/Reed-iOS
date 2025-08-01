@@ -29,46 +29,24 @@ final class SentenceRegistrationView: BaseView {
         placeholder: "기록하고 싶은 문장을 작성해보세요"
     )
     
-    private let registerButton: BKButton = {
-        let button = BKButton(
-            style: .custom(
-                background: BKButtonColorSet(
-                    normal: .bkBaseColor(.primary),
-                    pressed: .bkBaseColor(.primary),
-                    disabled: .bkBaseColor(.primary)
-                ),
-                foreground: BKButtonColorSet(
-                    normal: .bkContentColor(.brand),
-                    pressed: .bkContentColor(.brand),
-                    disabled: .bkContentColor(.brand)
-                )
-            )
-        )
-        button.layer.borderWidth = LayoutConstants.buttonBorderWidth
-        button.layer.borderColor = UIColor.bkBorderColor(.brand).cgColor
-        button.leftIcon = BKImage.Icon.maximize
-        button.title = "문장 스캔하기"
-        return button
-    }()
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        registerButton.layer.cornerRadius = registerButton.bounds.height / 2
-        registerButton.layer.masksToBounds = true
-        registerButton.clipsToBounds = true
-    }
+    private let textScanButton = BKButton(
+        style: .stroke,
+        size: .rounded
+    )
     
     override func setupView() {
         addSubviews(
             titleLabel,
             pageField,
             sentenceTextView,
-            registerButton
+            textScanButton
         )
     }
     
     override func configure() {
         titleLabel.numberOfLines = .zero
+        textScanButton.title = "문장 스캔하기"
+        textScanButton.leftIcon = BKImage.Icon.maximize
     }
     
     override func setupLayout() {
@@ -92,7 +70,7 @@ final class SentenceRegistrationView: BaseView {
                 .inset(LayoutConstants.horizontalInset)
         }
         
-        registerButton.snp.makeConstraints {
+        textScanButton.snp.makeConstraints {
             $0.top.equalTo(sentenceTextView.snp.bottom)
                 .offset(LayoutConstants.buttonOffset)
             $0.trailing.equalToSuperview()

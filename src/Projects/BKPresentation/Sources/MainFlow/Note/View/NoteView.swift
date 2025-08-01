@@ -18,10 +18,16 @@ protocol RegistrationFormProvidable {
 final class NoteView: BaseView {
     let eventPublisher = PassthroughSubject<NoteViewEvent, Never>()
     
+    private lazy var sentenceView = SentenceRegistrationView()
+    private lazy var emotionView = EmotionRegistrationView()
+    private lazy var appreciationView = SentenceAppreciationView { [weak self] in
+        self?.guideButtonTapped()
+    }
+
     private lazy var pageViews: [UIView] = [
-        SentenceRegistrationView(),
-        EmotionRegistrationView(),
-        SentenceAppreciationView()
+        sentenceView,
+        emotionView,
+        appreciationView
     ]
     
     let pageControl = BKPageControl()
@@ -49,6 +55,8 @@ final class NoteView: BaseView {
         pageControl.numberOfPages = pageViews.count
         pageControl.addTarget(self, action: #selector(pageControlChanged), for: .valueChanged)
         nextButton.primaryButton?.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        addGestureRecognizer(tapGesture)
     }
     
     override func setupLayout() {
@@ -85,6 +93,10 @@ final class NoteView: BaseView {
         
         makeInnerViews()
     }
+    
+    func setAppreciationText(_ text: String) {
+        appreciationView.setText(text)
+    }
 }
 
 private extension NoteView {
@@ -119,6 +131,10 @@ private extension NoteView {
         return NoteForm(page: "", sentence: "", emotion: .someEmotion1, appreciation: "")
     }
     
+    func guideButtonTapped() {
+        eventPublisher.send(.didTapGuideButton)
+    }
+    
     @objc func pageControlChanged(_ sender: BKPageControl) {
         let x = CGFloat(sender.currentPage) * contentScrollView.bounds.width
         contentScrollView.setContentOffset(.init(x: x, y: 0), animated: true)
@@ -136,6 +152,10 @@ private extension NoteView {
         
         pageControl.currentPage = next
         pageControlChanged(pageControl)
+    }
+    
+    @objc private func dismissKeyboard() {
+        endEditing(true)
     }
 }
 

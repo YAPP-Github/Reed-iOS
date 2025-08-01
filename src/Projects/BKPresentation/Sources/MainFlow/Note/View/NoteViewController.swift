@@ -4,8 +4,9 @@ import BKDesign
 import Combine
 import UIKit
 
-enum NoteViewEvent {
+enum NoteViewEvent: Equatable {
     case completeForm(NoteForm)
+    case didTapGuideButton
 }
 
 final class NoteViewController: BaseViewController<NoteView> {
@@ -56,6 +57,24 @@ final class NoteViewController: BaseViewController<NoteView> {
                 self?.presentRegistrationSuccessDialog()
             }
             .store(in: &cancellable)
+        
+        contentView.eventPublisher
+            .filter { $0 == .didTapGuideButton }
+            .sink { [weak self] _ in
+                self?.presentAppreciationGuide()
+            }
+            .store(in: &cancellable)
+    }
+    
+    override func bindState() {
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates()
+            .map { $0.selectedGuideText }
+            .sink { [weak self] selectedText in
+                self?.contentView.setAppreciationText(selectedText)
+            }
+            .store(in: &cancellable)
     }
 }
 
@@ -104,11 +123,22 @@ private extension NoteViewController {
                 rightButtonTitle: "확인",
                 rightButtonAction: { [weak self] in
                     self?.dismiss(animated: true)
-                    self?.navigationController?.popViewController(animated: true)
+                    self?.coordinator?.popAndFinish()
                 }
             )
         )
         let dialogViewController = BKDialogViewController(dialog: dialog)
         present(dialogViewController, animated: true)
+    }
+    
+    func presentAppreciationGuide() {
+        let sheet = BKBottomSheetViewController.makeAppreciationGuideSheet(
+            confirmAction: { [weak self] selectedGuide in
+                self?.viewModel.send(.appreciationGuideSelected(selectedGuide.rawValue))
+                self?.dismiss(animated: true)
+            }
+        )
+        
+        sheet.show(from: self, animated: true)
     }
 }
