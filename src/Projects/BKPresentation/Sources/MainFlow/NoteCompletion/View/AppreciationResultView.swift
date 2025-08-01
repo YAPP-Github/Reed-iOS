@@ -11,7 +11,7 @@ enum EmotionIcon: String {
     case someEmotion4 = "#emotion4"
     
     var icon: UIImage {
-        return BKImage.Graphics.mascot
+        return BKImage.Graphics.empty
     }
     
     static func toEmotionIcon(from emotion: Emotion) -> EmotionIcon {
