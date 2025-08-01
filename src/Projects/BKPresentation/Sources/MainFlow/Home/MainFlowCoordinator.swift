@@ -46,7 +46,8 @@ extension MainFlowCoordinator {
     func didTapNoteButton() {
         let noteCoordinator = NoteCoordinator(
             parentCoordinator: self,
-            navigationController: navigationController
+            navigationController: navigationController,
+            bookId: "0198672d-2e33-7f8e-82ad-e426714dc2d5"
         )
         childCoordinators.append(noteCoordinator)
         noteCoordinator.start()

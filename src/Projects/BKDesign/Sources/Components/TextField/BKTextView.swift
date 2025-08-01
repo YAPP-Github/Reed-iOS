@@ -3,6 +3,7 @@
 /// 기존 `BKTextView`를 `BKTextFieldView`로 네이밍 변경하고,
 /// 멀티라인 입력용 `BKTextView`를 새로 추가합니다.
 
+import Combine
 import SnapKit
 import UIKit
 
@@ -55,6 +56,11 @@ public final class BKTextView: UIView {
         stackView.alignment = .fill
         return stackView
     }()
+    
+    private let textDidChangeSubject = PassthroughSubject<Void, Never>()
+    public var textDidChangePublisher: AnyPublisher<Void, Never> {
+        textDidChangeSubject.eraseToAnyPublisher()
+    }
     
     public var text: String {
         return textView.text ?? ""
@@ -176,6 +182,7 @@ private extension BKTextView {
 extension BKTextView: UITextViewDelegate {
     public func textViewDidChange(_ textView: UITextView) {
         placeholderLabel.isHidden = !textView.text.isEmpty
+        if !textView.text.isEmpty { textDidChangeSubject.send(()) }
     }
     
     public func textViewDidBeginEditing(_ textView: UITextView) {

@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct BookInfo {
+public struct BookInfo: Equatable {
     public let bookId: String
     public let isbn: String
     public let title: String

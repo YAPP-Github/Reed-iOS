@@ -8,19 +8,25 @@ final class NoteCoordinator: Coordinator, SessionExpirationNotifying {
     var childCoordinators = [Coordinator]()
     var navigationController: UINavigationController
     
+    private let bookId: String
+    
     // Combine을 위한 cancellables 추가
     private var cancellables = Set<AnyCancellable>()
     
     init(
         parentCoordinator: Coordinator?,
-        navigationController: UINavigationController
+        navigationController: UINavigationController,
+        bookId: String
     ) {
         self.parentCoordinator = parentCoordinator
         self.navigationController = navigationController
+        self.bookId = bookId
     }
     
     func start() {
-        let viewController = NoteViewController(viewModel: NoteViewModel())
+        let viewController = NoteViewController(
+            viewModel: NoteViewModel(bookId: bookId)
+        )
         viewController.coordinator = self
         navigationController.pushViewController(viewController, animated: true)
     }

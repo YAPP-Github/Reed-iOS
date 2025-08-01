@@ -5,7 +5,7 @@ import SnapKit
 import UIKit
 
 enum EmotionIcon: String {
-    case someEmotion1 = "#emotion1"
+    case someEmotion1 = "#따뜻함"
     case someEmotion2 = "#emotion2"
     case someEmotion3 = "#emotion3"
     case someEmotion4 = "#emotion4"

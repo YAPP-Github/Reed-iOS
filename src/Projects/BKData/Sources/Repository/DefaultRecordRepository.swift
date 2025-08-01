@@ -14,19 +14,41 @@ public final class DefaultRecordRepository: RecordRepository {
     
     public func create(
         bookId: String,
-        data: RecordVO
+        recordData: RecordVO
     ) -> AnyPublisher<RecordInfo, Error> {
         networkProvider.request(
-            target: RecordAPI.createRecord(
+            target: RecordAPI.insert(
                 userBookId: bookId,
-                dto: RecordPostDTO(data: data)
+                recordData: recordData
             ),
-            type: RecordDetailResponseDTO.self
+            type: InsertRecordResponseDTO.self
         )
-        .mapError { return $0 as Error }
+        .mapError { $0 as Error }
         .debugError(logger: AppLogger.network)
-        .map { return $0.toRecordInfo() }
+        .map { $0.toRecordInfo() }
         .eraseToAnyPublisher()
     }
     
+    public func fetch(
+        bookId: String,
+        page: Int,
+        size: Int,
+        sortType: LibrarySortType
+    ) -> AnyPublisher<[RecordInfo], Error> {
+        networkProvider.request(
+            target: RecordAPI.fetch(
+                userBookId: bookId,
+                dto: FetchRecordRequestDTO(
+                    page: page,
+                    size: size,
+                    sort: sortType
+                )
+            ),
+            type: FetchRecordResponseDTO<RecordInfo>.self
+        )
+        .mapError { $0 as Error }
+        .debugError(logger: AppLogger.network)
+        .map { $0.content }
+        .eraseToAnyPublisher()
+    }
 }

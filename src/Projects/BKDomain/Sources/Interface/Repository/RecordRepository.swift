@@ -6,8 +6,13 @@ import UIKit
 public protocol RecordRepository {
     func create(
         bookId: String,
-        data: RecordVO
+        recordData: RecordVO
     ) -> AnyPublisher<RecordInfo, Error>
     
-//    func fetch() -> AnyPublisher<[RecordInfo], Error>
+    func fetch(
+        bookId: String,
+        page: Int,
+        size: Int,
+        sortType: LibrarySortType
+    ) -> AnyPublisher<[RecordInfo], Error>
 }

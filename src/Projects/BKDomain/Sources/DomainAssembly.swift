@@ -114,6 +114,20 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(
+            type: BookUpsertUseCase.self
+        ) { _ in
+            @Autowired var repository: BookRepository
+            return DefaultBookUpsertUseCase(repository: repository)
+        }
+        
+        container.register(
+            type: CreateRecordUseCase.self
+        ) { _ in
+            @Autowired var repository: RecordRepository
+            return DefaultCreateRecordUseCase(repository: repository)
+        }
+        
+        container.register(
             type: MarkOnboardingSeenUseCase.self
         ) { _ in
             @Autowired var repository: OnboardingRepository

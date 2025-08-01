@@ -1,6 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import Combine
 import SnapKit
 import UIKit
 
@@ -9,6 +10,7 @@ struct SentenceAppreciationForm {
 }
 
 final class SentenceAppreciationView: BaseView {
+    private let textDidChangeSubject = PassthroughSubject<Void, Never>()
     private let containerView = UIView()
     private let titleLabel = BKLabel(
         text: "문장에 대한 감상을 남겨주세요",
@@ -84,10 +86,19 @@ final class SentenceAppreciationView: BaseView {
     }
 }
 
-extension SentenceAppreciationView: RegistrationFormProvidable {
+extension SentenceAppreciationView: RegistrationFormProvidable, FormInputNotifiable {
+    var inputChangedPublisher: AnyPublisher<Void, Never> {
+        appreciationTextView.textDidChangePublisher
+    }
+
     func registrationForm() -> RegistrationForm? {
+        let trimmedSentence = appreciationTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedSentence.isEmpty else {
+            return nil
+        }
+        
         return .appreciation(SentenceAppreciationForm(
-            appreciation: appreciationTextView.text
+            appreciation: trimmedSentence
         ))
     }
 }

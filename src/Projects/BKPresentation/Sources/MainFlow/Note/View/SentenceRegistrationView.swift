@@ -1,19 +1,19 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import Combine
 import SnapKit
 import UIKit
 
 struct SentenceRegistrationForm {
-    let page: String
+    let page: Int
     let sentence: String
 }
 
-enum SentenceRegistrationEvent {
-    case ocrScanTapped
-}
-
 final class SentenceRegistrationView: BaseView {
+    private let inputChangedSubject = PassthroughSubject<Void, Never>()
+    private var cancellables = Set<AnyCancellable>()
+    
     private let containerView = UIView()
     private let titleLabel = BKLabel(
         text: """
@@ -38,6 +38,13 @@ final class SentenceRegistrationView: BaseView {
         size: .rounded
     )
     
+    var onTextScanTapped: (() -> Void)?
+    
+    override init(frame: CGRect = .zero) {
+        super.init(frame: frame)
+        bindInputs()
+    }
+    
     override func setupView() {
         addSubviews(
             titleLabel,
@@ -51,6 +58,9 @@ final class SentenceRegistrationView: BaseView {
         titleLabel.numberOfLines = .zero
         textScanButton.title = "문장 스캔하기"
         textScanButton.leftIcon = BKImage.Icon.maximize
+        pageField.setTextFieldDelegate(self)
+        pageField.setTextFieldKeyboardType(.numberPad)
+        textScanButton.addTarget(self, action: #selector(textScanButtonTapped), for: .touchUpInside)
     }
     
     override func setupLayout() {
@@ -84,12 +94,51 @@ final class SentenceRegistrationView: BaseView {
     }
 }
 
-extension SentenceRegistrationView: RegistrationFormProvidable {
+extension SentenceRegistrationView: RegistrationFormProvidable, FormInputNotifiable {
+    var inputChangedPublisher: AnyPublisher<Void, Never> {
+        inputChangedSubject.eraseToAnyPublisher()
+    }
+    
     func registrationForm() -> RegistrationForm? {
+        let trimmedPage = pageField.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedSentence = sentenceTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmedPage.isEmpty,
+              !trimmedSentence.isEmpty,
+              let page = Int(trimmedPage)
+        else {
+            return nil
+        }
+
         return .sentence(SentenceRegistrationForm(
-            page: pageField.text,
-            sentence: sentenceTextView.text
+            page: page,
+            sentence: trimmedSentence
         ))
+    }
+    
+    private func bindInputs() {
+        pageField.textDidChangePublisher
+            .merge(with: sentenceTextView.textDidChangePublisher)
+            .sink { [weak self] _ in
+                self?.inputChangedSubject.send(())
+            }
+            .store(in: &cancellables)
+    }
+    
+    @objc func textScanButtonTapped() {
+        onTextScanTapped?()
+    }
+}
+
+extension SentenceRegistrationView: UITextFieldDelegate {
+    func textField(
+        _ textField: UITextField,
+        shouldChangeCharactersIn range: NSRange,
+        replacementString string: String
+    ) -> Bool {
+        let allowedCharacters = CharacterSet.decimalDigits
+        let characterSet = CharacterSet(charactersIn: string)
+        return allowedCharacters.isSuperset(of: characterSet)
     }
 }
 

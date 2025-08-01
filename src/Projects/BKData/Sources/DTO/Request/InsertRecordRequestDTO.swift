@@ -3,13 +3,13 @@
 import BKDomain
 import Foundation
 
-public struct RecordPostDTO: Encodable {
+struct InsertRecordRequestDTO: Encodable {
     let pageNumber: Int
     let quote: String
     let review: String
     let emotionTags: [String]
     
-    public init(
+    init(
         pageNumber: Int,
         quote: String,
         review: String,
@@ -21,7 +21,7 @@ public struct RecordPostDTO: Encodable {
         self.emotionTags = emotionTags
     }
     
-    public init(data: RecordVO) {
+    init(data: RecordVO) {
         self.init(
             pageNumber: data.pageNumber,
             quote: data.quote,

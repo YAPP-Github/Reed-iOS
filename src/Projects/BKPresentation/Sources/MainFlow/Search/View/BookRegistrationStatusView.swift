@@ -4,12 +4,6 @@ import BKDesign
 import SnapKit
 import UIKit
 
-enum BookRegistrationStatus: String {
-    case before = "읽기 전"
-    case inProgress = "읽는 중"
-    case after = "독서 완료"
-}
-
 final class BookRegistrationStatusView: UIView {
     private let stackView = UIStackView()
     private let statuses: [BookRegistrationStatus] = [.before, .inProgress, .after]

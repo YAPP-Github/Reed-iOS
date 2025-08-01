@@ -1,5 +1,6 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import Combine
 import UIKit
 
 public final class BKTextFieldView: UIView {
@@ -15,6 +16,11 @@ public final class BKTextFieldView: UIView {
         didSet {
             isError ? textField.setType(type: .error) : textField.setType(type: .normal)
         }
+    }
+    
+    private let textDidChangeSubject = PassthroughSubject<Void, Never>()
+    public var textDidChangePublisher: AnyPublisher<Void, Never> {
+        textDidChangeSubject.eraseToAnyPublisher()
     }
     
     override public var intrinsicContentSize: CGSize {
@@ -69,6 +75,14 @@ public final class BKTextFieldView: UIView {
         helpMessageLabel.setText(text: message)
         self.isError = isError
     }
+    
+    public func setTextFieldDelegate(_ delegate: UITextFieldDelegate?) {
+        textField.delegate = delegate
+    }
+    
+    public func setTextFieldKeyboardType(_ type: UIKeyboardType) {
+        textField.keyboardType = type
+    }
 }
 
 private extension BKTextFieldView {
@@ -91,12 +105,17 @@ private extension BKTextFieldView {
         [titleLabel, textField, helpMessageLabel]
             .forEach(stackView.addArrangedSubview(_:))
         addSubview(stackView)
+        textField.addTarget(self, action: #selector(textDidChange), for: .editingChanged)
     }
     
     func layout() {
         stackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+    }
+    
+    @objc private func textDidChange() {
+        if !text.isEmpty { textDidChangeSubject.send(()) }
     }
     
     enum LayoutConstants {
