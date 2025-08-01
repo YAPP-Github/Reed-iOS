@@ -18,7 +18,7 @@ final class MainFlowCoordinator: Coordinator, FinishNotifying {
     }
     
     func start() {
-        let homeViewController = RealHomeViewController()
+        let homeViewController = HomeViewController(viewModel: HomeViewModel())
         homeViewController.coordinator = self
         navigationController.pushViewController(homeViewController, animated: true)
     }
@@ -43,11 +43,11 @@ extension MainFlowCoordinator {
         searchCoordinator.start()
     }
     
-    func didTapNoteButton() {
+    func didTapNoteButton(bookId: String) {
         let noteCoordinator = NoteCoordinator(
             parentCoordinator: self,
             navigationController: navigationController,
-            bookId: "0198672d-2e33-7f8e-82ad-e426714dc2d5"
+            bookId: bookId
         )
         childCoordinators.append(noteCoordinator)
         noteCoordinator.start()
