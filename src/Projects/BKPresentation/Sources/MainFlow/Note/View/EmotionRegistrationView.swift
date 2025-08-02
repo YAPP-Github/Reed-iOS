@@ -10,30 +10,29 @@ struct EmotionRegistrationForm {
 }
 
 enum Emotion: String, CaseIterable {
-    case someEmotion1 = "1"
-    case someEmotion2 = "2"
-    case someEmotion3 = "3"
-    case someEmotion4 = "4"
+    case warmth = "warmth"
+    case joy = "joy"
+    case nervous = "nervous"
+    case sadness = "sadness"
     
     var emotionView: UIView {
-        let tmpView = UIView()
-        tmpView.snp.makeConstraints {
-            $0.height.equalTo(210)
-        }
-        
-        tmpView.backgroundColor = .bkContentColor(.tertiary)
-        tmpView.layer.cornerRadius = 12
+        let imageView = UIImageView()
         
         switch self {
-        case .someEmotion1:
-            return tmpView
-        case .someEmotion2:
-            return tmpView
-        case .someEmotion3:
-            return tmpView
-        case .someEmotion4:
-            return tmpView
+        case .warmth:
+            imageView.image = BKImage.Graphics.warmth
+        case .joy:
+            imageView.image = BKImage.Graphics.joy
+        case .nervous:
+            imageView.image = BKImage.Graphics.nervous
+        case .sadness:
+            imageView.image = BKImage.Graphics.sadness
         }
+        
+        imageView.layer.cornerRadius = 12
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFit
+        return imageView
     }
 }
 
@@ -68,10 +67,10 @@ final class EmotionRegistrationView: BaseView {
         return stackView
     }()
     
-    private lazy var emotion1View = makeEmotionView(for: .someEmotion1)
-    private lazy var emotion2View = makeEmotionView(for: .someEmotion2)
-    private lazy var emotion3View = makeEmotionView(for: .someEmotion3)
-    private lazy var emotion4View = makeEmotionView(for: .someEmotion4)
+    private lazy var emotion1View = makeEmotionView(for: .warmth)
+    private lazy var emotion2View = makeEmotionView(for: .joy)
+    private lazy var emotion3View = makeEmotionView(for: .nervous)
+    private lazy var emotion4View = makeEmotionView(for: .sadness)
     
     override func setupView() {
         addSubview(containerView)
@@ -108,10 +107,10 @@ extension EmotionRegistrationView: RegistrationFormProvidable, FormInputNotifiab
 
     private var emotionButtons: [Emotion: UIView] {
         [
-            .someEmotion1: emotion1View,
-            .someEmotion2: emotion2View,
-            .someEmotion3: emotion3View,
-            .someEmotion4: emotion4View
+            .warmth: emotion1View,
+            .joy: emotion2View,
+            .nervous: emotion3View,
+            .sadness: emotion4View
         ]
     }
     
@@ -142,12 +141,36 @@ private extension EmotionRegistrationView {
     }
     
     func makeEmotionView(for emotion: Emotion) -> UIView {
-        let view = emotion.emotionView
-        view.isUserInteractionEnabled = true
+        let wrapperView = UIView()
+        let imageView = UIImageView()
+
+        switch emotion {
+        case .warmth:
+            imageView.image = BKImage.Graphics.warmth
+        case .joy:
+            imageView.image = BKImage.Graphics.joy
+        case .nervous:
+            imageView.image = BKImage.Graphics.nervous
+        case .sadness:
+            imageView.image = BKImage.Graphics.sadness
+        }
+
+        imageView.layer.cornerRadius = 12
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFit
+
+        wrapperView.addSubview(imageView)
+        imageView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.height.equalTo(imageView.snp.width).multipliedBy(1.325)
+        }
+
+        wrapperView.isUserInteractionEnabled = true
         let gesture = UITapGestureRecognizer(target: self, action: #selector(emotionTapped(_:)))
-        view.addGestureRecognizer(gesture)
-        view.tag = emotion.hashValue
-        return view
+        wrapperView.addGestureRecognizer(gesture)
+        wrapperView.tag = emotion.hashValue
+
+        return wrapperView
     }
     
     @objc func emotionTapped(_ sender: UITapGestureRecognizer) {
