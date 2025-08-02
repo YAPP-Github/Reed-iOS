@@ -5,10 +5,10 @@ import SnapKit
 import UIKit
 
 enum EmotionIcon: String {
-    case someEmotion1 = "#따뜻함"
-    case someEmotion2 = "#emotion2"
-    case someEmotion3 = "#emotion3"
-    case someEmotion4 = "#emotion4"
+    case warmth = "#따뜻함"
+    case joy = "#즐거움"
+    case sadness = "#슬픔"
+    case nervous = "#긴장됨"
     
     var icon: UIImage {
         return BKImage.Graphics.empty
@@ -16,14 +16,14 @@ enum EmotionIcon: String {
     
     static func toEmotionIcon(from emotion: Emotion) -> EmotionIcon {
         switch emotion {
-        case .someEmotion1:
-            return .someEmotion1
-        case .someEmotion2:
-            return .someEmotion2
-        case .someEmotion3:
-            return .someEmotion3
-        case .someEmotion4:
-            return .someEmotion4
+        case .warmth:
+            return .warmth
+        case .joy:
+            return .joy
+        case .sadness:
+            return .sadness
+        case .nervous:
+            return .nervous
         }
     }
 }
