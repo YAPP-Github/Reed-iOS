@@ -58,5 +58,9 @@ public enum BKImage {
         public static let onboarding2 = BKDesignAsset.onboarding2.image
         public static let homeChar = BKDesignAsset.homeCharacter.image
         public static let empty = BKDesignAsset.empty.image
+        public static let warmth = BKDesignAsset.warmth.image
+        public static let sadness = BKDesignAsset.sadness.image
+        public static let joy = BKDesignAsset.joy.image
+        public static let nervous = BKDesignAsset.nervous.image
     }
 }
