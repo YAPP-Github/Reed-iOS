@@ -88,8 +88,9 @@ extension NoteCoordinator {
         _ textViewController: RecognizedTextViewController,
         viewModel: RecognizedTextViewModel
     ) {
-        // 뷰모델의 사이드 이펙트 바인딩
         bindRecognizedTextViewModelSideEffects(viewModel)
+        
+        textViewController.modalPresentationStyle = .fullScreen
         
         if let presentedViewController = navigationController.presentedViewController {
             presentedViewController.present(textViewController, animated: true)
@@ -134,8 +135,6 @@ extension NoteCoordinator {
     
     /// 인식된 텍스트를 노트로 저장하는 로직
     private func saveRecognizedText(_ text: String) {
-        // TODO: 새 노트 생성하거나 기존 노트에 추가하는 로직
-        // 예: createNewNote(with: text) 또는 addToCurrentNote(text)
         print("텍스트 저장: \(text)")
     }
 }
