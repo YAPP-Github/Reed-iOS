@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "icon_24_folder.png",
+      "filename" : "book.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "icon_24_folder@2x.png",
+      "filename" : "book@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "icon_24_folder@3x.png",
+      "filename" : "book@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
@@ -19,8 +19,5 @@
   "info" : {
     "author" : "xcode",
     "version" : 1
-  },
-  "properties" : {
-    "template-rendering-intent" : "template"
   }
 }
