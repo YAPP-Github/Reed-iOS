@@ -144,6 +144,14 @@ private extension UINavigationController {
         let gearButton = makeIconButton(BKImage.Icon.settings, target: target, action: gearAction)
         gearButton.tintColor = .bkContentColor(.primary)
         
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .bkBackgroundColor(.home)
+        appearance.backgroundImage = nil
+
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+        navigationBar.compactAppearance = appearance
         navigationBar.tintColor = .bkContentColor(.primary)
         viewController.navigationItem.title = nil
         viewController.navigationItem.largeTitleDisplayMode = .never
