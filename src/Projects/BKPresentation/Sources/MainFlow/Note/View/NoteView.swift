@@ -107,7 +107,7 @@ final class NoteView: BaseView {
     }
     
     func setAppreciationText(_ text: String) {
-        appreciationView.setText(text)
+        appreciationView.setTextWithStartEditing(text)
     }
 }
 

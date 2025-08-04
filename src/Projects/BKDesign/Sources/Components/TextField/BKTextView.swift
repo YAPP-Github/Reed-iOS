@@ -98,6 +98,11 @@ public final class BKTextView: UIView {
         self.textView.text = text
         textViewDidChange(textView)
     }
+    
+    public func startEditing() {
+        textView.selectedRange = NSRange(location: 0, length: 0)
+        textView.becomeFirstResponder()
+    }
 }
 
 private extension BKTextView {
