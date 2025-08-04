@@ -91,6 +91,7 @@ final class TermsItemCell: UICollectionViewListCell {
     
     public func configure(_ term: Term) {
         titleLabel.setText(text: term.title)
+        contentView.backgroundColor = .bkBaseColor(.primary)
 
         checkBox.tintColor = term.isAgreed ? .bkContentColor(.brand) : .bkContentColor(.tertiary)
         chevronIconView.isHidden = (term.url == nil)
