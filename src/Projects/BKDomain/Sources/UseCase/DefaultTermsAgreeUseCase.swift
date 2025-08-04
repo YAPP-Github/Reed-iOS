@@ -15,7 +15,7 @@ public struct DefaultTermsAgreeUseCase: TermsAgreeUseCase {
     
     public func execute(_ isAgreed: Bool) -> AnyPublisher<Bool, AuthError> {
         authStateRepository
-            .putTermsAgreement(isAgreed: isAgreed)
+            .updateTermsAgreement(isAgreed: isAgreed)
             .debugError(logger: AppLogger.auth)
             .eraseToAnyPublisher()
     }

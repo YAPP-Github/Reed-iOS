@@ -7,5 +7,5 @@ public protocol AuthStateRepository {
     
     func validate() -> AnyPublisher<UserProfile, AuthError>
     
-    func putTermsAgreement(isAgreed: Bool) -> AnyPublisher<Bool, AuthError>
+    func updateTermsAgreement(isAgreed: Bool) -> AnyPublisher<Bool, AuthError>
 }

@@ -33,7 +33,7 @@ public struct DefaultAuthStateRepository: AuthStateRepository {
         .eraseToAnyPublisher()
     }
     
-    public func putTermsAgreement(isAgreed: Bool) -> AnyPublisher<Bool, AuthError> {
+    public func updateTermsAgreement(isAgreed: Bool) -> AnyPublisher<Bool, AuthError> {
         networkProvider.request(
             target: AuthAPI.termsAgreement(termsAgreed: isAgreed),
             type: UserProfileResponseDTO.self
