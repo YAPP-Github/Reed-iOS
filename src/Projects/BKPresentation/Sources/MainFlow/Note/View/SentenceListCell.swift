@@ -4,7 +4,7 @@ import BKDesign
 import SnapKit
 import UIKit
 
-final class SentenceListCell: UICollectionViewListCell {
+final class SentenceListCell: UICollectionViewCell {
     
     private let sentenceLabel = BKLabel(
         text: "",
@@ -60,6 +60,7 @@ final class SentenceListCell: UICollectionViewListCell {
             contentView.backgroundColor = .bkBackgroundColor(.tertiary)
             contentView.layer.borderWidth = 1
             contentView.layer.borderColor = UIColor.bkBorderColor(.brand).cgColor
+            sentenceLabel.setColor(color: .bkContentColor(.brand))
         } else {
             contentView.backgroundColor = .bkBackgroundColor(.secondary)
             contentView.layer.borderColor = UIColor.clear.cgColor

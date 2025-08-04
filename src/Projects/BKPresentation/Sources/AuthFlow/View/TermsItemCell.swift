@@ -4,7 +4,7 @@ import BKDesign
 import SnapKit
 import UIKit
 
-final class TermsItemCell: UICollectionViewListCell {
+final class TermsItemCell: UICollectionViewCell {
     static let identifier: String = "TermsItemCell"
     
     // MARK: - Layout Metrics
