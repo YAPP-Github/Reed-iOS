@@ -113,7 +113,6 @@ final class RecognizedTextViewModel: BaseViewModel {
     func handle(_ effect: SideEffect) -> AnyPublisher<Action, Never> {
         switch effect {
         case .confirmWithSelectedText, .dismissToRetake:
-            // 이 경우들은 Coordinator나 상위 컴포넌트에서 처리
             return Empty().eraseToAnyPublisher()
         }
     }

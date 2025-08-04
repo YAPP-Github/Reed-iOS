@@ -97,22 +97,10 @@ final class OCRScannerViewModel: BaseViewModel {
                 scanAreaFrame: scanAreaFrame
             )
             if !capturedTexts.isEmpty {
-                // 각 캡처된 텍스트를 문장별로 파싱
-                var allSentences: [String] = []
-                
-                for capturedText in capturedTexts {
-                    let parsedSentences = parseSentencesToStrings(from: capturedText)
-                    allSentences.append(contentsOf: parsedSentences)
-                }
-                
-                newState.capturedSentences = allSentences
-                
-                // 기존 방식도 유지 (호환성을 위해)
+                newState.capturedSentences = capturedTexts
                 let combinedText = capturedTexts.joined(separator: "\n")
                 newState.capturedText = combinedText
-                
-                // 문장 배열로 전달
-                effects.append(.showRecognizedSentences(allSentences))
+                effects.append(.showRecognizedSentences(capturedTexts))
             } else {
                 newState.shouldShowAlert = true
                 newState.alertMessage = "스캔 영역에서 텍스트를 찾을 수 없습니다.\n텍스트가 초록색 테두리 안에 있는지 확인해주세요."
@@ -165,7 +153,16 @@ final class OCRScannerViewModel: BaseViewModel {
                 let textCenter = CGPoint(x: textFrame.midX, y: textFrame.midY)
                 
                 if scanAreaFrame.contains(textCenter) {
-                    capturedTexts.append(textItem.transcript)
+                    let lines = textItem.transcript.components(separatedBy: .newlines)
+                    
+                    for line in lines {
+                        let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                        debugPulse("\(trimmedLine)")
+                        
+                        if !trimmedLine.isEmpty {
+                            capturedTexts.append(trimmedLine)
+                        }
+                    }
                 }
             default:
                 break
@@ -187,33 +184,5 @@ final class OCRScannerViewModel: BaseViewModel {
             width: maxX - minX,
             height: maxY - minY
         )
-    }
-    
-    private func parseSentencesToStrings(from text: String) -> [String] {
-        var sentences: [String] = []
-        var currentSentence = ""
-        
-        for char in text {
-            currentSentence.append(char)
-            
-            // 문장 부호를 만나면 문장 완성
-            if char == "." || char == "!" || char == "?" {
-                let trimmedSentence = currentSentence.trimmingCharacters(in: .whitespacesAndNewlines)
-                if !trimmedSentence.isEmpty {
-                    sentences.append(trimmedSentence)
-                }
-                currentSentence = ""
-            }
-        }
-        
-        // 마지막에 문장 부호가 없는 경우 처리
-        if !currentSentence.isEmpty {
-            let trimmedSentence = currentSentence.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !trimmedSentence.isEmpty {
-                sentences.append(trimmedSentence)
-            }
-        }
-        
-        return sentences
     }
 }
