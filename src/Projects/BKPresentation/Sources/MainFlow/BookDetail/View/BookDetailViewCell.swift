@@ -76,7 +76,7 @@ final class BookDetailViewCell: UICollectionViewCell {
         emotionIcon.image = item.emotion.image
         emotionIcon.layer.cornerRadius = LayoutConstants.imageCornerRadius
         emotionIcon.clipsToBounds = true
-        emotionLabel.setText(text: item.emotion.rawValue)
+        emotionLabel.setText(text: "#\(item.emotion.rawValue)")
         creationLabel.setText(
             text: DateFormatter.localizedString(
                 from: item.createdAt,
@@ -84,7 +84,7 @@ final class BookDetailViewCell: UICollectionViewCell {
                 timeStyle: .none
             )
         )
-        pageLabel.setText(text: "\(item.page)P")
+        pageLabel.setText(text: "\(item.page)p")
     }
 }
 

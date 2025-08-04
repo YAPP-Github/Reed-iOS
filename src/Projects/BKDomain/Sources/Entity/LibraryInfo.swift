@@ -5,7 +5,7 @@ import Foundation
 public struct LibraryInfo {
     public let currentPage: Int?
     public let count: BookCountSet
-    public let books : [BookInfo]
+    public let books: [BookInfo]
     
     public init(
         currentPage: Int?,

@@ -4,7 +4,7 @@ import BKDesign
 import SnapKit
 import UIKit
 
-final class GoToSearchView: UIView {
+final class BookSearchEntryView: UIView {
     private let title = BKLabel(
         text: "책 등록하기",
         fontStyle: .body2(weight: .medium),
@@ -34,6 +34,7 @@ final class GoToSearchView: UIView {
         
         iconImage.snp.makeConstraints {
             $0.leading.equalTo(title.snp.trailing).offset(BKSpacing.spacing1)
+            $0.trailing.equalToSuperview()
             $0.centerY.equalToSuperview()
             $0.size.equalTo(20)
         }

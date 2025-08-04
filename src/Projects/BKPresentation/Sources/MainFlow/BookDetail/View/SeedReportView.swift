@@ -5,10 +5,10 @@ import SnapKit
 import UIKit
 
 enum EmotionSeed: String, CaseIterable {
-    case warmth = "#따뜻함"
-    case joy = "#즐거움"
-    case tension = "#긴장감"
-    case sadness = "#슬픔"
+    case warmth = "따뜻함"
+    case joy = "즐거움"
+    case tension = "긴장감"
+    case sadness = "슬픔"
     
     var image: UIImage {
         return BKImage.Graphics.empty
@@ -89,7 +89,7 @@ final class SeedReportView: BaseView {
                 .offset(LayoutConstants.contentSpacing)
             $0.height.equalTo(LayoutConstants.emotionReportHeight)
             $0.leading.trailing.equalToSuperview()
-                .inset(LayoutConstants.contentInset)
+                .inset(LayoutConstants.contentInset * 2)
         }
         
         reportContainer.snp.makeConstraints {

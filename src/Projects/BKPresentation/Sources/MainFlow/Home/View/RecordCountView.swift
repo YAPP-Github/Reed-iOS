@@ -18,37 +18,49 @@ final class RecordCountView: UIView {
     }
     
     private func setLayout() {
-        self.clipsToBounds = true
-        self.layer.masksToBounds = true
-        self.layer.cornerRadius = BKRadius.small
-        self.backgroundColor = .bkBaseColor(.secondary)
+        clipsToBounds = true
+        layer.masksToBounds = true
+        layer.cornerRadius = LayoutConstants.cornerRadius
+        backgroundColor = .bkBaseColor(.secondary)
         
         addSubviews(image, title)
         
         image.backgroundColor = .bkBaseColor(.primary)
         
         image.snp.makeConstraints {
-            $0.size.equalTo(28)
-            $0.verticalEdges.equalToSuperview().inset(8)
-            $0.leading.equalToSuperview().inset(12)
+            $0.size.equalTo(LayoutConstants.iconSize)
+            $0.verticalEdges.equalToSuperview()
+                .inset(LayoutConstants.verticalInset)
+            $0.leading.equalToSuperview()
+                .inset(LayoutConstants.horizontalInset)
         }
         
         title.snp.makeConstraints {
-            $0.leading.equalTo(image.snp.trailing).offset(4)
-            $0.verticalEdges.equalToSuperview().inset(8)
-            $0.trailing.equalToSuperview().inset(12)
+            $0.leading.equalTo(image.snp.trailing)
+                .offset(LayoutConstants.spacing)
+            $0.verticalEdges.equalToSuperview()
+                .inset(LayoutConstants.verticalInset)
+            $0.trailing.equalToSuperview()
+                .inset(LayoutConstants.horizontalInset)
         }
-        
     }
     
     public func configure(count: Int) {
         title.setText(text: "\(count)개")
         title.setFontStyle(style: .label1(weight: .medium))
         title.setColor(color: .bkContentColor(.secondary))
-        
         title.highlightedWord = "\(count)"
         title.highlightFont = BKTextStyle.label1(weight: .semiBold).uiFont
         title.highlightColor = .bkContentColor(.brand)
     }
-    
+}
+
+private extension RecordCountView {
+    enum LayoutConstants {
+        static let cornerRadius: CGFloat = BKRadius.small
+        static let iconSize: CGFloat = 28
+        static let verticalInset: CGFloat = 8
+        static let horizontalInset: CGFloat = 12
+        static let spacing: CGFloat = 4
+    }
 }
