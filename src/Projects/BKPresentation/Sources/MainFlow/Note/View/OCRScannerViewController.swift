@@ -82,7 +82,6 @@ final class OCRScannerViewController: UIViewController {
             for: .touchUpInside
         )
         
-        // 스캔 영역 뷰 (초록색 테두리)
         scanAreaView.backgroundColor = .clear
         scanAreaView.isUserInteractionEnabled = false
         

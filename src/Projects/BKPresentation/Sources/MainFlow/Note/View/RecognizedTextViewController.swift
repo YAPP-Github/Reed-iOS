@@ -1,5 +1,6 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import BKDesign
 import Combine
 import SnapKit
@@ -194,6 +195,7 @@ final class RecognizedTextViewController: UIViewController {
     private func handleSideEffect(_ sideEffect: RecognizedTextViewModel.SideEffect) {
         switch sideEffect {
         case .confirmWithSelectedText(let selectedText):
+            debugPulse(selectedText)
             onConfirm?(selectedText)
             
         case .dismissToRetake:
