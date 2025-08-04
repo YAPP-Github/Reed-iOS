@@ -58,8 +58,8 @@ private extension BottomTabBarController {
 
         appearance.stackedLayoutAppearance.normal.titleTextAttributes = normalAttrs
         appearance.stackedLayoutAppearance.selected.titleTextAttributes = selectedAttrs
-        appearance.stackedLayoutAppearance.normal.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -6)
-        appearance.stackedLayoutAppearance.selected.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -6)
+        appearance.stackedLayoutAppearance.normal.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -4)
+        appearance.stackedLayoutAppearance.selected.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -4)
     }
     
     func setupTabBarIconColors(appearance: UITabBarAppearance) {
