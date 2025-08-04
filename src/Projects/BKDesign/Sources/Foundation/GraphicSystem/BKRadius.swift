@@ -4,6 +4,7 @@ import UIKit
 
 public enum BKRadius {
     public static let none: CGFloat = 0
+    public static let shadow: CGFloat = 3
     public static let xsmall: CGFloat = 4
     public static let small: CGFloat = 8
     public static let medium: CGFloat = 12
