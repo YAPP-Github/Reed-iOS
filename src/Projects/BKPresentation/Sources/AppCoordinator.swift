@@ -70,6 +70,20 @@ private extension AppCoordinator {
         tabBarCoordinator.start()
     }
     
+    func startTermsFlow() {
+        let termsCoordinator = TermsCoordinator(
+            parentCoordinator: self,
+            navigationController: navigationController
+        )
+        
+        termsCoordinator.onFinish = { [weak self] in
+            self?.startMainFlow()
+        }
+        
+        addChildCoordinator(termsCoordinator)
+        termsCoordinator.start()
+    }
+    
     func startOnboardingFlow() {
         let onboardingCoordinator = OnboardingCoordinator(
             parentCoordinator: self,
