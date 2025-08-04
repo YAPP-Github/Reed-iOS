@@ -8,6 +8,7 @@ enum NoteViewEvent: Equatable {
     case completeForm(NoteForm)
     case didTapGuideButton
     case didTapOCRButton
+    case setScannedText(String)
 }
 
 final class NoteViewController: BaseViewController<NoteView> {
@@ -90,6 +91,12 @@ final class NoteViewController: BaseViewController<NoteView> {
                 self?.presentRegistrationSuccessDialog()
             }
             .store(in: &cancellable)
+    }
+}
+
+extension NoteViewController {
+    func setScannedText(_ text: String) {
+        contentView.handleEvent(.setScannedText(text))
     }
 }
 

@@ -197,3 +197,27 @@ private extension NoteView {
         static let horizontalInset = BKInset.inset5
     }
 }
+
+extension NoteView {
+    
+    /// 외부에서 이벤트를 직접 처리할 수 있는 메서드
+    func handleEvent(_ event: NoteViewEvent) {
+        switch event {
+        case .setScannedText(let text):
+            setScannedText(text)
+        default:
+            break
+        }
+    }
+    
+    /// OCR 텍스트를 SentenceRegistrationView에 설정
+    func setScannedText(_ text: String) {
+        sentenceView.setScannedText(text)
+        
+        // 현재 페이지가 문장 등록 페이지가 아니라면 해당 페이지로 이동
+        if pageControl.currentPage != 0 {
+            pageControl.currentPage = 0
+            pageControlChanged(pageControl)
+        }
+    }
+}

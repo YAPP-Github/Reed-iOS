@@ -128,6 +128,11 @@ extension SentenceRegistrationView: RegistrationFormProvidable, FormInputNotifia
     @objc func textScanButtonTapped() {
         onTextScanTapped?()
     }
+    
+    func setScannedText(_ text: String) {
+        sentenceTextView.setText(text)
+        inputChangedSubject.send(())
+    }
 }
 
 extension SentenceRegistrationView: UITextFieldDelegate {
