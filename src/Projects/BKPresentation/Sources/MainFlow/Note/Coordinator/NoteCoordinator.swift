@@ -13,6 +13,8 @@ final class NoteCoordinator: Coordinator, SessionExpirationNotifying {
     // Combine을 위한 cancellables 추가
     private var cancellables = Set<AnyCancellable>()
     
+    private weak var noteViewController: NoteViewController?
+    
     init(
         parentCoordinator: Coordinator?,
         navigationController: UINavigationController,
@@ -28,6 +30,8 @@ final class NoteCoordinator: Coordinator, SessionExpirationNotifying {
             viewModel: NoteViewModel(bookId: bookId)
         )
         viewController.coordinator = self
+        
+        self.noteViewController = viewController
         navigationController.pushViewController(viewController, animated: true)
     }
 }
@@ -68,7 +72,7 @@ extension NoteCoordinator {
             showRecognizedTextViewController(with: sentences)
             
         case .dismissScanner:
-            dismissOCRScanner()
+            navigationController.dismiss(animated: true)
             
         }
     }
@@ -112,29 +116,13 @@ extension NoteCoordinator {
     private func handleRecognizedTextSideEffect(_ sideEffect: RecognizedTextViewModel.SideEffect) {
         switch sideEffect {
         case .confirmWithSelectedText(let selectedText):
-            print("선택된 텍스트: \(selectedText)")
-            
-            // 선택된 텍스트 저장
-            saveRecognizedText(selectedText)
-            
-            // OCR 스캐너까지 모두 닫기
-            dismissOCRScanner()
+            noteViewController?.setScannedText(selectedText)
+            navigationController.dismiss(animated: true)
             
         case .dismissToRetake:
-            print("버튼 눌림")
             if let presentedViewController = navigationController.presentedViewController?.presentedViewController {
                 presentedViewController.dismiss(animated: true)
             }
         }
-    }
-    
-    /// OCR 스캐너 화면 닫기
-    private func dismissOCRScanner() {
-        navigationController.dismiss(animated: true)
-    }
-    
-    /// 인식된 텍스트를 노트로 저장하는 로직
-    private func saveRecognizedText(_ text: String) {
-        print("텍스트 저장: \(text)")
     }
 }
