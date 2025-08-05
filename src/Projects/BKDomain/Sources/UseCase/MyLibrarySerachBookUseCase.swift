@@ -2,7 +2,7 @@
 
 import Combine
 
-public struct LibrarySearchBookUseCase: SearchBookUseCase {
+public struct MyLibrarySearchBookUseCase: SearchBookUseCase {
     private let repository: BookRepository
     
     public init(repository: BookRepository) {

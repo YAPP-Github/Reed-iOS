@@ -38,7 +38,7 @@ extension MainFlowCoordinator {
         let searchCoordinator = SearchCoordinator(
             parentCoordinator: self,
             navigationController: navigationController,
-            searchViewType: .globalSearch
+            searchViewType: .defaultSearch
         )
         childCoordinators.append(searchCoordinator)
         searchCoordinator.start()

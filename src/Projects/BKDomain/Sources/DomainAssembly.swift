@@ -70,68 +70,64 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(
-            type: SearchBookUseCase.self,
-            name: "Global"
+            type: SearchBookUseCase.self
         ) { _ in
             @Autowired var repository: BookRepository
-            return GlobalSearchBookUseCase(repository: repository)
+            return DefaultSearchBookUseCase(repository: repository)
         }
         
         container.register(
             type: SearchBookUseCase.self,
-            name: "Library"
+            name: "MyLibrary"
         ) { _ in
             @Autowired var repository: BookRepository
-            return LibrarySearchBookUseCase(repository: repository)
+            return MyLibrarySearchBookUseCase(repository: repository)
         }
         
-        // Global RecentSearch UseCases
+        // Default RecentSearch UseCases
         container.register(
-            type: FetchRecentSearchUseCase.self,
-            name: "Global"
+            type: FetchRecentSearchUseCase.self
         ) { _ in
-            @Autowired(name: "Global") var repository: RecentSearchRepository
+            @Autowired var repository: RecentSearchRepository
             return DefaultFetchRecentSearchUseCase(repository: repository)
         }
 
         container.register(
-            type: StoreRecentSearchUseCase.self,
-            name: "Global"
+            type: StoreRecentSearchUseCase.self
         ) { _ in
-            @Autowired(name: "Global") var repository: RecentSearchRepository
+            @Autowired var repository: RecentSearchRepository
             return DefaultStoreRecentSearchUseCase(repository: repository)
         }
 
         container.register(
-            type: DeleteRecentSearchUseCase.self,
-            name: "Global"
+            type: DeleteRecentSearchUseCase.self
         ) { _ in
-            @Autowired(name: "Global") var repository: RecentSearchRepository
+            @Autowired var repository: RecentSearchRepository
             return DefaultDeleteRecentSearchUseCase(repository: repository)
         }
 
-        // Library RecentSearch UseCases
+        // MyLibrary RecentSearch UseCases
         container.register(
             type: FetchRecentSearchUseCase.self,
-            name: "Library"
+            name: "MyLibrary"
         ) { _ in
-            @Autowired(name: "Library") var repository: RecentSearchRepository
+            @Autowired(name: "MyLibrary") var repository: RecentSearchRepository
             return DefaultFetchRecentSearchUseCase(repository: repository)
         }
 
         container.register(
             type: StoreRecentSearchUseCase.self,
-            name: "Library"
+            name: "MyLibrary"
         ) { _ in
-            @Autowired(name: "Library") var repository: RecentSearchRepository
+            @Autowired(name: "MyLibrary") var repository: RecentSearchRepository
             return DefaultStoreRecentSearchUseCase(repository: repository)
         }
 
         container.register(
             type: DeleteRecentSearchUseCase.self,
-            name: "Library"
+            name: "MyLibrary"
         ) { _ in
-            @Autowired(name: "Library") var repository: RecentSearchRepository
+            @Autowired(name: "MyLibrary") var repository: RecentSearchRepository
             return DefaultDeleteRecentSearchUseCase(repository: repository)
         }
         

@@ -28,7 +28,7 @@ extension ArchiveCoordinator {
         let searchCoordinator = SearchCoordinator(
             parentCoordinator: self,
             navigationController: navigationController,
-            searchViewType: .archiveSearch
+            searchViewType: .myLibrarySearch
         )
         searchCoordinator.start()
         childCoordinators.append(searchCoordinator)
