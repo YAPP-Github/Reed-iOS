@@ -5,11 +5,15 @@ import Foundation
 
 public final class DefaultRecentSearchRepository: RecentSearchRepository {
     private let storage: KeyValueStorage
-    private let key = "recent_searches"
+    private let key: String
     private let maxCount = 10
 
-    public init(storage: KeyValueStorage) {
+    public init(
+        storage: KeyValueStorage,
+        key: String
+    ) {
         self.storage = storage
+        self.key = key
     }
 
     public func load() -> [String] {
