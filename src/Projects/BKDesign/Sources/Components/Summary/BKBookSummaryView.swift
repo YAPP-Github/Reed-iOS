@@ -30,12 +30,10 @@ public enum BKBookSummaryViewStyle {
 
     var labelStackSpacing: CGFloat {
         switch self {
-        case .regular, .compact:
+        case .regular, .compact, .record:
             return BKSpacing.spacing1
         case .big:
             return BKSpacing.spacing2
-        case .record:
-            return BKSpacing.spacing1
         }
     }
 
@@ -47,18 +45,19 @@ public enum BKBookSummaryViewStyle {
 public class BKBookSummaryView: UIView {
     private let thumbnail = UIImageView()
     private let labelStack: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .vertical
-        sv.alignment = .leading
-        return sv
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .leading
+        return stackView
     }()
+    
     private let titleLabel = BKLabel(fontStyle: .body1(weight: .semiBold))
     private let descriptionStack: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .horizontal
-        sv.spacing = .zero
-        sv.alignment = .leading
-        return sv
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = .zero
+        stackView.alignment = .leading
+        return stackView
     }()
     private let authorLabel = BKLabel(fontStyle: .label1(weight: .medium), color: .bkContentColor(.disable))
     private let separatorLabel = BKLabel(text: " | ", fontStyle: .label1(weight: .medium), color: .bkContentColor(.disable))
@@ -95,6 +94,7 @@ public class BKBookSummaryView: UIView {
             descriptionStack.addArrangedSubview(authorLabel)
             descriptionStack.addArrangedSubview(separatorLabel)
             descriptionStack.addArrangedSubview(publisherLabel)
+            labelStack.setCustomSpacing(BKSpacing.spacing3, after: descriptionStack)
         } else {
             let descriptionBlock = UIStackView(arrangedSubviews: [descriptionStack])
             descriptionBlock.axis = .vertical
