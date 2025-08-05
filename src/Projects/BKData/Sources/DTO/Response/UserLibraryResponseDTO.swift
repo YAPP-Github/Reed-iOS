@@ -34,7 +34,7 @@ public struct UserLibraryResponseDTO: Decodable {
         return next < books.page.totalPages ? next : nil
     }
     
-    public func getBooks() -> [BookInfo] {
+    public func getBookInfos() -> [BookInfo] {
         return books.content.map { $0.toBookInfo() }
     }
 }

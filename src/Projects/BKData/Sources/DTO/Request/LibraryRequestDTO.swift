@@ -5,27 +5,27 @@ import Foundation
 
 struct LibraryRequestDTO: DictionaryRepresentable {
     let title: String?
-    let status: BookStatus
-    let sortType: LibrarySortType
-    let pageNumber: Int?
-    let pageSize: Int?
+    let status: BookStatus?
+    let sort: LibrarySortType?
+    let page: Int?
+    let size: Int?
     
     var dictionary: [String: Any] {
         return self.toDictionary()
     }
     
     init(
-        title: String?,
-        status: BookStatus,
-        sortType: LibrarySortType,
-        pageNumber: Int?,
-        pageSize: Int?
+        title: String? = nil,
+        status: BookStatus? = nil,
+        sortType: LibrarySortType? = nil,
+        pageNumber: Int? = nil,
+        pageSize: Int? = nil
     ) {
         self.title = title
         self.status = status
-        self.sortType = sortType
-        self.pageNumber = pageNumber
-        self.pageSize = pageSize
+        self.sort = sortType
+        self.page = pageNumber
+        self.size = pageSize
     }
     
     init(_ entity: MyLibraryParameters) {

@@ -52,7 +52,7 @@ public struct DefaultBookRepository: BookRepository {
             return LibraryInfo(
                 currentPage: $0.nextPageNumber(),
                 count: $0.toBookCountSet(),
-                books: $0.getBooks()
+                books: $0.getBookInfos()
             )
         }
         .eraseToAnyPublisher()
