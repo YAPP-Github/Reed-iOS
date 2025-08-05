@@ -81,23 +81,23 @@ final class SearchView: BaseView {
         var snapshot = NSDiffableDataSourceSnapshot<SearchSection, SearchItem>()
         
         switch state {
-        case .recent(let keywords):
-            if keywords.isEmpty {
-                collectionView.backgroundView = makeEmptyLabel("최근 검색어 내역이 없습니다.")
+        case .recent(let state):
+            if state.queries.isEmpty {
+                collectionView.backgroundView = makeEmptyLabel(state.placeholder)
             } else {
                 collectionView.backgroundView = nil
                 header.setTitle(.recent)
                 snapshot.appendSections([.recent])
-                snapshot.appendItems(keywords.map { .keyword($0) }, toSection: .recent)
+                snapshot.appendItems(state.queries.map { .query($0) }, toSection: .recent)
             }
             
-        case .result(let results):
-            if results.isEmpty {
+        case .result(let state):
+            if state.books.isEmpty {
                 collectionView.backgroundView = makeEmptyLabel("검색어와 일치하는 도서가 없습니다.")
             } else {
                 collectionView.backgroundView = nil
                 snapshot.appendSections([.result])
-                snapshot.appendItems(results.map { .result($0) }, toSection: .result)
+                snapshot.appendItems(state.books.map { .result($0) }, toSection: .result)
             }
             header.setTitle(.result(count: count))
             layoutMode = .afterSearch
@@ -123,7 +123,7 @@ private extension SearchView {
             collectionView: collectionView
         ) { collectionView, indexPath, item in
             switch item {
-            case .keyword(let keyword):
+            case .query(let keyword):
                 return self.makeRecentKeywordCell(in: collectionView, at: indexPath, keyword: keyword)
             case .result(let result):
                 return self.makeSearchResultCell(in: collectionView, at: indexPath, book: result)
@@ -167,13 +167,15 @@ private extension SearchView {
         ) as? SearchResultCell else {
             return UICollectionViewCell()
         }
+        
         cell.configure(
             title: book.title,
             description: .init(
                 author: book.author,
                 publisher: book.publisher
             ),
-            image: book.thumbnail
+            image: book.thumbnail,
+            recordCount: book.recordCount
         )
         return cell
     }
