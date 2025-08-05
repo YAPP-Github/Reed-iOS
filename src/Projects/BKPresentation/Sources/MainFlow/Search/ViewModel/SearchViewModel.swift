@@ -10,6 +10,23 @@ enum SearchItem: Hashable {
     case result(Book)
 }
 
+enum SearchViewType: String {
+    case globalSearch = "Global"
+    case archiveSearch = "Library"
+    
+    var recentPlaceholder: String {
+        return "최근 검색어가 없습니다."
+    }
+
+    var resultPlaceholder: String {
+        switch self {
+        case .globalSearch:
+            return "검색어와 일치하는 도서가 없습니다."
+        case .archiveSearch:
+            return "내 서재에 해당 도서가 없습니다."
+        }
+    }
+}
 final class SearchViewModel: BaseViewModel {
     enum SearchState: Equatable {
         case recent([String])
@@ -64,7 +81,8 @@ final class SearchViewModel: BaseViewModel {
         $state.eraseToAnyPublisher()
     }
     
-    init() {
+    init(searchViewType: SearchViewType) {
+        self.searchViewType = searchViewType
         bindSideEffects()
     }
     
