@@ -39,7 +39,27 @@ public struct DefaultBookRepository: BookRepository {
         .eraseToAnyPublisher()
     }
     
-    public func myLibrary(_ parameters: MyLibraryParameters) -> AnyPublisher<LibraryInfo, Error> {
+    public func searchMyLibrary(
+        _ parameters: MyLibraryParameters
+    ) -> AnyPublisher<([Book], totalResults: Int), Never> {
+        networkProvider.request(
+            target: BookAPI.myLibrary(
+                parameter: LibraryRequestDTO(parameters)
+            ),
+            type: UserLibraryResponseDTO.self
+        )
+        .map { ($0.getBookInfos(), $0.books.page.totalElements) }
+        .map { bookInfo, count in
+            let books = bookInfo.map { $0.toBook() }
+            return (books, count)
+        }
+        .catch { _ in Just(([], 0)) }
+        .eraseToAnyPublisher()
+    }
+    
+    public func myLibrary(
+        _ parameters: MyLibraryParameters
+    ) -> AnyPublisher<LibraryInfo, Error> {
         networkProvider.request(
             target: BookAPI.myLibrary(
                 parameter: LibraryRequestDTO(parameters)
