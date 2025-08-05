@@ -70,13 +70,6 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(
-            type: FetchRecentSearchUseCase.self
-        ) { _ in
-            @Autowired var repository: RecentSearchRepository
-            return DefaultFetchRecentSearchUseCase(repository: repository)
-        }
-        
-        container.register(
             type: SearchBookUseCase.self
         ) { _ in
             @Autowired var repository: BookRepository
@@ -84,16 +77,57 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(
+            type: SearchBookUseCase.self,
+            name: "MyLibrary"
+        ) { _ in
+            @Autowired var repository: BookRepository
+            return MyLibrarySearchBookUseCase(repository: repository)
+        }
+        
+        // Default RecentSearch UseCases
+        container.register(
+            type: FetchRecentSearchUseCase.self
+        ) { _ in
+            @Autowired var repository: RecentSearchRepository
+            return DefaultFetchRecentSearchUseCase(repository: repository)
+        }
+
+        container.register(
             type: StoreRecentSearchUseCase.self
         ) { _ in
             @Autowired var repository: RecentSearchRepository
             return DefaultStoreRecentSearchUseCase(repository: repository)
         }
-        
+
         container.register(
             type: DeleteRecentSearchUseCase.self
         ) { _ in
             @Autowired var repository: RecentSearchRepository
+            return DefaultDeleteRecentSearchUseCase(repository: repository)
+        }
+
+        // MyLibrary RecentSearch UseCases
+        container.register(
+            type: FetchRecentSearchUseCase.self,
+            name: "MyLibrary"
+        ) { _ in
+            @Autowired(name: "MyLibrary") var repository: RecentSearchRepository
+            return DefaultFetchRecentSearchUseCase(repository: repository)
+        }
+
+        container.register(
+            type: StoreRecentSearchUseCase.self,
+            name: "MyLibrary"
+        ) { _ in
+            @Autowired(name: "MyLibrary") var repository: RecentSearchRepository
+            return DefaultStoreRecentSearchUseCase(repository: repository)
+        }
+
+        container.register(
+            type: DeleteRecentSearchUseCase.self,
+            name: "MyLibrary"
+        ) { _ in
+            @Autowired(name: "MyLibrary") var repository: RecentSearchRepository
             return DefaultDeleteRecentSearchUseCase(repository: repository)
         }
         

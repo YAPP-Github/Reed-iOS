@@ -12,6 +12,7 @@ public struct BookInfo: Equatable {
     public let publisher: String
     public let createdAt: Date?
     public let updatedAt: Date?
+    public let recordCount: Int
     
     public init(
         bookId: String,
@@ -22,7 +23,8 @@ public struct BookInfo: Equatable {
         imageUrl: URL?,
         publisher: String,
         createdAt: Date?,
-        updatedAt: Date?
+        updatedAt: Date?,
+        recordCount: Int
     ) {
         self.bookId = bookId
         self.isbn = isbn
@@ -33,5 +35,18 @@ public struct BookInfo: Equatable {
         self.publisher = publisher
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.recordCount = recordCount
+    }
+    
+    public func toBook() -> Book {
+        return Book(
+            isbn: isbn,
+            title: title,
+            author: author,
+            publisher: publisher,
+            thumbnail: imageUrl,
+            userBookStatus: status.rawValue,
+            recordCount: recordCount
+        )
     }
 }

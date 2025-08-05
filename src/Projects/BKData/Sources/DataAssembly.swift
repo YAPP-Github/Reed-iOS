@@ -60,7 +60,21 @@ public struct DataAssembly: Assembly {
             type: RecentSearchRepository.self
         ) { _ in
             @Autowired(name: "UserDefaults") var storage: KeyValueStorage
-            return DefaultRecentSearchRepository(storage: storage)
+            return DefaultRecentSearchRepository(
+                storage: storage,
+                key: "recent_searches_default"
+            )
+        }
+        
+        container.register(
+            type: RecentSearchRepository.self,
+            name: "MyLibrary"
+        ) { _ in
+            @Autowired(name: "UserDefaults") var storage: KeyValueStorage
+            return DefaultRecentSearchRepository(
+                storage: storage,
+                key: "recent_searches_my_library"
+            )
         }
         
         container.register(

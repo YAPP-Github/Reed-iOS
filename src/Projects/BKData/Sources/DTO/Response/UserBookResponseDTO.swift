@@ -14,6 +14,7 @@ public struct UserBookResponseDTO: Decodable {
     let publisher: String
     let createdDate: String
     let updatedDate: String
+    let recordCount: Int
 
     enum CodingKeys: String, CodingKey {
         case id = "userBookId"
@@ -26,6 +27,7 @@ public struct UserBookResponseDTO: Decodable {
         case publisher
         case createdDate = "createdAt"
         case updatedDate = "updatedAt"
+        case recordCount
     }
 
     public func toBookInfo() -> BookInfo {
@@ -38,7 +40,8 @@ public struct UserBookResponseDTO: Decodable {
             imageUrl: URL(string: coverURL),
             publisher: publisher,
             createdAt: DateParser.parse(createdDate),
-            updatedAt: DateParser.parse(updatedDate)
+            updatedAt: DateParser.parse(updatedDate),
+            recordCount: recordCount
         )
     }
 }

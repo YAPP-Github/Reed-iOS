@@ -7,16 +7,22 @@ final class SearchCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     var navigationController: UINavigationController
     
+    private let searchViewType: SearchViewType
+    
     init(
         parentCoordinator: Coordinator?,
-        navigationController: UINavigationController
+        navigationController: UINavigationController,
+        searchViewType: SearchViewType
     ) {
         self.parentCoordinator = parentCoordinator
         self.navigationController = navigationController
+        self.searchViewType = searchViewType
     }
     
     func start() {
-        let searchViewController = SearchViewController(viewModel: SearchViewModel())
+        let searchViewController = SearchViewController(
+            viewModel: SearchViewModel(searchViewType: searchViewType)
+        )
         searchViewController.coordinator = self
         navigationController.pushViewController(searchViewController, animated: true)
     }

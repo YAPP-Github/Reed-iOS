@@ -6,18 +6,48 @@ import Combine
 import Foundation
 
 enum SearchItem: Hashable {
-    case keyword(String)
+    case query(String)
     case result(Book)
+}
+
+struct RecentState: Equatable {
+    let queries: [String]
+    let placeholder: String
+}
+
+struct ResultState: Equatable {
+    let books: [Book]
+    let placeholder: String
+}
+
+enum SearchViewType: String {
+    case defaultSearch = "Default"
+    case myLibrarySearch = "MyLibrary"
+    
+    var recentPlaceholder: String {
+        return "최근 검색어가 없습니다."
+    }
+
+    var resultPlaceholder: String {
+        switch self {
+        case .defaultSearch:
+            return "검색어와 일치하는 도서가 없습니다."
+        case .myLibrarySearch:
+            return "내 서재에 해당 도서가 없습니다."
+        }
+    }
 }
 
 final class SearchViewModel: BaseViewModel {
     enum SearchState: Equatable {
-        case recent([String])
-        case result([Book])
+        case recent(RecentState)
+        case result(ResultState)
     }
     
     struct State: Equatable {
-        var searchState: SearchState = .recent([])
+        var searchState: SearchState = .recent(
+            RecentState(queries: [], placeholder: "")
+        )
         var bookId: String?
         var noteReadied = false
         var isLoading = false
@@ -53,18 +83,36 @@ final class SearchViewModel: BaseViewModel {
     private var allBooks: [Book] = []
     private var currentQuery: String?
     private var currentPage = 1
+    private let searchViewType: SearchViewType
     
-    @Autowired var fetchRecentSearchUseCase: FetchRecentSearchUseCase
-    @Autowired var storeRecentSearchUseCase: StoreRecentSearchUseCase
-    @Autowired var deleteRecentSearchUseCase: DeleteRecentSearchUseCase
-    @Autowired var searchBookUseCase: SearchBookUseCase
-    @Autowired var upsertUseCase: BookUpsertUseCase
+    private lazy var fetchRecentSearchUseCase: FetchRecentSearchUseCase = {
+        @Autowired(name: searchViewType.rawValue) var useCase: FetchRecentSearchUseCase
+        return useCase
+    }()
+    
+    private lazy var storeRecentSearchUseCase: StoreRecentSearchUseCase = {
+        @Autowired(name: searchViewType.rawValue) var useCase: StoreRecentSearchUseCase
+        return useCase
+    }()
+    
+    private lazy var deleteRecentSearchUseCase: DeleteRecentSearchUseCase = {
+        @Autowired(name: searchViewType.rawValue) var useCase: DeleteRecentSearchUseCase
+        return useCase
+    }()
+    
+    private lazy var searchBookUseCase: SearchBookUseCase = {
+        @Autowired(name: searchViewType.rawValue) var useCase: SearchBookUseCase
+        return useCase
+    }()
+    
+    @Autowired private var upsertUseCase: BookUpsertUseCase
     
     var statePublisher: AnyPublisher<State, Never> {
         $state.eraseToAnyPublisher()
     }
     
-    init() {
+    init(searchViewType: SearchViewType) {
+        self.searchViewType = searchViewType
         bindSideEffects()
     }
     
@@ -84,19 +132,29 @@ final class SearchViewModel: BaseViewModel {
             
         case .search(let query):
             currentQuery = query
-            currentPage = 1
+            currentPage = searchViewType == .defaultSearch ? 1 : 0
             allBooks = []
             newState.isLoading = true
             effects.append(.searchResult(query))
             
         case .fetchRecentQueriesSuccessed(let queries):
-            newState.searchState = .recent(queries)
+            newState.searchState = .recent(
+                RecentState(
+                    queries: queries,
+                    placeholder: searchViewType.recentPlaceholder
+                )
+            )
             
         case .fetchSearchResultSuccessed(let result):
             allBooks = result.books
             newState.totalResults = result.totalResults
             newState.isLoading = false
-            newState.searchState = .result(result.books)
+            newState.searchState = .result(
+                ResultState(
+                    books: result.books,
+                    placeholder: searchViewType.resultPlaceholder
+                )
+            )
             newState.hasMoreData = allBooks.count < result.totalResults
             
         case .loadNextPage:
@@ -117,7 +175,12 @@ final class SearchViewModel: BaseViewModel {
             
             allBooks += unique
             newState.isLoading = false
-            newState.searchState = .result(allBooks)
+            newState.searchState = .result(
+                ResultState(
+                    books: allBooks,
+                    placeholder: searchViewType.resultPlaceholder
+                )
+            )
             newState.hasMoreData = allBooks.count < newState.totalResults
             
         case .deleteRecentQuery(let query):

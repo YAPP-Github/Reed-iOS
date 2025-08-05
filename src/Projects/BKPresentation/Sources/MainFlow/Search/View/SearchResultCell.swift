@@ -13,18 +13,12 @@ final class SearchResultCell: UICollectionViewCell {
     
     static let identifier = "SearchResultCell"
 
-    private let resultView = BKBookSummaryView()
+    private var resultView: BKBookSummaryView?
     private let dividerView = BKDivider(type: .small)
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.addSubviews(resultView, dividerView)
-
-        resultView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(dividerView.snp.top)
-        }
-
+        contentView.addSubview(dividerView)
         dividerView.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview()
         }
@@ -36,18 +30,32 @@ final class SearchResultCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        resultView.clearView()
+        resultView?.clearView()
     }
 
     func configure(
         title: String,
         description: BookDescription,
-        image: URL?
+        image: URL?,
+        recordCount: Int? = nil
     ) {
-        resultView.configure(
+        if resultView == nil {
+            let view = BKBookSummaryView(
+                style: recordCount != nil ? .record : .regular
+            )
+            contentView.addSubview(view)
+            view.snp.makeConstraints {
+                $0.top.leading.trailing.equalToSuperview()
+                $0.bottom.equalTo(dividerView.snp.top)
+            }
+            self.resultView = view
+        }
+        
+        resultView?.configure(
             title: title,
             author: description.author,
             publisher: description.publisher,
+            recordCount: recordCount,
             image: image
         )
     }

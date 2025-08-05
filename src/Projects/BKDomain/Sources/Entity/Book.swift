@@ -9,6 +9,7 @@ public struct Book: Hashable {
     public let publisher: String
     public let thumbnail: URL?
     public let userBookStatus: String
+    public let recordCount: Int?
     
     public init(
         isbn: String,
@@ -16,7 +17,8 @@ public struct Book: Hashable {
         author: String,
         publisher: String,
         thumbnail: URL?,
-        userBookStatus: String
+        userBookStatus: String,
+        recordCount: Int? = nil
     ) {
         self.isbn = isbn
         self.title = title
@@ -24,5 +26,6 @@ public struct Book: Hashable {
         self.publisher = publisher
         self.thumbnail = thumbnail
         self.userBookStatus = userBookStatus
+        self.recordCount = recordCount
     }
 }
