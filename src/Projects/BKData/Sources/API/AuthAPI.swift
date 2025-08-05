@@ -4,7 +4,11 @@ import BKDomain
 import Foundation
 
 public enum AuthAPI {
-    case login(provider: AuthProvider, token: String)
+    case login(
+        provider: AuthProvider,
+        token: String,
+        authorizationCode: String?
+    )
     case logout
     case refresh(token: String)
     case me
@@ -55,10 +59,11 @@ extension AuthAPI: RequestTarget {
     
     public var body: (any Encodable)? {
         switch self {
-        case .login(let provider, let token):
+        case .login(let provider, let token, let authCode):
             return AuthLoginRequestDTO(
                 providerType: provider,
-                oauthToken: token
+                oauthToken: token,
+                authorizationCode: authCode
             )
         case .refresh(let token):
             return RefreshRequestDTO(
