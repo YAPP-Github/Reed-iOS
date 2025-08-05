@@ -70,10 +70,11 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(
-            type: FetchRecentSearchUseCase.self
+            type: SearchBookUseCase.self,
+            name: "Global"
         ) { _ in
-            @Autowired var repository: RecentSearchRepository
-            return DefaultFetchRecentSearchUseCase(repository: repository)
+            @Autowired var repository: BookRepository
+            return GlobalSearchBookUseCase(repository: repository)
         }
         
         container.register(
