@@ -84,6 +84,16 @@ final class NoteViewController: BaseViewController<NoteView> {
         
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
+            .map { $0.shouldStartEditing }
+            .filter { $0 }
+            .removeDuplicates()
+            .sink { [weak self] _ in
+                self?.contentView.startEditingIfNeeded() 
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
             .removeDuplicates { $0.createCompleted == $1.createCompleted }
             .filter { $0.createCompleted }
             .sink { [weak self] _ in

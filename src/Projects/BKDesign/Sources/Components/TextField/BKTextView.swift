@@ -100,8 +100,14 @@ public final class BKTextView: UIView {
     }
     
     public func startEditing() {
-        textView.selectedRange = NSRange(location: 0, length: 0)
-        textView.becomeFirstResponder()
+        guard window != nil, superview != nil else { return }
+
+        if textView.window != nil, !textView.isFirstResponder {
+            DispatchQueue.main.async {
+                self.textView.selectedRange = NSRange(location: 0, length: 0)
+                self.textView.becomeFirstResponder()
+            }
+        }
     }
 }
 

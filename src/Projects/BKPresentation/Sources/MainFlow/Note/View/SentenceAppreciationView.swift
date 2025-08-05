@@ -85,8 +85,7 @@ final class SentenceAppreciationView: BaseView {
         appreciationTextView.setText(content)
     }
     
-    func setTextWithStartEditing(_ content: String) {
-        appreciationTextView.setText(content)
+    func startEditingIfNeeded() {
         appreciationTextView.startEditing()
     }
 }
