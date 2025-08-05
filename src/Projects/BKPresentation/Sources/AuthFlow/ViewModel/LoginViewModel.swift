@@ -85,7 +85,8 @@ final class LoginViewModel: BaseViewModel {
                     guard let self else { return Empty<Action, Never>().eraseToAnyPublisher() }
                     return self.socialTokenAuthUseCase.execute(
                         provider: .apple,
-                        token: token
+                        token: token.identityToken,
+                        authorizationCode: token.authorizationCode
                     )
                     .map { _ in Action.loginSuccess }
                     .catch { Just(Action.authFailed(message: $0.localizedDescription)) }
@@ -100,7 +101,8 @@ final class LoginViewModel: BaseViewModel {
                     guard let self = self else { return Empty<Action, Never>().eraseToAnyPublisher() }
                     return self.socialTokenAuthUseCase.execute(
                         provider: .kakao,
-                        token: token
+                        token: token.identityToken,
+                        authorizationCode: nil
                     )
                     .map { _ in Action.loginSuccess }
                     .catch { Just(Action.authFailed(message: $0.localizedDescription)) }
