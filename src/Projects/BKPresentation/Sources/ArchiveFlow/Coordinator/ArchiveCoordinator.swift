@@ -24,5 +24,13 @@ final class ArchiveCoordinator: Coordinator {
 
 extension ArchiveCoordinator {
     // Archive 관련 네비게이션 메서드들을 여기에 추가
-    
+    func didTapSearchButton() {
+        let searchCoordinator = SearchCoordinator(
+            parentCoordinator: self,
+            navigationController: navigationController,
+            searchViewType: .archiveSearch
+        )
+        searchCoordinator.start()
+        childCoordinators.append(searchCoordinator)
+    }
 }
