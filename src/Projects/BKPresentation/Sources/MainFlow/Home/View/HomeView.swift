@@ -102,7 +102,7 @@ final class HomeView: BaseView {
     
     override func setupLayout() {
         backgroundColorView.snp.makeConstraints {
-            $0.top.equalToSuperview()
+            $0.top.equalTo(safeAreaLayoutGuide)
             $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
             $0.height.equalTo(LayoutConstants.backgroundHeight)
         }
@@ -120,17 +120,19 @@ final class HomeView: BaseView {
         mainTitleLabel.snp.makeConstraints {
             $0.top.leading.equalToSuperview()
         }
+        mainTitleLabel.sizeToFit()
         
         searchButton.snp.makeConstraints {
             $0.top.equalTo(mainTitleLabel.snp.bottom)
                 .offset(LayoutConstants.titleToSearchButtonSpacing)
             $0.leading.equalToSuperview()
+            $0.height.equalTo(22)
         }
         
+        // TODO : 파일 교체 예정
         graphicImageView.snp.makeConstraints {
             $0.top.bottom.trailing.equalToSuperview()
-            $0.leading.equalTo(mainTitleLabel.snp.trailing)
-                .offset(LayoutConstants.titleToGraphicSpacing)
+            $0.height.width.equalTo(144)
         }
         
         bookSectionTitleLabel.snp.makeConstraints {
@@ -142,7 +144,6 @@ final class HomeView: BaseView {
         
         bookCollectionView.snp.makeConstraints {
             $0.top.equalTo(bookSectionTitleLabel.snp.bottom)
-                .offset(LayoutConstants.collectionTopSpacing)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(LayoutConstants.collectionHeight)
         }
@@ -155,7 +156,6 @@ final class HomeView: BaseView {
         
         pageControl.snp.makeConstraints {
             $0.top.equalTo(bookCollectionView.snp.bottom)
-                .offset(LayoutConstants.pageControlTopSpacing)
             $0.centerX.equalToSuperview()
             $0.height.equalTo(LayoutConstants.pageControlHeight)
         }
@@ -211,8 +211,7 @@ extension HomeView: UICollectionViewDelegateFlowLayout {
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
         let width = collectionView.frame.width - LayoutConstants.cellWidthOffset
-        let height = collectionView.frame.height
-        return CGSize(width: width, height: height)
+        return CGSize(width: width, height: 362)
     }
     
     func collectionView(
@@ -263,7 +262,7 @@ private extension HomeView {
 
 private extension HomeView {
     enum LayoutConstants {
-        static let backgroundHeight: CGFloat = 259
+        static let backgroundHeight: CGFloat = 155
         static let topAreaTopInset: CGFloat = 16
         static let topAreaLeading: CGFloat = 24
         static let topAreaTrailing: CGFloat = 20
@@ -276,7 +275,7 @@ private extension HomeView {
         static let sectionTitleHorizontalInset: CGFloat = 20
 
         static let collectionTopSpacing: CGFloat = 12
-        static let collectionHeight: CGFloat = 330
+        static let collectionHeight: CGFloat = 362
 
         static let pageControlTopSpacing: CGFloat = 20
         static let pageControlHeight: CGFloat = 6
