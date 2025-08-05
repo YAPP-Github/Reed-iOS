@@ -4,5 +4,5 @@ import Combine
 import Foundation
 
 public protocol SocialLoginUseCase {
-    func execute() -> AnyPublisher<String, AuthError>
+    func execute() -> AnyPublisher<SocialLoginToken, AuthError>
 }

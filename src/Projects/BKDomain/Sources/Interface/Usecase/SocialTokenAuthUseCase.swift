@@ -7,6 +7,7 @@ import Foundation
 public protocol SocialTokenAuthUseCase {
     func execute(
         provider: AuthProvider,
-        token: String
+        token: String,
+        authorizationCode: String?
     ) -> AnyPublisher<Void, AuthError>
 }

@@ -13,11 +13,13 @@ public struct DefaultSocialTokenAuthUseCase: SocialTokenAuthUseCase {
     
     public func execute(
         provider: AuthProvider,
-        token: String
+        token: String,
+        authorizationCode: String?
     ) -> AnyPublisher<Void, AuthError> {
         return repository.login(
             provider: provider,
-            token: token
+            token: token,
+            authorizationCode: authorizationCode
         )
     }
 }
