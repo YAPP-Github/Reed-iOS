@@ -49,7 +49,25 @@ private extension AppCoordinator {
         )
         
         loginCoordinator.onFinish = { [weak self] in
-            self?.startMainFlow()
+            guard let self else { return }
+            authStateUseCase.execute()
+                .receive(on: DispatchQueue.main)
+                .map(\.termsAgreed)
+                .sink(
+                    receiveCompletion: { completion in
+                        if case .failure = completion {
+                            self.startAuthFlow()
+                        }
+                    },
+                    receiveValue: { termsAgreed in
+                        if termsAgreed {
+                            self.startMainFlow()
+                        } else {
+                            self.startTermsFlow()
+                        }
+                    }
+                )
+                .store(in: &cancellable)
         }
         
         addChildCoordinator(loginCoordinator)
@@ -70,6 +88,20 @@ private extension AppCoordinator {
         tabBarCoordinator.start()
     }
     
+    func startTermsFlow() {
+        let termsCoordinator = TermsCoordinator(
+            parentCoordinator: self,
+            navigationController: navigationController
+        )
+        
+        termsCoordinator.onFinish = { [weak self] in
+            self?.startMainFlow()
+        }
+        
+        addChildCoordinator(termsCoordinator)
+        termsCoordinator.start()
+    }
+    
     func startOnboardingFlow() {
         let onboardingCoordinator = OnboardingCoordinator(
             parentCoordinator: self,
@@ -87,13 +119,21 @@ private extension AppCoordinator {
         authStateUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
+                guard let self else { return }
                 switch completion {
                 case .finished:
-                    self?.startMainFlow()
+                    break
                 case .failure:
-                    self?.startAuthFlow()
+                    self.startAuthFlow()
                 }
-            }, receiveValue: { _ in })
+            }, receiveValue: { [weak self] userProfile in
+                guard let self else { return }
+                if userProfile.termsAgreed {
+                    self.startMainFlow()
+                } else {
+                    self.startTermsFlow()
+                }
+            })
             .store(in: &cancellable)
     }
 }

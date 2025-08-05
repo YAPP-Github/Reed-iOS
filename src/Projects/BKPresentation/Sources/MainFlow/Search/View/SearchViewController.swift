@@ -73,7 +73,7 @@ final class SearchViewController: BaseViewController<SearchView> {
                 if case let .upsertBook(isbn) = event { return isbn }
                 return nil
             }
-            .removeDuplicates()
+            .throttle(for: .milliseconds(800), scheduler: RunLoop.main, latest: false)
             .sink { [weak self] query in
                 self?.presentBookRegistration(with: query)
             }

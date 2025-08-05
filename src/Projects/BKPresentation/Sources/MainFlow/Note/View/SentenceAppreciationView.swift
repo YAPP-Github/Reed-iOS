@@ -84,6 +84,10 @@ final class SentenceAppreciationView: BaseView {
     func setText(_ content: String) {
         appreciationTextView.setText(content)
     }
+    
+    func startEditingIfNeeded() {
+        appreciationTextView.startEditing()
+    }
 }
 
 extension SentenceAppreciationView: RegistrationFormProvidable, FormInputNotifiable {

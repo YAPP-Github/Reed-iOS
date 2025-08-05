@@ -3,7 +3,7 @@
 import Foundation
 
 public struct SearchBookResult: Decodable {
-    public let isbn: String
+    public let isbn13: String
     public let title: String
     public let author: String
     public let publisher: String
@@ -14,7 +14,7 @@ public struct SearchBookResult: Decodable {
 public extension SearchBookResult {
     func toBook() -> Book {
         return Book(
-            isbn: isbn,
+            isbn: isbn13,
             title: title,
             author: author,
             publisher: publisher,

@@ -9,6 +9,7 @@ enum HomeViewEvent: Equatable {
     case didTapRecordButton(String)
     case didTapBook(String)
     case didTapSearchButton
+    case didTapEmptyBook
 }
 
 final class HomeViewController: BaseViewController<HomeView> {
@@ -49,6 +50,8 @@ final class HomeViewController: BaseViewController<HomeView> {
                 case .didTapRecordButton(let bookId):
                     self?.coordinator?.didTapNoteButton(bookId: bookId)
                 case .didTapSearchButton:
+                    self?.coordinator?.didTapSearchButton()
+                case .didTapEmptyBook:
                     self?.coordinator?.didTapSearchButton()
                 }
             }

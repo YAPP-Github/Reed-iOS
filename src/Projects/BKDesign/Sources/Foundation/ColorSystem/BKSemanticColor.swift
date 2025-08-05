@@ -12,6 +12,7 @@ public enum BKSemanticColor {
         case primaryPressed
         case secondaryPressed
         case tertiaryPressed
+        case home
         case disable
         
         public func resolve(for mode: BKColorMode) -> UIColor {
@@ -24,6 +25,7 @@ public enum BKSemanticColor {
                 case .primaryPressed: return BKAtomicColor.Green.g600.color
                 case .secondaryPressed: return BKAtomicColor.Neutral.n200.color
                 case .tertiaryPressed: return BKAtomicColor.Green.g200.color
+                case .home: return UIColor(hex: "#F2F8E9")
                 case .disable: return BKAtomicColor.Neutral.n200.color
                 }
             // case .dark: // 추후 다크 모드 색상을 여기에 정의합니다.
@@ -160,6 +162,19 @@ public enum BKSemanticColor {
                 }
             // case .dark:
                 // switch self { /* dark mode colors */ }
+            }
+        }
+    }
+    
+    public enum Shadow {
+        case primary
+        
+        public func resolve(for mode: BKColorMode) -> UIColor {
+            switch mode {
+            case .light:
+                switch self {
+                case .primary: return UIColor(hex: "#BCC4BE")
+                }
             }
         }
     }

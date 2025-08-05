@@ -126,6 +126,19 @@ public extension UIColor {
             }
         }
     }
+    
+    static func bkShadowColor(
+        _ semanticColor: BKSemanticColor.Shadow
+    ) -> UIColor {
+        return UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark:
+                return semanticColor.resolve(for: .light)
+            default:
+                return semanticColor.resolve(for: .light)
+            }
+        }
+    }
 }
 
 // UIColor 비교를 위한 확장

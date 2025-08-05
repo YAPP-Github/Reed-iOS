@@ -7,6 +7,7 @@ import UIKit
 
 final class HomeView: BaseView {
     let eventPublisher = PassthroughSubject<HomeViewEvent, Never>()
+    private var cancellable: Set<AnyCancellable> = []
     
     private var books: [HomeBookInfo] = []
     private let backgroundColorView = UIView()
@@ -67,13 +68,16 @@ final class HomeView: BaseView {
         return pageControl
     }
     
+    private let homeEmptyView = HomeEmptyView()
+    
     override func setupView() {
         addSubviews(
             backgroundColorView,
             topArea,
             bookSectionTitleLabel,
             bookCollectionView,
-            pageControl
+            pageControl,
+            homeEmptyView
         )
         topArea.addSubviews(mainTitleLabel, searchButton, graphicImageView)
     }
@@ -88,6 +92,12 @@ final class HomeView: BaseView {
         searchButton.isUserInteractionEnabled = true
         graphicImageView.isUserInteractionEnabled = false
         searchButton.addGestureRecognizer(tapGesture)
+        
+        homeEmptyView.buttonTapped
+            .sink { [weak self] in
+                self?.eventPublisher.send(.didTapEmptyBook)
+            }
+            .store(in: &cancellable)
     }
     
     override func setupLayout() {
@@ -137,6 +147,12 @@ final class HomeView: BaseView {
             $0.height.equalTo(LayoutConstants.collectionHeight)
         }
         
+        homeEmptyView.snp.makeConstraints {
+            $0.top.equalTo(bookSectionTitleLabel.snp.bottom)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(LayoutConstants.collectionHeight + LayoutConstants.collectionTopSpacing)
+        }
+        
         pageControl.snp.makeConstraints {
             $0.top.equalTo(bookCollectionView.snp.bottom)
                 .offset(LayoutConstants.pageControlTopSpacing)
@@ -149,6 +165,7 @@ final class HomeView: BaseView {
         self.books = books
         pageControl.numberOfPages = books.count
         collectionView.reloadData()
+        homeEmptyView.isHidden = !books.isEmpty
     }
 }
 

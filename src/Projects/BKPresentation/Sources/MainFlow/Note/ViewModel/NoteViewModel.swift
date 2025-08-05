@@ -9,6 +9,7 @@ final class NoteViewModel: BaseViewModel {
     struct State: Equatable {
         var selectedGuideText: String = ""
         var createCompleted: Bool = false
+        var shouldStartEditing: Bool = false
     }
     
     enum Action {
@@ -50,6 +51,7 @@ final class NoteViewModel: BaseViewModel {
         switch action {
         case .appreciationGuideSelected(let guideText):
             newState.selectedGuideText = guideText
+            newState.shouldStartEditing = true
             
         case .submitNoteForm(let noteForm):
             effects.append(.submit(noteForm))

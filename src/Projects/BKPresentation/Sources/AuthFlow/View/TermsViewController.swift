@@ -7,8 +7,7 @@ import SafariServices
 import UIKit
 
 final class TermsViewController: BaseViewController<TermsView> {
-    
-    weak var coordinator: LoginCoordinator?
+    weak var coordinator: TermsCoordinator?
     
     let viewModel: AnyViewBindableViewModel<TermsViewModel.State, TermsViewModel.Action>
     private var cancellables = Set<AnyCancellable>()

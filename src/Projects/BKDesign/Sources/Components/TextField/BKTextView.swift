@@ -98,6 +98,17 @@ public final class BKTextView: UIView {
         self.textView.text = text
         textViewDidChange(textView)
     }
+    
+    public func startEditing() {
+        guard window != nil, superview != nil else { return }
+
+        if textView.window != nil, !textView.isFirstResponder {
+            DispatchQueue.main.async {
+                self.textView.selectedRange = NSRange(location: 0, length: 0)
+                self.textView.becomeFirstResponder()
+            }
+        }
+    }
 }
 
 private extension BKTextView {
