@@ -21,8 +21,8 @@ struct ResultState: Equatable {
 }
 
 enum SearchViewType: String {
-    case globalSearch = "Global"
-    case archiveSearch = "Library"
+    case defaultSearch = "Default"
+    case myLibrarySearch = "MyLibrary"
     
     var recentPlaceholder: String {
         return "최근 검색어가 없습니다."
@@ -30,9 +30,9 @@ enum SearchViewType: String {
 
     var resultPlaceholder: String {
         switch self {
-        case .globalSearch:
+        case .defaultSearch:
             return "검색어와 일치하는 도서가 없습니다."
-        case .archiveSearch:
+        case .myLibrarySearch:
             return "내 서재에 해당 도서가 없습니다."
         }
     }
@@ -85,25 +85,25 @@ final class SearchViewModel: BaseViewModel {
     private var currentPage = 1
     private let searchViewType: SearchViewType
     
-    private var fetchRecentSearchUseCase: FetchRecentSearchUseCase {
+    private lazy var fetchRecentSearchUseCase: FetchRecentSearchUseCase = {
         @Autowired(name: searchViewType.rawValue) var useCase: FetchRecentSearchUseCase
         return useCase
-    }
+    }()
     
-    private var storeRecentSearchUseCase: StoreRecentSearchUseCase {
+    private lazy var storeRecentSearchUseCase: StoreRecentSearchUseCase = {
         @Autowired(name: searchViewType.rawValue) var useCase: StoreRecentSearchUseCase
         return useCase
-    }
+    }()
     
-    private var deleteRecentSearchUseCase: DeleteRecentSearchUseCase {
+    private lazy var deleteRecentSearchUseCase: DeleteRecentSearchUseCase = {
         @Autowired(name: searchViewType.rawValue) var useCase: DeleteRecentSearchUseCase
         return useCase
-    }
+    }()
     
-    private var searchBookUseCase: SearchBookUseCase {
+    private lazy var searchBookUseCase: SearchBookUseCase = {
         @Autowired(name: searchViewType.rawValue) var useCase: SearchBookUseCase
         return useCase
-    }
+    }()
     
     @Autowired private var upsertUseCase: BookUpsertUseCase
     
@@ -132,7 +132,7 @@ final class SearchViewModel: BaseViewModel {
             
         case .search(let query):
             currentQuery = query
-            currentPage = searchViewType == .globalSearch ? 1 : 0
+            currentPage = searchViewType == .defaultSearch ? 1 : 0
             allBooks = []
             newState.isLoading = true
             effects.append(.searchResult(query))
