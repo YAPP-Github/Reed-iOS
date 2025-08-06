@@ -1,6 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import BKDomain
 import SnapKit
 import UIKit
 
@@ -29,6 +30,15 @@ enum EmotionSeed: String, CaseIterable {
         case .joy: return .bkEmotionBaseColor(.joy)
         case .tension: return .bkEmotionBaseColor(.tension)
         case .sadness: return .bkEmotionBaseColor(.sadness)
+        }
+    }
+    
+    static func from(emotion: Emotion) -> Self {
+        switch emotion {
+        case .joy: return .joy
+        case .nervous: return .tension
+        case .sadness: return .sadness
+        case .warmth: return .warmth
         }
     }
 }
@@ -106,12 +116,13 @@ final class SeedReportView: BaseView {
         }
     }
     
-    func applyReport(with data: [EmotionSeed]) {
+    func applyReport(with data: [EmotionSeed?]) {
         emotionReport.arrangedSubviews.forEach {
             emotionReport.removeArrangedSubview($0)
             $0.removeFromSuperview()
         }
         
+        let data = data.compactMap(\.self)
         let counts = data.reduce(into: [EmotionSeed: Int]()) { acc, seed in
             acc[seed, default: 0] += 1
         }

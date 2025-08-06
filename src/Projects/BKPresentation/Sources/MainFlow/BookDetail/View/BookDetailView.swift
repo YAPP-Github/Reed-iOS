@@ -11,11 +11,21 @@ enum Section {
 }
 
 struct BookDetailItem: Hashable {
-    let id: UUID = UUID()
+    let id: String
     let note: String
-    let emotion: EmotionSeed
+    let emotion: EmotionSeed?
     let createdAt: Date
     let page: Int
+    
+    static func from(recordInfo: RecordInfo) -> Self {
+        return Self(
+            id: recordInfo.bookId,
+            note: recordInfo.quote,
+            emotion: EmotionSeed.from(emotion: recordInfo.emotionTags.first ?? .joy),
+            createdAt: recordInfo.createdAt,
+            page: recordInfo.pageNumber
+        )
+    }
 }
 
 enum SortOption: String, CaseIterable {
@@ -116,6 +126,7 @@ final class BookDetailView: BaseView {
         header.onTapSortButton = { [weak self] in
             self?.eventPublisher.send(.didTapSortMenuButton(self?.currentSortOption))
         }
+        addNoteButton.addTarget(self, action: #selector(addNoteButtonTapped), for: .touchUpInside)
     }
 
     override func setupLayout() {
@@ -237,7 +248,8 @@ final class BookDetailView: BaseView {
             title: book.title,
             author: book.author,
             publisher: book.publisher,
-            extraText: "2021년"
+            extraText: book.pubDate?.toKoreanYearString(),
+            image: book.thumbnail
         )
     }
 }
@@ -316,6 +328,10 @@ extension BookDetailView: UICollectionViewDelegateFlowLayout {
 private extension BookDetailView {
     @objc func readingStateButtonTapped() {
         eventPublisher.send(.didTapStatusButton)
+    }
+    
+    @objc func addNoteButtonTapped() {
+        eventPublisher.send(.didTapAddNoteButton)
     }
     
     enum LayoutConstants {
