@@ -11,6 +11,7 @@ public enum AuthAPI {
     )
     case logout
     case refresh(token: String)
+    case withdraw
 }
 
 extension AuthAPI: RequestTarget {
@@ -26,6 +27,8 @@ extension AuthAPI: RequestTarget {
             return "/signout"
         case .refresh:
             return "/refresh"
+        case .withdraw:
+            return "/withdraw"
         }
     }
     
@@ -33,6 +36,8 @@ extension AuthAPI: RequestTarget {
         switch self {
         case .login, .logout, .refresh:
             return .post
+        case .withdraw:
+            return .delete
         }
     }
     
@@ -42,7 +47,7 @@ extension AuthAPI: RequestTarget {
             return [
                 "Content-Type": "application/json"
             ]
-        case .logout:
+        case .logout, .withdraw:
             return [:]
         }
     }
@@ -59,14 +64,14 @@ extension AuthAPI: RequestTarget {
             return RefreshRequestDTO(
                 refreshToken: token
             )
-        case .logout:
+        case .logout, .withdraw:
             return nil
         }
     }
     
     public var query: [String: Any] {
         switch self {
-        case .login, .logout, .refresh:
+        case .login, .logout, .refresh, .withdraw:
             return [:]
         }
     }
