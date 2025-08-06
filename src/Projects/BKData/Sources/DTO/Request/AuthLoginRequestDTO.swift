@@ -6,4 +6,5 @@ import Foundation
 struct AuthLoginRequestDTO: Encodable {
     let providerType: AuthProvider
     let oauthToken: String
+    let authorizationCode: String?
 }

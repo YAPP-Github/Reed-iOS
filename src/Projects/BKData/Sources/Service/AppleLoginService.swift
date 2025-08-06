@@ -13,7 +13,7 @@ public final class AppleLoginService: AnyObject, SocialLoginService {
         self.delegateProxy = AppleLoginDelegateProxy()
     }
     
-    public func login() -> AnyPublisher<String, AuthError> {
+    public func login() -> AnyPublisher<SocialLoginToken, AuthError> {
         return delegateProxy.startAuthorization()
     }
 }

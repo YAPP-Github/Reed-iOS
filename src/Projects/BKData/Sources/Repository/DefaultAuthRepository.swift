@@ -26,12 +26,14 @@ public struct DefaultAuthRepository: AuthRepository {
     
     public func login(
         provider: AuthProvider,
-        token: String
+        token: String,
+        authorizationCode: String?
     ) -> AnyPublisher<Void, AuthError> {
         return defaultProvider.request(
             target: AuthAPI.login(
                 provider: provider,
-                token: token
+                token: token,
+                authorizationCode: authorizationCode
             ),
             type: AuthLoginResponseDTO.self
         )

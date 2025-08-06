@@ -15,7 +15,8 @@ public protocol AuthRepository {
     /// - Failure: `AuthError` 유형의 에러
     func login(
         provider: AuthProvider,
-        token: String
+        token: String,
+        authorizationCode: String?
     ) -> AnyPublisher<Void, AuthError>
     
     /// 서버에 로그아웃 요청을 보냅니다.

@@ -4,11 +4,13 @@ import BKDomain
 import Foundation
 
 public enum AuthAPI {
-    case login(provider: AuthProvider, token: String)
+    case login(
+        provider: AuthProvider,
+        token: String,
+        authorizationCode: String?
+    )
     case logout
     case refresh(token: String)
-    case me
-    case termsAgreement(termsAgreed: Bool)
 }
 
 extension AuthAPI: RequestTarget {
@@ -24,10 +26,6 @@ extension AuthAPI: RequestTarget {
             return "/signout"
         case .refresh:
             return "/refresh"
-        case .me:
-            return "/me"
-        case .termsAgreement:
-            return "/terms-agreement"
         }
     }
     
@@ -35,45 +33,40 @@ extension AuthAPI: RequestTarget {
         switch self {
         case .login, .logout, .refresh:
             return .post
-        case .me:
-            return .get
-        case .termsAgreement:
-            return .put
         }
     }
     
     public var headers: [String: String] {
         switch self {
-        case .login, .refresh, .termsAgreement:
+        case .login, .refresh:
             return [
                 "Content-Type": "application/json"
             ]
-        case .logout, .me:
+        case .logout:
             return [:]
         }
     }
     
     public var body: (any Encodable)? {
         switch self {
-        case .login(let provider, let token):
+        case .login(let provider, let token, let authCode):
             return AuthLoginRequestDTO(
                 providerType: provider,
-                oauthToken: token
+                oauthToken: token,
+                authorizationCode: authCode
             )
         case .refresh(let token):
             return RefreshRequestDTO(
                 refreshToken: token
             )
-        case .logout, .me:
+        case .logout:
             return nil
-        case .termsAgreement(let termsAgreed):
-            return  TermsAgreementRequestDTO(termsAgreed: termsAgreed)
         }
     }
     
     public var query: [String: Any] {
         switch self {
-        case .login, .logout, .refresh, .me, .termsAgreement:
+        case .login, .logout, .refresh:
             return [:]
         }
     }

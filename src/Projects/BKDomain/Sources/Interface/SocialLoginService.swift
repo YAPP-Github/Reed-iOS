@@ -6,5 +6,5 @@ import Foundation
 public protocol SocialLoginService: AnyObject {
     var provider: AuthProvider { get }
     
-    func login() -> AnyPublisher<String, AuthError>
+    func login() -> AnyPublisher<SocialLoginToken, AuthError>
 }

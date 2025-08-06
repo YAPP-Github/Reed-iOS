@@ -30,7 +30,7 @@ public final class KakaoLoginService: AnyObject, SocialLoginService {
 
     /// 카카오 로그인 실행
     /// - Returns: accessToken을 방출하는 퍼블리셔 또는 에러
-    public func login() -> AnyPublisher<String, AuthError> {
+    public func login() -> AnyPublisher<SocialLoginToken, AuthError> {
         if kakaoAPI.isLoginWithTalkAvailable() {
             return loginWithApp()
         } else {
@@ -43,8 +43,8 @@ public final class KakaoLoginService: AnyObject, SocialLoginService {
 private extension KakaoLoginService {
     /// 카카오톡 앱을 이용한 로그인
     /// - Returns: accessToken을 방출하는 퍼블리셔 또는 에러
-    func loginWithApp() -> AnyPublisher<String, AuthError> {
-        Future<String, AuthError> { [kakaoAPI] promise in
+    func loginWithApp() -> AnyPublisher<SocialLoginToken, AuthError> {
+        Future<SocialLoginToken, AuthError> { [kakaoAPI] promise in
             kakaoAPI.loginWithKakaoTalk(
                 launchMethod: .UniversalLink,
                 channelPublicIds: nil,
@@ -54,7 +54,7 @@ private extension KakaoLoginService {
                 if let sdkError = error {
                     promise(.failure(.sdkError(message: sdkError.localizedDescription)))
                 } else if let access = token?.accessToken {
-                    promise(.success(access))
+                    promise(.success(SocialLoginToken(identityToken: access)))
                 } else {
                     promise(.failure(.missingToken))
                 }
@@ -65,8 +65,8 @@ private extension KakaoLoginService {
     
     /// 카카오 계정을 이용한 로그인
     /// - Returns: accessToken을 방출하는 퍼블리셔 또는 에러
-    func loginWithAccount() -> AnyPublisher<String, AuthError> {
-        Future<String, AuthError> { [kakaoAPI] promise in
+    func loginWithAccount() -> AnyPublisher<SocialLoginToken, AuthError> {
+        Future<SocialLoginToken, AuthError> { [kakaoAPI] promise in
             kakaoAPI.loginWithKakaoAccount(
                 prompts: nil,
                 channelPublicIds: nil,
@@ -76,7 +76,7 @@ private extension KakaoLoginService {
                 if let sdkError = error {
                     promise(.failure(.sdkError(message: sdkError.localizedDescription)))
                 } else if let access = token?.accessToken {
-                    promise(.success(access))
+                    promise(.success(SocialLoginToken(identityToken: access)))
                 } else {
                     promise(.failure(.missingToken))
                 }
