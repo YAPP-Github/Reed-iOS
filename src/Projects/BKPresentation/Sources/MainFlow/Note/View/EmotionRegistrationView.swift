@@ -1,6 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import BKDomain
 import Combine
 import SnapKit
 import UIKit
@@ -9,12 +10,7 @@ struct EmotionRegistrationForm {
     let emotion: Emotion
 }
 
-enum Emotion: String, CaseIterable {
-    case warmth = "warmth"
-    case joy = "joy"
-    case nervous = "nervous"
-    case sadness = "sadness"
-    
+extension Emotion {
     var emotionView: UIView {
         let imageView = UIImageView()
         

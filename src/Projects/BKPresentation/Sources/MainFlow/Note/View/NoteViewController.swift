@@ -1,6 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import BKDomain
 import Combine
 import UIKit
 
@@ -97,8 +98,9 @@ final class NoteViewController: BaseViewController<NoteView> {
             .receive(on: DispatchQueue.main)
             .removeDuplicates { $0.createCompleted == $1.createCompleted }
             .filter { $0.createCompleted }
-            .sink { [weak self] _ in
-                self?.presentRegistrationSuccessDialog()
+            .compactMap(\.recordInfo)
+            .sink { [weak self] in
+                self?.presentRegistrationSuccessDialog(recordInfo: $0)
             }
             .store(in: &cancellable)
     }
@@ -120,7 +122,7 @@ private extension NoteViewController {
         }
     }
     
-    func presentRegistrationSuccessDialog() {
+    func presentRegistrationSuccessDialog(recordInfo: RecordInfo) {
         let imageView = UIImageView(image: BKImage.Graphics.empty)
         let dialog = BKDialog(
             title: "기록이 저장되었어요!",
@@ -134,7 +136,7 @@ private extension NoteViewController {
                 rightButtonTitle: "기록 보러가기",
                 rightButtonAction: { [weak self] in
                     self?.dismiss(animated: true)
-                    self?.coordinator?.didCompleteNoteCreation()
+                    self?.coordinator?.didCompleteNoteCreation(recordInfo: recordInfo)
                 }
             ),
             suppliedContentStyle: .upper(imageView)

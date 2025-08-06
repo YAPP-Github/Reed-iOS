@@ -1,6 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import UIKit
+import BKDomain
 import Combine
 
 final class NoteCoordinator: Coordinator, SessionExpirationNotifying {
@@ -37,8 +38,12 @@ final class NoteCoordinator: Coordinator, SessionExpirationNotifying {
 }
 
 extension NoteCoordinator {
-    func didCompleteNoteCreation() {
-        let viewController = NoteCompletionViewController()
+    func didCompleteNoteCreation(recordInfo: RecordInfo) {
+        let viewController = NoteCompletionViewController(
+            viewModel: NoteCompletionViewModel(
+                recordInfo: recordInfo
+            )
+        )
         let noteNavigationController = UINavigationController(rootViewController: viewController)
         noteNavigationController.modalPresentationStyle = .fullScreen
         navigationController.present(noteNavigationController, animated: true) {
