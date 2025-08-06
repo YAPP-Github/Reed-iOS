@@ -174,6 +174,13 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(
+            type: FetchRecordsUseCase.self
+        ) { _ in
+            @Autowired var repository: RecordRepository
+            return DefaultFetchRecordsUseCase(repository: repository)
+        }
+        
+        container.register(
             type: FetchSeedStatsUseCase.self
         ) { _ in
             @Autowired var repository: SeedRepository
