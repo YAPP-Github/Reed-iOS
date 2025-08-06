@@ -6,5 +6,5 @@ public protocol CreateRecordUseCase {
     func execute(
         bookId: String,
         record: RecordVO
-    ) -> AnyPublisher<Void, Error>
+    ) -> AnyPublisher<RecordInfo, Error>
 }
