@@ -31,24 +31,33 @@ public final class DefaultRecordRepository: RecordRepository {
     
     public func fetch(
         bookId: String,
-        page: Int,
-        size: Int,
         sortType: LibrarySortType
     ) -> AnyPublisher<[RecordInfo], Error> {
         networkProvider.request(
             target: RecordAPI.fetch(
                 userBookId: bookId,
                 dto: FetchRecordRequestDTO(
-                    page: page,
-                    size: size,
                     sort: sortType
                 )
             ),
-            type: FetchRecordResponseDTO<RecordInfo>.self
+            type: FetchRecordResponseDTO.self
         )
         .mapError { $0 as Error }
         .debugError(logger: AppLogger.network)
-        .map { $0.content }
+        .map { $0.content.map { $0.toRecordInfo() }}
+        .eraseToAnyPublisher()
+    }
+    
+    public func findBy(
+        id recordId: String
+    ) -> AnyPublisher<RecordInfo, Error> {
+        networkProvider.request(
+            target: RecordAPI.detail(userRecordId: recordId),
+            type: DetailRecordResponseDTO.self
+        )
+        .mapError { $0 as Error }
+        .debugError(logger: AppLogger.network)
+        .map { $0.toRecordInfo() }
         .eraseToAnyPublisher()
     }
 }
