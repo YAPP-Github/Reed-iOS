@@ -3,12 +3,12 @@
 import UIKit
 import SnapKit
 
-final class LoadingIndicator {
+public final class LoadingIndicator {
     
     private static let tag = 999999
     
     /// 로딩 인디케이터 보여주기
-    static func show() {
+    public static func show() {
         DispatchQueue.main.async {
             guard let window = getKeyWindow() else { return }
             
@@ -25,7 +25,7 @@ final class LoadingIndicator {
     }
     
     /// 로딩 인디케이터 숨기기
-    static func hide() {
+    public static func hide() {
         DispatchQueue.main.async {
             guard let window = getKeyWindow() else { return }
             
@@ -58,12 +58,12 @@ final class LoadingIndicator {
 extension UIViewController {
     
     /// 로딩 시작
-    func showLoading() {
+    public func showLoading() {
         LoadingIndicator.show()
     }
     
     /// 로딩 종료
-    func hideLoading() {
+    public func hideLoading() {
         LoadingIndicator.hide()
     }
 }

@@ -10,6 +10,7 @@ final class LoginViewModel: BaseViewModel {
         var isLoggedIn: Bool = false
         var latestProvider: String?
         var errorMessage: String?
+        var isLoading: Bool = false
     }
 
     enum Action {
@@ -59,19 +60,23 @@ final class LoginViewModel: BaseViewModel {
         case .appleLoginButtonTapped:
             newState.errorMessage = nil
             newState.latestProvider = "apple"
+            newState.isLoading = true
             effects.append(.signInApple)
 
         case .kakaoLoginButtonTapped:
             newState.errorMessage = nil
             newState.latestProvider = "kakao"
+            newState.isLoading = true
             effects.append(.signInKakao)
 
         case .loginSuccess:
             newState.isLoggedIn = true
             newState.errorMessage = nil
+            newState.isLoading = false
 
         case .authFailed(let message):
             newState.errorMessage = message
+            newState.isLoading = false
         }
 
         return (newState, effects)
