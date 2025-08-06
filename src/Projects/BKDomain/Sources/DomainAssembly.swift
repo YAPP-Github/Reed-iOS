@@ -165,5 +165,12 @@ public struct DomainAssembly: Assembly {
             @Autowired var repository: HomeRepository
             return DefaultFetchHomeUseCase(repository: repository)
         }
+        
+        container.register(
+            type: FetchBookDetailUseCase.self
+        ) { _ in
+            @Autowired var repository: BookRepository
+            return DefaultFetchBookDetailUseCase(repository: repository)
+        }
     }
 }

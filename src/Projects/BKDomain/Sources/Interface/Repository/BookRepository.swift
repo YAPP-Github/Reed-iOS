@@ -23,4 +23,9 @@ public protocol BookRepository {
         _ bookIsbn: String,
         _ status: BookStatus
     ) -> AnyPublisher<BookInfo, Error>
+    
+    /// 특정 도서에 대한 정보를 가져옵니다.
+    func detail(
+        isbn: String
+    ) -> AnyPublisher<Book, Error>
 }

@@ -4,7 +4,7 @@ import BKDomain
 import Foundation
 
 enum BookAPI {
-    case detail
+    case detail(isbn: String)
     case myLibrary(parameter: LibraryRequestDTO)
     case search(dto: SearchBookRequestDTO)
     case upsert(dto: UserBookRegisterRequestDTO)
@@ -59,8 +59,8 @@ extension BookAPI: RequestTarget {
     
     var query: [String: Any] {
         switch self {
-        case .detail:
-            return [:]
+        case .detail(let isbn):
+            return BookDetailRequestDTO(isbn: isbn).toDictionary()
         case .myLibrary(let parameter):
             return parameter.dictionary
         case .search(let dto):

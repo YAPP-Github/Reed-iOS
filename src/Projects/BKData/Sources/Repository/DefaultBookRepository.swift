@@ -96,4 +96,18 @@ public struct DefaultBookRepository: BookRepository {
         .map { return $0.toBookInfo() }
         .eraseToAnyPublisher()
     }
+    
+    
+    public func detail(
+        isbn: String
+    ) -> AnyPublisher<Book, Error> {
+        networkProvider.request(
+            target: BookAPI.detail(isbn: isbn),
+            type: BookDetailResponseDTO.self
+        )
+        .mapError { $0 as Error }
+        .debugError(logger: AppLogger.network)
+        .map { $0.toBook() }
+        .eraseToAnyPublisher()
+    }
 }
