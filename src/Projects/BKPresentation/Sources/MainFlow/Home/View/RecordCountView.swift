@@ -25,7 +25,7 @@ final class RecordCountView: UIView {
         
         addSubviews(image, title)
         
-        image.backgroundColor = .bkBaseColor(.primary)
+        image.backgroundColor = .clear
         
         image.snp.makeConstraints {
             $0.size.equalTo(LayoutConstants.iconSize)

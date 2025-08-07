@@ -170,8 +170,12 @@ final class HomeCardCell: UICollectionViewCell {
             $0.width.lessThanOrEqualToSuperview()
         }
         
+        publisherLabel.snp.makeConstraints {
+            $0.width.lessThanOrEqualTo(infoArea.snp.width).multipliedBy(0.3)
+        }
+        
         authorLabel.snp.makeConstraints {
-            $0.width.equalTo(publisherLabel.snp.width).multipliedBy(7.0 / 3.0).priority(.high)
+            $0.width.lessThanOrEqualTo(infoArea.snp.width).multipliedBy(0.7)
         }
         
         recordCountView.snp.makeConstraints {
