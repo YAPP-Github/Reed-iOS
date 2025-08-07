@@ -77,9 +77,11 @@ final class HomeCardCell: UICollectionViewCell {
         
         titleLabel.numberOfLines = 1
         authorLabel.numberOfLines = 1
+        
         titleLabel.setText(text: title)
         authorLabel.setText(text: author)
         publisherLabel.setText(text: publisher)
+        
         titleLabel.lineBreakMode = .byTruncatingTail
         authorLabel.lineBreakMode = .byTruncatingTail
         publisherLabel.lineBreakMode = .byTruncatingTail
@@ -111,6 +113,7 @@ final class HomeCardCell: UICollectionViewCell {
         
         titleLabel.numberOfLines = 1
         authorLabel.numberOfLines = 1
+        
         titleLabel.lineBreakMode = .byTruncatingTail
         authorLabel.lineBreakMode = .byTruncatingTail
         publisherLabel.lineBreakMode = .byTruncatingTail
@@ -206,7 +209,7 @@ private extension HomeCardCell {
         static let containerInset = UIEdgeInsets(top: 12, left: 0, bottom: 20, right: 0)
         static let sidePadding: CGFloat = 20
         static let bottomPadding: CGFloat = 20
-        static let recordCountHeight: CGFloat = 44
+        static let recordCountHeight: CGFloat = 46
         static let recordCountSpacing: CGFloat = 12
         static let buttonTopSpacing: CGFloat = 24
         static let despStackTopSpacing: CGFloat = 4
