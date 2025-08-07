@@ -266,7 +266,7 @@ private extension HomeView {
         static let topAreaTopInset: CGFloat = 16
         static let topAreaLeading: CGFloat = 24
         static let topAreaTrailing: CGFloat = 20
-        static let topAreaHeight: CGFloat = 160
+        static let topAreaHeight: CGFloat = 144
 
         static let titleToSearchButtonSpacing: CGFloat = 12
         static let titleToGraphicSpacing: CGFloat = 20
