@@ -42,9 +42,11 @@ final class HomeCardCell: UICollectionViewCell {
         stackView.axis = .horizontal
         stackView.spacing = 4
         stackView.alignment = .center
-        stackView.distribution = .fill
+        stackView.distribution = .fillProportionally
         return stackView
     }()
+    
+    private let infoArea = UIView()
     
     private let recordCountView = RecordCountView()
     private let addNoteButton = BKButton(style: .primary, size: .medium)
@@ -124,16 +126,14 @@ final class HomeCardCell: UICollectionViewCell {
         containerView.addSubviews(
             thumbnail,
             titleLabel,
-            descriptionStack,
+            infoArea,
             recordCountView,
             addNoteButton
         )
         
+        infoArea.addSubview(descriptionStack)
         [authorLabel, separatorLabel, publisherLabel].forEach { label in
             descriptionStack.addArrangedSubview(label)
-            
-            label.setContentHuggingPriority(.required, for: .horizontal)
-            label.setContentCompressionResistancePriority(.required, for: .horizontal)
         }
         
         setupConstraints()
@@ -159,23 +159,19 @@ final class HomeCardCell: UICollectionViewCell {
                 .inset(LayoutConstants.sidePadding)
         }
         
-        authorLabel.snp.makeConstraints {
-            $0.width.lessThanOrEqualTo(120)
-        }
-
-        separatorLabel.snp.makeConstraints {
-            $0.width.equalTo(5)
-        }
-
-        publisherLabel.snp.makeConstraints {
-            $0.width.lessThanOrEqualTo(120)
+        infoArea.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(LayoutConstants.despStackTopSpacing)
+            $0.leading.trailing.equalToSuperview().inset(LayoutConstants.sidePadding)
+            $0.height.equalTo(LayoutConstants.infoAreaHeight)
         }
         
         descriptionStack.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(LayoutConstants.despStackTopSpacing)
-            $0.centerX.equalToSuperview()
-            $0.leading.trailing.greaterThanOrEqualToSuperview()
-                .inset(LayoutConstants.sidePadding)
+            $0.center.equalToSuperview()
+            $0.width.lessThanOrEqualToSuperview()
+        }
+        
+        authorLabel.snp.makeConstraints {
+            $0.width.equalTo(publisherLabel.snp.width).multipliedBy(7.0 / 3.0).priority(.high)
         }
         
         recordCountView.snp.makeConstraints {
@@ -213,6 +209,7 @@ private extension HomeCardCell {
         static let recordCountSpacing: CGFloat = 12
         static let buttonTopSpacing: CGFloat = 24
         static let despStackTopSpacing: CGFloat = 4
+        static let infoAreaHeight: CGFloat = 22
         
         static let titleTopSpacing: CGFloat = 16
         static let thumbnailTopSpacing: CGFloat = 32
