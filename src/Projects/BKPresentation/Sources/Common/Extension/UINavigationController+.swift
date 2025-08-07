@@ -148,6 +148,8 @@ private extension UINavigationController {
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .bkBackgroundColor(.home)
         appearance.backgroundImage = nil
+        appearance.shadowImage = UIImage()
+        appearance.shadowColor = .clear
 
         navigationBar.standardAppearance = appearance
         navigationBar.scrollEdgeAppearance = appearance
