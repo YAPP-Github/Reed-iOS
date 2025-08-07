@@ -16,8 +16,9 @@ final class HomeViewController: BaseViewController<HomeView> {
     weak var coordinator: MainFlowCoordinator?
     
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
-        .home(
+        .homeWithImage(
             viewController: self,
+            image: BKImage.Logos.smallLogo,
             target: self,
             gearAction: #selector(goToSettingViewController)
         )

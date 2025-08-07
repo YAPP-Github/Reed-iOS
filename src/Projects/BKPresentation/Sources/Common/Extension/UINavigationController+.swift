@@ -27,6 +27,13 @@ extension UINavigationController {
             target: Any?,
             gearAction: Selector
         )
+        
+        case homeWithImage(
+            viewController: UIViewController,
+            image: UIImage,
+            target: Any?,
+            gearAction: Selector
+        )
     }
     
     struct StandardRightButton {
@@ -90,6 +97,21 @@ extension UINavigationController {
             makeHomeStyle(
                 title: title,
                 for: viewController,
+                target: target,
+                gearAction: gearAction
+            )
+            
+        case .homeWithImage(
+            let viewController,
+            let image,
+            let target,
+            let gearAction
+        ):
+            makeHomeStyle(
+                for: viewController,
+                customTitleView: makeHomeImageTitleView(
+                    image: image
+                ),
                 target: target,
                 gearAction: gearAction
             )
@@ -272,5 +294,45 @@ private extension UINavigationController {
         
         viewController.navigationItem.rightBarButtonItem =
         makeRightButtons([button])
+    }
+    
+    func makeHomeStyle(
+        for viewController: UIViewController,
+        customTitleView: UIView,
+        target: Any?,
+        gearAction: Selector
+    ) {
+        let gearButton = makeIconButton(BKImage.Icon.settings, target: target, action: gearAction)
+        gearButton.tintColor = .bkContentColor(.primary)
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .bkBackgroundColor(.home)
+        appearance.shadowColor = .clear
+
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+        navigationBar.compactAppearance = appearance
+        navigationBar.tintColor = .bkContentColor(.primary)
+        viewController.navigationItem.title = nil
+        viewController.navigationItem.largeTitleDisplayMode = .never
+        
+        viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: customTitleView)
+        viewController.navigationItem.rightBarButtonItem = makeRightButtons([gearButton])
+    }
+    
+    func makeHomeImageTitleView(image: UIImage) -> UIView {
+        let imageView = UIImageView(image: image)
+        imageView.contentMode = .scaleAspectFit
+        
+        let wrapper = UIView()
+        wrapper.addSubview(imageView)
+        
+        imageView.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(BKInset.inset1)
+            $0.centerY.equalToSuperview()
+            $0.height.equalTo(24)
+        }
+        return wrapper
     }
 }
