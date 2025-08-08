@@ -17,4 +17,15 @@ enum BookRegistrationStatus: String {
             return .reading
         }
     }
+    
+    static func from(_ bookStatus: BKDomain.BookStatus) -> BookRegistrationStatus {
+        switch bookStatus {
+        case .beforeRegistration, .beforeReading:
+            return .before
+        case .reading:
+            return .inProgress
+        case .completed:
+            return .after
+        }
+    }
 }
