@@ -24,7 +24,7 @@ public struct DefaultAuthStateRepository: AuthStateRepository {
     
     public func validate() -> AnyPublisher<UserProfile, AuthError> {
         networkProvider.request(
-            target: AuthAPI.me,
+            target: UserAPI.me,
             type: UserProfileResponseDTO.self
         )
         .mapError { _ in AuthError.missingToken }
@@ -35,7 +35,7 @@ public struct DefaultAuthStateRepository: AuthStateRepository {
     
     public func updateTermsAgreement(isAgreed: Bool) -> AnyPublisher<Bool, AuthError> {
         networkProvider.request(
-            target: AuthAPI.termsAgreement(termsAgreed: isAgreed),
+            target: UserAPI.termsAgreement(termsAgreed: isAgreed),
             type: UserProfileResponseDTO.self
         )
         .mapError { networkError -> AuthError in

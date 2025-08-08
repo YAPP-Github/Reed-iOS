@@ -1,6 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import Combine
+import BKCore
 import BKDomain
 import Foundation
 
@@ -9,25 +10,60 @@ final class BookDetailViewModel: BaseViewModel {
         var items: [BookDetailItem] = []
         var currentBook: Book? = nil
         var sortOption: SortOption = .pageDescending
+        var seeds = [Seed]()
+        var isAddNoteTriggered = false
+        var isStatusButtonTriggered = false
+        let userBookId: String
+        var error: DomainError? = nil
+        var isRetrying: Bool = false
     }
     
     enum Action {
         case onAppear
         case changeSortOption(SortOption)
+        case addNoteButtonTapped
+        case addNoteHandled
+        case statusButtonTapped
+        case changeStatusHandled
+        case upsert(isbn: String, status: BookRegistrationStatus)
+        case upsertSuccessed(Book)
+        case fetchRecordsSuccessed([BookDetailItem])
+        case fetchSeedStatsSuccessed([Seed])
+        case fetchBookDetailSuccessed(Book)
+        case errorOccured(DomainError)
+        case errorHandled
+        case retryTapped
     }
     
     enum SideEffect {
+        case upsertBook(isbn: String, status: BookRegistrationStatus)
+        case fetchRecords
+        case fetchSeedStats
+        case fetchBookDetail
     }
     
-    @Published private var state = State()
+    @Published private var state: State
     private var cancellables = Set<AnyCancellable>()
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
+    private var lastEffect: SideEffect? = nil
+    
+    @Autowired private var fetchRecordsUseCase: FetchRecordsUseCase
+    @Autowired private var fetchSeedStatsUseCase: FetchSeedStatsUseCase
+    @Autowired private var fetchBookDetailUseCase: FetchBookDetailUseCase
+    @Autowired private var bookUpsertUseCase: BookUpsertUseCase
+    
+    private let isbn: String
     
     var statePublisher: AnyPublisher<State, Never> {
         $state.eraseToAnyPublisher()
     }
     
-    init() {
+    init(
+        isbn: String,
+        userBookId: String
+    ) {
+        self.isbn = isbn
+        self.state = State(userBookId: userBookId)
         bindSideEffects()
     }
     
@@ -43,10 +79,55 @@ final class BookDetailViewModel: BaseViewModel {
         
         switch action {
         case .onAppear:
-            newState.items = Constants.mockResult
-            newState.currentBook = Constants.mockBook
+            effects.append(.fetchBookDetail)
+            effects.append(.fetchRecords)
+            effects.append(.fetchSeedStats)
+            
         case .changeSortOption(let option):
             newState.sortOption = option
+            
+        case .addNoteButtonTapped:
+            newState.isAddNoteTriggered = true
+            
+        case .addNoteHandled:
+            newState.isAddNoteTriggered = false
+            
+        case .statusButtonTapped:
+            newState.isStatusButtonTriggered = true
+            
+        case .changeStatusHandled:
+            newState.isStatusButtonTriggered = false
+            
+        case .upsert(let isbn, let status):
+            effects.append(.upsertBook(isbn: isbn, status: status))
+            
+        case .upsertSuccessed(let book):
+            newState.currentBook = book
+            
+        case .fetchBookDetailSuccessed(let book):
+            newState.currentBook = book
+            
+        case .fetchRecordsSuccessed(let items):
+            newState.items = items
+            
+        case .fetchSeedStatsSuccessed(let seeds):
+            newState.seeds = seeds
+            
+        case .errorOccured(let error):
+            if newState.isRetrying == false {
+                newState.isRetrying = true
+            } else {
+                newState.isRetrying = false
+                newState.error = error
+            }
+
+        case .retryTapped:
+            if let last = lastEffect {
+                effects.append(last)
+            }
+            
+        case .errorHandled:
+            newState.error = nil
         }
         
         return (newState, effects)
@@ -54,6 +135,45 @@ final class BookDetailViewModel: BaseViewModel {
     
     func handle(_ effect: SideEffect) -> AnyPublisher<Action, Never> {
         switch effect {
+        case .upsertBook(let isbn, let status):
+            return bookUpsertUseCase.execute(
+                isbn: isbn,
+                status: status.toBookStatus()
+            )
+            .map { Action.upsertSuccessed($0.toBook()) }
+            .catch { [weak self] in
+                self?.lastEffect = .upsertBook(isbn: isbn, status: status)
+                return Just(Action.errorOccured($0))
+            }
+            .eraseToAnyPublisher()
+            
+        case .fetchBookDetail:
+            return fetchBookDetailUseCase.execute(isbn: isbn)
+                .map { Action.fetchBookDetailSuccessed($0)}
+                .catch { [weak self] in
+                    self?.lastEffect = .fetchBookDetail
+                    return Just(Action.errorOccured($0))
+                }
+                .eraseToAnyPublisher()
+            
+        case .fetchRecords:
+            return fetchRecordsUseCase.execute(id: state.userBookId)
+                .map { $0.map { BookDetailItem.from(recordInfo: $0) } }
+                .map { Action.fetchRecordsSuccessed($0) }
+                .catch { [weak self] in
+                    self?.lastEffect = .fetchRecords
+                    return Just(Action.errorOccured($0))
+                }
+                .eraseToAnyPublisher()
+            
+        case .fetchSeedStats:
+            return fetchSeedStatsUseCase.execute()
+                .map { Action.fetchSeedStatsSuccessed($0) }
+                .catch { [weak self] in
+                    self?.lastEffect = .fetchSeedStats
+                    return Just(Action.errorOccured($0))
+                }
+                .eraseToAnyPublisher()
         }
     }
     
@@ -64,60 +184,5 @@ final class BookDetailViewModel: BaseViewModel {
             }
             .sink(receiveValue: send(_:))
             .store(in: &cancellables)
-    }
-}
-
-private extension BookDetailViewModel {
-    enum Constants {
-        static let mockBook = Book(
-            isbn: "11",
-            title: "오브젝트",
-            author: "조영호",
-            publisher: "위키북스",
-            thumbnail: nil,
-            userBookStatus: "READING"
-        )
-        
-        static let mockResult = [
-            BookDetailItem(
-                note: """
-                “1장: 객체, 설계
-                01. 티켓 판매 애플리케이션 구현하기
-                02. 무엇이 문제인가“
-                """,
-                emotion: .joy,
-                createdAt: Date(),
-                page: 12
-            ),
-            BookDetailItem(
-                note: """
-                “03. 설계 개선하기
-                ___자율성을 높이자
-                ___무엇이 개선됐는가
-                ___어떻게 한 것인가“
-                """,
-                emotion: .joy,
-                createdAt: Date(),
-                page: 64
-            ),
-            BookDetailItem(
-                note: """
-                “04. 객체지향 설계
-                ___설계가 왜 필요한가
-                ___객체지향 설계“
-                """,
-                emotion: .tension,
-                createdAt: Date(),
-                page: 96
-            ),
-            BookDetailItem(
-                note: """
-                “___ 협력, 객체, 클래스“
-                """,
-                emotion: .sadness,
-                createdAt: Date(),
-                page: 125
-            )
-        ]
     }
 }

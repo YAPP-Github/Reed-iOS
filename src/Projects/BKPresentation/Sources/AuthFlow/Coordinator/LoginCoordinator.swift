@@ -1,5 +1,6 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKDesign
 import Foundation
 import UIKit
 
@@ -23,3 +24,5 @@ final class LoginCoordinator: Coordinator, FinishNotifying {
         navigationController.setViewControllers([loginViewController], animated: true)
     }
 }
+
+extension LoginCoordinator: ErrorHandleable {}

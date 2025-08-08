@@ -253,7 +253,7 @@ extension HomeView: UICollectionViewDelegateFlowLayout {
         didSelectItemAt indexPath: IndexPath
     ) {
         let selectedBook = books[indexPath.item]
-        eventPublisher.send(.didTapBook(selectedBook.userBookId))
+        eventPublisher.send(.didTapBook(isbn: "9791193737330", userBookId: selectedBook.userBookId))
     }
 }
 

@@ -7,7 +7,7 @@ import UIKit
 
 enum HomeViewEvent: Equatable {
     case didTapRecordButton(String)
-    case didTapBook(String)
+    case didTapBook(isbn: String, userBookId: String)
     case didTapSearchButton
     case didTapEmptyBook
 }
@@ -54,8 +54,8 @@ final class HomeViewController: BaseViewController<HomeView> {
         contentView.eventPublisher
             .sink { [weak self] event in
                 switch event {
-                case .didTapBook(let _):
-                    self?.coordinator?.didTapBookDetailButton()
+                case .didTapBook(let isbn, let userBookId):
+                    self?.coordinator?.didTapBookDetailButton(isbn: isbn, userBookId: userBookId)
                 case .didTapRecordButton(let bookId):
                     self?.coordinator?.didTapNoteButton(bookId: bookId)
                 case .didTapSearchButton:
@@ -83,6 +83,18 @@ final class HomeViewController: BaseViewController<HomeView> {
             .removeDuplicates()
             .sink { [weak self] shouldPlayAnimation in
                 self?.contentView.playAnimation(shouldPlayAnimation)
+            }
+            .store(in: &cancellable)
+
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .map(\.error)
+            .removeDuplicates()
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.coordinator?.handleError(error)
+                self?.viewModel.send(.errorHandled)
             }
             .store(in: &cancellable)
     }

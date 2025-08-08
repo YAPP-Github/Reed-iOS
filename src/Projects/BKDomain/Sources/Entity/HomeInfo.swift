@@ -7,7 +7,7 @@ public struct HomeInfo: Equatable {
     public let title: String
     public let author: String
     public let publisher: String
-    public let coverImageUrl: URL?
+    public let coverImageUrl: URL
     public let lastRecordedAt: Date?
     public let recordCount: Int
     
@@ -16,7 +16,7 @@ public struct HomeInfo: Equatable {
         title: String,
         author: String,
         publisher: String,
-        coverImageUrl: URL?,
+        coverImageUrl: URL,
         lastRecordedAt: Date?,
         recordCount: Int
     ) {

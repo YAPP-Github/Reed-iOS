@@ -2,7 +2,7 @@
 
 import UIKit
 
-final class SettingCoordinator: Coordinator, SessionExpirationNotifying {
+final class SettingCoordinator: Coordinator {
     weak var parentCoordinator: Coordinator?
     var childCoordinators = [Coordinator]()
     var navigationController: UINavigationController
@@ -21,3 +21,5 @@ final class SettingCoordinator: Coordinator, SessionExpirationNotifying {
         navigationController.pushViewController(settingViewController, animated: true)
     }
 }
+
+extension SettingCoordinator: SessionExpirationNotifying, ErrorHandleable, WebPresenting {}

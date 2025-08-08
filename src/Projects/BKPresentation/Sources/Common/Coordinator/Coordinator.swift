@@ -15,6 +15,14 @@ public protocol Coordinator: AnyObject {
 
 // MARK: - Default Implementation
 public extension Coordinator {
+    var topViewController: UIViewController? {
+        return navigationController.topViewController
+    }
+    
+    var presentedViewController: UIViewController? {
+        return navigationController.presentedViewController
+    }
+    
     func didFinish() {
         finishAllChildCoordinators()
         parentCoordinator?.removeChildCoordinator(self)

@@ -6,5 +6,5 @@ public protocol BookUpsertUseCase {
     func execute(
         isbn: String,
         status: BookStatus
-    ) -> AnyPublisher<BookInfo, Error>
+    ) -> AnyPublisher<BookInfo, DomainError>
 }

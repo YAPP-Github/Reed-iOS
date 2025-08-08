@@ -47,7 +47,7 @@ public class BKBookSummaryView: UIView {
     private let labelStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.alignment = .leading
+        stackView.alignment = .fill
         return stackView
     }()
     

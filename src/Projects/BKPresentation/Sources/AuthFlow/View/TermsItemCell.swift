@@ -4,7 +4,7 @@ import BKDesign
 import SnapKit
 import UIKit
 
-final class TermsItemCell: UICollectionViewCell {
+final class TermsItemCell: UICollectionViewListCell {
     static let identifier: String = "TermsItemCell"
     
     // MARK: - Layout Metrics
@@ -94,7 +94,7 @@ final class TermsItemCell: UICollectionViewCell {
         contentView.backgroundColor = .bkBaseColor(.primary)
 
         checkBox.tintColor = term.isAgreed ? .bkContentColor(.brand) : .bkContentColor(.tertiary)
-        chevronIconView.isHidden = (term.url == nil)
+        chevronIconView.isHidden = (term.docsType == nil)
     }
     
     private func setupActions() {

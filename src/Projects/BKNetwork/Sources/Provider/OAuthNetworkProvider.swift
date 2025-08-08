@@ -30,7 +30,7 @@ public struct OAuthNetworkProvider: NetworkProvider {
                 try self.decodeResponse(data: data, response: response, type: type)
             }
             .debugError("Decoding Failed", logger: AppLogger.network)
-            .mapError { $0 as? NetworkError ?? .invalidResponse }
+            .mapError { self.mapToNetworkError($0) }
             .eraseToAnyPublisher()
     }
 }
@@ -77,7 +77,7 @@ private extension OAuthNetworkProvider {
             .flatMap { request in
                 let adapted = self.interceptor.adapt(request)
                 return self.requestor.data(for: adapted)
-                    .mapError { $0 as? NetworkError ?? .invalidResponse }
+                    .mapError { self.mapToNetworkError($0) }
             }
             .eraseToAnyPublisher()
     }

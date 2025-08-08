@@ -24,6 +24,8 @@ final class MainFlowCoordinator: Coordinator, FinishNotifying {
     }
 }
 
+extension MainFlowCoordinator: SessionExpirationNotifying, ErrorHandleable {}
+
 extension MainFlowCoordinator {
     func didTapSettingButton() {
         let settingCoordinator = SettingCoordinator(
@@ -54,10 +56,15 @@ extension MainFlowCoordinator {
         noteCoordinator.start()
     }
     
-    func didTapBookDetailButton() {
+    func didTapBookDetailButton(
+        isbn: String,
+        userBookId: String
+    ) {
         let bookDetailCoordinator = BookDetailCoordinator(
             parentCoordinator: self,
-            navigationController: navigationController
+            navigationController: navigationController,
+            isbn: isbn,
+            userBookId: userBookId
         )
         childCoordinators.append(bookDetailCoordinator)
         bookDetailCoordinator.start()

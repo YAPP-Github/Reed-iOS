@@ -1,6 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import BKDomain
 import SnapKit
 import UIKit
 
@@ -12,7 +13,7 @@ final class NoteCompletionView: BaseView {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = LayoutConstants.contentStackSpacing
-        stackView.alignment = .center
+        stackView.alignment = .fill
         return stackView
     }()
     
@@ -25,24 +26,25 @@ final class NoteCompletionView: BaseView {
         [collectedSentenceView, appreciationResultView].forEach(contentStack.addArrangedSubview(_:))
     }
     
-    /// 임시로 넣어둔 데이터들입니다.
-    override func configure() {
+    func apply(
+        recordInfo: RecordInfo
+    ) {
         resultView.configure(
-            title: "여름은 오래 그곳에 남아",
-            author: "마쓰이에 마사시",
-            publisher: "비채"
+            title: recordInfo.bookTitle,
+            author: recordInfo.author,
+            publisher: recordInfo.bookPublisher,
+            image: recordInfo.bookCoverImageUrl
         )
         
-        collectedSentenceView.apply(sentence: """
-        “소설가들은 늘 소재를 찾아 떠도는 존재 같지만, 실은 그 반대인 경우가 더 잦다.”
-        """, page: 99)
+        collectedSentenceView.apply(
+            sentence: recordInfo.quote,
+            page: recordInfo.pageNumber
+        )
         
         appreciationResultView.apply(
-            emotion: .joy,
-            creationDate: "2025.06.25",
-            appreciation: """
-            소설가들은 늘 소재를 찾아 떠도는 존재 같지만, 실은 그 반대인 경우가 더 잦다.
-            """
+            emotion: EmotionIcon.from(emotion: recordInfo.emotionTags.first ?? .joy),
+            creationDate: recordInfo.createdAt,
+            appreciation: recordInfo.review
         )
     }
     
@@ -67,6 +69,14 @@ final class NoteCompletionView: BaseView {
                 .offset(LayoutConstants.contentStackSpacing)
             $0.horizontalEdges.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
+        }
+        
+        collectedSentenceView.snp.makeConstraints {
+            $0.width.equalToSuperview()
+        }
+        
+        appreciationResultView.snp.makeConstraints {
+            $0.width.equalToSuperview()
         }
     }
 }

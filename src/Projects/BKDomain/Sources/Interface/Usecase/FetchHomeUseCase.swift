@@ -3,5 +3,5 @@
 import Combine
 
 public protocol FetchHomeUseCase {
-    func execute() -> AnyPublisher<[HomeInfo], Error>
+    func execute() -> AnyPublisher<[HomeInfo], DomainError>
 }

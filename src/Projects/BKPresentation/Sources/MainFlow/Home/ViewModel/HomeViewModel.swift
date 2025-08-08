@@ -8,12 +8,15 @@ final class HomeViewModel: BaseViewModel {
     struct State: Equatable {
         var homeInfos: [HomeBookInfo] = []
         var shouldPlayAnimation: Bool = false
+        var error: DomainError? = nil
     }
     
     enum Action {
         case onAppear
         case onDisappear
         case fetchHomeSuccessed([HomeBookInfo])
+        case errorOccured(DomainError)
+        case errorHandled
     }
     
     enum SideEffect {
@@ -50,8 +53,15 @@ final class HomeViewModel: BaseViewModel {
             newState.shouldPlayAnimation = true
         case .onDisappear:
             newState.shouldPlayAnimation = false
+
         case .fetchHomeSuccessed(let homeInfos):
             newState.homeInfos = homeInfos
+            
+        case .errorOccured(let error):
+            newState.error = error
+            
+        case .errorHandled:
+            newState.error = nil
         }
         
         return (newState, effects)
@@ -61,9 +71,9 @@ final class HomeViewModel: BaseViewModel {
         switch effect {
         case .fetch:
             fetchHomeUseCase.execute()
-                .catch { _ in Empty() }
                 .map { $0.map { HomeBookInfo.from($0) }}
                 .map { Action.fetchHomeSuccessed($0) }
+                .catch { Just(Action.errorOccured($0)) }
                 .eraseToAnyPublisher()
         }
     }

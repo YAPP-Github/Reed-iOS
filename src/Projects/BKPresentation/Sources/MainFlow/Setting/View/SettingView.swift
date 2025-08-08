@@ -101,6 +101,10 @@ extension SettingView: UICollectionViewDelegate {
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
+        if indexPath.section == Section.top.rawValue {
+            eventPublisher.send(.firstMenuTapped(firstMenus[indexPath.item]))
+        }
+        
         if indexPath.section == Section.bottom.rawValue {
             if indexPath.item == Section.top.rawValue {
                 eventPublisher.send(.logoutButtonTapped)

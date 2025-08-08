@@ -11,11 +11,13 @@ final class OCRScannerViewModel: BaseViewModel {
     // MARK: - Core Components
     struct State: Equatable {
         var isScanning: Bool = false
-        var errorMessage: String?
         var capturedText: String?
         var capturedSentences: [String] = []
+        
+        // 에러 핸들링
         var shouldShowAlert: Bool = false
-        var alertMessage: String = ""
+        var shouldShowDialog: Bool = false
+        var failureCount: Int = 0
     }
     
     enum Action {
@@ -29,6 +31,8 @@ final class OCRScannerViewModel: BaseViewModel {
         case closeButtonTapped
         case textCaptured(String)
         case alertDismissed
+        case dialogDismissed
+        case resetFailureCount
     }
     
     enum SideEffect {
@@ -67,9 +71,6 @@ final class OCRScannerViewModel: BaseViewModel {
     ) -> (State, [SideEffect]) {
         var newState = state
         var effects: [SideEffect] = []
-        
-        // 기본적으로 에러나 알림 상태 초기화
-        newState.errorMessage = nil
         newState.shouldShowAlert = false
         
         switch action {
@@ -92,18 +93,28 @@ final class OCRScannerViewModel: BaseViewModel {
             currentRecognizedItems = allItems
             
         case .captureButtonTapped(let scanAreaFrame):
+            debugPulse("\(newState.failureCount)")
+            
             let capturedTexts = extractTextsInScanArea(
                 items: currentRecognizedItems,
                 scanAreaFrame: scanAreaFrame
             )
             if !capturedTexts.isEmpty {
+                newState.failureCount = 0
+                
                 newState.capturedSentences = capturedTexts
                 let combinedText = capturedTexts.joined(separator: "\n")
+                
                 newState.capturedText = combinedText
                 effects.append(.showRecognizedSentences(capturedTexts))
             } else {
-                newState.shouldShowAlert = true
-                newState.alertMessage = "스캔 영역에서 텍스트를 찾을 수 없습니다.\n텍스트가 초록색 테두리 안에 있는지 확인해주세요."
+                newState.failureCount += 1
+                
+                if newState.failureCount >= 3 {
+                    newState.shouldShowDialog = true
+                } else {
+                    newState.shouldShowAlert = true
+                }
             }
             
         case .closeButtonTapped:
@@ -114,7 +125,12 @@ final class OCRScannerViewModel: BaseViewModel {
             
         case .alertDismissed:
             newState.shouldShowAlert = false
-            newState.alertMessage = ""
+            
+        case .dialogDismissed:
+            newState.shouldShowDialog = false
+            
+        case .resetFailureCount:
+            newState.failureCount = 0
         }
         
         return (newState, effects)
@@ -122,7 +138,7 @@ final class OCRScannerViewModel: BaseViewModel {
     
     func handle(_ effect: SideEffect) -> AnyPublisher<Action, Never> {
         switch effect {
-        case .showRecognizedSentences(let textList):
+        case .showRecognizedSentences:
             return Empty().eraseToAnyPublisher()
             
         case .dismissScanner:

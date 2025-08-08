@@ -10,7 +10,7 @@ public struct UserBookResponseDTO: Decodable {
     let title: String
     let author: String
     let status: BookStatus
-    let coverURL: String
+    let coverURL: URL
     let publisher: String
     let createdDate: String
     let updatedDate: String
@@ -37,7 +37,7 @@ public struct UserBookResponseDTO: Decodable {
             title: title,
             author: author,
             status: status,
-            imageUrl: URL(string: coverURL),
+            imageUrl: coverURL,
             publisher: publisher,
             createdAt: DateParser.parse(createdDate),
             updatedAt: DateParser.parse(updatedDate),

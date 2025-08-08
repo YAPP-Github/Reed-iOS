@@ -87,6 +87,6 @@
 		<string>Pretendard-Bold.otf</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>OCR 카메라 접근 허용</string>
+	<string>OCR을 통해 텍스트를 인식하여 더 편리한 문장 입력 방식을 제공하기 위해서 카메라를 사용합니다.</string>
 </dict>
 </plist>

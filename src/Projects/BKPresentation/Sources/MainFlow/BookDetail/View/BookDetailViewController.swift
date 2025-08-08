@@ -6,6 +6,7 @@ import UIKit
 
 enum BookDetailViewEvent: Equatable {
     case didTapStatusButton
+    case didTapAddNoteButton
     case didTapSortMenuButton(SortOption?)
 }
 
@@ -44,7 +45,14 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
         contentView.eventPublisher
             .filter { $0 == .didTapStatusButton }
             .sink { [weak self] _ in
-                self?.presentBookRegistration(with: "")
+                self?.viewModel.send(.statusButtonTapped)
+            }
+            .store(in: &cancellable)
+        
+        contentView.eventPublisher
+            .filter { $0 == .didTapAddNoteButton }
+            .sink { [weak self] _ in
+                self?.viewModel.send(.addNoteButtonTapped)
             }
             .store(in: &cancellable)
         
@@ -86,6 +94,54 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
                 self?.contentView.applySort(option: $0)
             }
             .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .filter { $0.isAddNoteTriggered }
+            .sink { [weak self] in
+                self?.coordinator?.didTapAddNoteButton(bookId: $0.userBookId)
+                self?.viewModel.send(.addNoteHandled)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .filter { $0.isStatusButtonTriggered }
+            .sink { [weak self] in
+                self?.presentBookRegistration(with: $0.currentBook?.isbn ?? "")
+                self?.viewModel.send(.changeStatusHandled)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map(\.error)
+            .removeDuplicates()
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.coordinator?.handleError(error)
+                self?.viewModel.send(.errorHandled)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map(\.isRetrying)
+            .removeDuplicates()
+            .filter { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.coordinator?.presentCustomErrorAlert(
+                    subtitle: """
+                    일시적인 오류로 
+                    데이터를 불러올 수 없어요
+                    """,
+                    onConfirm: { [weak self] in
+                        self?.viewModel.send(.retryTapped)
+                    }
+                )
+                self?.viewModel.send(.errorHandled)
+            }
+            .store(in: &cancellable)
     }
 }
 
@@ -99,7 +155,9 @@ private extension BookDetailViewController {
             buttonConfiguration: .singleFullButton(
                 title: "변경하기"
             ) { [weak self] in
+                guard let selected = statusView.selectedStatus else { return }
                 self?.dismiss(animated: true)
+                self?.viewModel.send(.upsert(isbn: isbn, status: selected))
             }
         )
         sheet.button?.primaryButton?.isEnabled = false

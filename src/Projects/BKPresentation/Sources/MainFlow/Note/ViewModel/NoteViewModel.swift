@@ -10,12 +10,18 @@ final class NoteViewModel: BaseViewModel {
         var selectedGuideText: String = ""
         var createCompleted: Bool = false
         var shouldStartEditing: Bool = false
+        var recordInfo: RecordInfo?
+        var error: DomainError? = nil
+        var isRetrying: Bool = false
     }
     
     enum Action {
         case appreciationGuideSelected(String)
         case submitNoteForm(NoteForm)
-        case submitNoteFormSuccessed
+        case submitNoteFormSuccessed(RecordInfo)
+        case errorOccured(DomainError)
+        case errorHandled
+        case retryTapped
     }
     
     enum SideEffect {
@@ -26,6 +32,7 @@ final class NoteViewModel: BaseViewModel {
     private var cancellables = Set<AnyCancellable>()
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
     private let bookId: String
+    private var lastEffect: SideEffect? = nil
     
     @Autowired var createRecordUseCase: CreateRecordUseCase
     
@@ -56,8 +63,25 @@ final class NoteViewModel: BaseViewModel {
         case .submitNoteForm(let noteForm):
             effects.append(.submit(noteForm))
             
-        case .submitNoteFormSuccessed:
+        case .submitNoteFormSuccessed(let recordInfo):
             newState.createCompleted = true
+            newState.recordInfo = recordInfo
+            
+        case .errorOccured(let error):
+            if newState.isRetrying == false {
+                newState.isRetrying = true
+            } else {
+                newState.isRetrying = false
+                newState.error = error
+            }
+
+        case .retryTapped:
+            if let last = lastEffect {
+                effects.append(last)
+            }
+            
+        case .errorHandled:
+            newState.error = nil
         }
         
         return (newState, effects)
@@ -70,8 +94,11 @@ final class NoteViewModel: BaseViewModel {
                 bookId: bookId,
                 record: noteForm.toRecordVO()
             )
-            .map { Action.submitNoteFormSuccessed }
-            .catch { _ in Empty() }
+            .map { Action.submitNoteFormSuccessed($0) }
+            .catch { [weak self] in
+                self?.lastEffect = .submit(noteForm)
+                return Just(Action.errorOccured($0))
+            }
             .eraseToAnyPublisher()
         }
     }

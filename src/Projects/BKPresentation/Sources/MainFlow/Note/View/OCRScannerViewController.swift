@@ -1,12 +1,34 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import BKCore
 import Combine
 import SnapKit
 import UIKit
 import VisionKit
 
 final class OCRScannerViewController: UIViewController {
+    
+    enum LayoutGuide {
+        static let buttonRadius: CGFloat = 36
+        static let scanAreaHeight: CGFloat = 200
+        static let guideLabelBottomOffset: CGFloat = -48
+        static let closeButtonTopOffset: CGFloat = 18
+        static let closeButtonTrailingInset: CGFloat = 20
+        static let closeButtonSize: CGFloat = 24
+        static let captureButtonBottomInset: CGFloat = 16
+        static let captureButtonSize: CGFloat = 72
+        static let errorLabelBottomOffset: CGFloat = -16
+    }
+    
+    enum LabelString {
+        static let guideText = "수집할 문장이 화면에 모두 담기도록\n조정 후 하단 캡쳐 버튼을 눌러주세요"
+        static let errorText = "문장을 인식하지 못했어요\n다시 한 번 촬영해주세요"
+        static let dialogTitle = "문장을 인식하지 못했어요"
+        static let dialogSubTitle = "직접 문장을 입력하시겠어요?"
+        static let leftOption = "다시 촬영하기"
+        static let rightOption = "직접 입력하기"
+    }
     
     // MARK: - Properties
     weak var coordinator: NoteCoordinator?
@@ -19,9 +41,16 @@ final class OCRScannerViewController: UIViewController {
     private let scanOverlayView = UIImageView(image: UIImage(named: "dim"))
     
     private let guideLabel = BKLabel(
-        text: "수집할 문장을 중앙에 맞춰 \n캡처 버튼을 눌러주세요",
+        text: LabelString.guideText,
         fontStyle: .headline2(weight: .medium),
         color: .bkContentColor(.inverse),
+        alignment: .center
+    )
+    
+    private let errorLabel = BKLabel(
+        text: LabelString.errorText,
+        fontStyle: .label2(weight: .semiBold),
+        color: .bkContentColor(.error),
         alignment: .center
     )
     
@@ -63,6 +92,8 @@ final class OCRScannerViewController: UIViewController {
         view.backgroundColor = .black
         
         guideLabel.numberOfLines = 2
+        errorLabel.numberOfLines = 2
+        errorLabel.isHidden = true
         
         closeButton.setImage(BKImage.Icon.x, for: .normal)
         closeButton.tintColor = .bkContentColor(.inverse)
@@ -73,7 +104,7 @@ final class OCRScannerViewController: UIViewController {
         )
         
         captureButton.backgroundColor = .bkBackgroundColor(.primary)
-        captureButton.layer.cornerRadius = 36
+        captureButton.layer.cornerRadius = LayoutGuide.buttonRadius
         captureButton.setImage(BKImage.Icon.maximize, for: .normal)
         captureButton.tintColor = .bkBaseColor(.primary)
         captureButton.addTarget(
@@ -85,11 +116,10 @@ final class OCRScannerViewController: UIViewController {
         scanAreaView.backgroundColor = .clear
         scanAreaView.isUserInteractionEnabled = false
         
-        // 오버레이 설정 (스캔 영역 외부를 어둡게)
         overlayView.backgroundColor = .clear
         overlayView.isUserInteractionEnabled = false
         
-        view.addSubviews(overlayView, scanAreaView, scanOverlayView, guideLabel, closeButton, captureButton)
+        view.addSubviews(overlayView, scanAreaView, scanOverlayView, guideLabel, closeButton, captureButton, errorLabel)
         
         setupConstraints()
     }
@@ -102,7 +132,7 @@ final class OCRScannerViewController: UIViewController {
         scanAreaView.snp.makeConstraints {
             $0.center.equalToSuperview()
             $0.width.equalToSuperview()
-            $0.height.equalTo(scanAreaView.snp.width)
+            $0.height.equalTo(LayoutGuide.scanAreaHeight)
         }
         
         scanOverlayView.snp.makeConstraints {
@@ -112,29 +142,34 @@ final class OCRScannerViewController: UIViewController {
         
         guideLabel.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(scanAreaView.snp.top).offset(-40)
+            $0.bottom.equalTo(scanAreaView.snp.top).offset(LayoutGuide.guideLabelBottomOffset)
         }
         
         closeButton.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(20)
-            $0.trailing.equalToSuperview().inset(20)
-            $0.size.equalTo(44)
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(LayoutGuide.closeButtonTopOffset)
+            $0.trailing.equalToSuperview().inset(LayoutGuide.closeButtonTrailingInset)
+            $0.size.equalTo(LayoutGuide.closeButtonSize)
         }
         
         captureButton.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(50)
-            $0.size.equalTo(72)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(LayoutGuide.captureButtonBottomInset)
+            $0.size.equalTo(LayoutGuide.captureButtonSize)
+        }
+        
+        errorLabel.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalTo(captureButton.snp.top).offset(LayoutGuide.errorLabelBottomOffset)
         }
     }
     
     private func setupScanner() {
         guard DataScannerViewController.isSupported else {
-            showAlert(message: "이 기기에서는 텍스트 스캔을 지원하지 않습니다.")
+            // "이 기기에서는 텍스트 스캔을 지원하지 않습니다."
             return
         }
         
-        // 한국어와 영어 지원
+        // OCR 인식 가능한 언어
         let recognizedDataTypes: Set<DataScannerViewController.RecognizedDataType> = [
             .text(languages: ["ko-KR", "en-US"])
         ]
@@ -192,15 +227,16 @@ final class OCRScannerViewController: UIViewController {
     }
     
     private func render(_ state: OCRScannerViewModel.State) {
-        // 알림 표시
-        if state.shouldShowAlert {
-            showAlert(message: state.alertMessage)
+        if state.shouldShowDialog {
+            showFailureDialog()
+            viewModel.send(.dialogDismissed)
+        } else if state.shouldShowAlert {
+            errorLabel.isHidden = false
             viewModel.send(.alertDismissed)
-        }
-        
-        // 에러 메시지 표시
-        if let errorMessage = state.errorMessage {
-            showAlert(message: errorMessage)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                self?.errorLabel.isHidden = true
+            }
         }
     }
     
@@ -210,18 +246,17 @@ final class OCRScannerViewController: UIViewController {
             do {
                 try scannerViewController?.startScanning()
             } catch {
-                // 추후 vm로 연결
-                print(error)
+                debugPulse(error)
             }
-            
         }
     }
     
     private func stopScanning() {
         scannerViewController?.stopScanning()
     }
-    
-    // MARK: - Actions
+}
+
+extension OCRScannerViewController {
     @objc
     private func closeButtonTapped() {
         viewModel.send(.closeButtonTapped)
@@ -233,29 +268,52 @@ final class OCRScannerViewController: UIViewController {
         viewModel.send(.captureButtonTapped(scanAreaFrame: scanAreaFrame))
     }
     
-    private func showAlert(message: String) {
-        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "확인", style: .default))
-        present(alert, animated: true)
+    private func showFailureDialog() {
+        let dialog = BKDialog(
+            title: LabelString.dialogTitle,
+            subtitle: LabelString.dialogSubTitle,
+            config: .init(
+                leftButtonTitle: LabelString.leftOption,
+                leftButtonAction: { [weak self] in
+                    self?.dismiss(animated: true)
+                    self?.viewModel.send(.resetFailureCount)
+                },
+                rightButtonTitle: LabelString.rightOption,
+                rightButtonAction: { [weak self] in
+                    self?.dismiss(animated: true)
+                    self?.viewModel.send(.closeButtonTapped)
+                }
+            )
+        )
+        
+        let dialogViewController = BKDialogViewController(dialog: dialog)
+        present(dialogViewController, animated: true)
     }
 }
 
 // MARK: - DataScannerViewControllerDelegate
 extension OCRScannerViewController: DataScannerViewControllerDelegate {
-    func dataScanner(_ dataScanner: DataScannerViewController, didAdd addedItems: [RecognizedItem], allItems: [RecognizedItem]) {
+    func dataScanner(
+        _ dataScanner: DataScannerViewController,
+        didAdd addedItems: [RecognizedItem],
+        allItems: [RecognizedItem]
+    ) {
         viewModel.send(.itemsAdded(addedItems, allItems: allItems))
     }
     
-    func dataScanner(_ dataScanner: DataScannerViewController, didUpdate updatedItems: [RecognizedItem], allItems: [RecognizedItem]) {
+    func dataScanner(
+        _ dataScanner: DataScannerViewController,
+        didUpdate updatedItems: [RecognizedItem],
+        allItems: [RecognizedItem]
+    ) {
         viewModel.send(.itemsUpdated(updatedItems, allItems: allItems))
     }
     
-    func dataScanner(_ dataScanner: DataScannerViewController, didRemove removedItems: [RecognizedItem], allItems: [RecognizedItem]) {
+    func dataScanner(
+        _ dataScanner: DataScannerViewController,
+        didRemove removedItems: [RecognizedItem],
+        allItems: [RecognizedItem]
+    ) {
         viewModel.send(.itemsRemoved(removedItems, allItems: allItems))
-    }
-    
-    func dataScanner(_ dataScanner: DataScannerViewController, didTapOn item: RecognizedItem) {
-        // 현재는 탭 기능을 사용하지 않으므로 빈 상태로 유지
-        // 필요시 viewModel에 액션 추가 가능
     }
 }

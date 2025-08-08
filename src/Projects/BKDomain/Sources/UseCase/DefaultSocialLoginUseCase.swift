@@ -11,7 +11,7 @@ public struct DefaultSocialLoginUseCase: SocialLoginUseCase {
         self.loginService = loginService
     }
     
-    public func execute() -> AnyPublisher<String, AuthError> {
+    public func execute() -> AnyPublisher<SocialLoginToken, AuthError> {
         return loginService
             .login()
             .eraseToAnyPublisher()

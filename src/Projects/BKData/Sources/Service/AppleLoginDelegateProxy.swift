@@ -7,15 +7,15 @@ import Combine
 import UIKit
 
 final class AppleLoginDelegateProxy: NSObject {
-    private var currentSubject: PassthroughSubject<String, AuthError>?
+    private var currentSubject: PassthroughSubject<SocialLoginToken, AuthError>?
     private var currentController: ASAuthorizationController?
 }
 
 extension AppleLoginDelegateProxy {
-    func startAuthorization() -> AnyPublisher<String, AuthError> {
+    func startAuthorization() -> AnyPublisher<SocialLoginToken, AuthError> {
         cancelPreviousAuthorization()
 
-        let subject = PassthroughSubject<String, AuthError>()
+        let subject = PassthroughSubject<SocialLoginToken, AuthError>()
         self.currentSubject = subject
 
         let controller = makeAuthorizationController()
@@ -63,13 +63,16 @@ extension AppleLoginDelegateProxy: ASAuthorizationControllerDelegate {
         didCompleteWithAuthorization authorization: ASAuthorization
     ) {
         guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential,
-              let tokenData = credential.identityToken,
-              let token = String(data: tokenData, encoding: .utf8)
+              let identityTokenData = credential.identityToken,
+              let identityToken = String(data: identityTokenData, encoding: .utf8),
+              let authorizationCodeData = credential.authorizationCode,
+              let authorizationCode = String(data: authorizationCodeData, encoding: .utf8)
         else {
             currentSubject?.send(completion: .failure(.missingToken))
             return
         }
-        
+
+        let token = SocialLoginToken(identityToken: identityToken, authorizationCode: authorizationCode)
         currentSubject?.send(token)
         currentSubject?.send(completion: .finished)
     }

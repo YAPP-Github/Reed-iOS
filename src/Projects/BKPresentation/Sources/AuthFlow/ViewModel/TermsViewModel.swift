@@ -15,7 +15,7 @@ final class TermsViewModel: BaseViewModel {
         var terms: [Term] = []
         var isAllAgreed: Bool = false
         var isStartButtonEnabled: Bool = false
-        var errorMessage: String?
+        var error: DomainError?
         var didAgreementSucceed: Bool = false
     }
     
@@ -25,7 +25,7 @@ final class TermsViewModel: BaseViewModel {
         case termTapped(index: Int)
         case startButtonTapped
         case agreementSuccess
-        case agreementFailed(AuthError)
+        case agreementFailed(DomainError)
     }
     
     enum SideEffect {
@@ -59,14 +59,13 @@ final class TermsViewModel: BaseViewModel {
         var newState = state
         var effects: [SideEffect] = []
         
-        newState.errorMessage = nil
+        newState.error = nil
         
         switch action {
         case .viewDidLoad:
-            let dummyURL = URL(string: "https://www.naver.com")!
             newState.terms = [
-                Term(title: "(필수)서비스 이용약관", url: dummyURL, isRequired: true),
-                Term(title: "(필수)개인정보처리방침", url: dummyURL, isRequired: true),
+                Term(title: "(필수)서비스 이용약관", docsType: .terms, isRequired: true),
+                Term(title: "(필수)개인정보처리방침", docsType: .privacy, isRequired: true),
                 Term(title: "(필수)만 14세 이상입니다", isRequired: true)
             ]
             
@@ -89,7 +88,7 @@ final class TermsViewModel: BaseViewModel {
             newState.didAgreementSucceed = true
             
         case .agreementFailed(let error):
-            newState.errorMessage = error.localizedDescription
+            newState.error = error
         }
         
         newState.isStartButtonEnabled = newState.terms
@@ -104,7 +103,7 @@ final class TermsViewModel: BaseViewModel {
         case .agreeToTerms:
             return termsAgreeUseCase.execute(true)
                 .map { isSuccess -> Action in
-                    return isSuccess ? .agreementSuccess : .agreementFailed(.unknown)
+                    return isSuccess ? .agreementSuccess : .agreementFailed(.internalServerError)
                 }
                 .catch { error -> Just<Action> in
                     return Just(Action.agreementFailed(error))

@@ -2,31 +2,33 @@
 
 import Foundation
 
-public struct RecordInfo: Decodable {
+public struct RecordInfo: Decodable, Equatable {
     public let recordId: String
     public let bookId: String
     public let pageNumber: Int
-    public let quote: String?
-    public let review: String?
-    public let emotionTags: [String]
+    public let quote: String
+    public let review: String
+    public let emotionTags: [Emotion]
     public let createdAt: Date
     public let updatedAt: Date?
     public let bookTitle: String
     public let bookPublisher: String
-    public let bookCoverImageUrl: URL?
+    public let bookCoverImageUrl: URL
+    public let author: String
     
     public init(
         recordId: String,
         bookId: String,
         pageNumber: Int,
-        quote: String?,
-        review: String?,
-        emotionTags: [String],
+        quote: String,
+        review: String,
+        emotionTags: [Emotion],
         createdAt: Date,
         updatedAt: Date?,
         bookTitle: String,
         bookPublisher: String,
-        bookCoverImageUrl: URL?
+        bookCoverImageUrl: URL,
+        author: String
     ) {
         self.recordId = recordId
         self.bookId = bookId
@@ -39,5 +41,6 @@ public struct RecordInfo: Decodable {
         self.bookTitle = bookTitle
         self.bookPublisher = bookPublisher
         self.bookCoverImageUrl = bookCoverImageUrl
+        self.author = author
     }
 }
