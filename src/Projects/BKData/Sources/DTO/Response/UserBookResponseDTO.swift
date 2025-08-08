@@ -6,7 +6,7 @@ import Foundation
 public struct UserBookResponseDTO: Decodable {
     let id: String
     let userID: String
-    let isbn: String
+    let isbn13: String
     let title: String
     let author: String
     let status: BookStatus
@@ -19,7 +19,7 @@ public struct UserBookResponseDTO: Decodable {
     enum CodingKeys: String, CodingKey {
         case id = "userBookId"
         case userID = "userId"
-        case isbn = "bookIsbn"
+        case isbn13 = "isbn13"
         case title = "bookTitle"
         case author = "bookAuthor"
         case status
@@ -33,7 +33,7 @@ public struct UserBookResponseDTO: Decodable {
     public func toBookInfo() -> BookInfo {
         return BookInfo(
             bookId: id,
-            isbn: isbn,
+            isbn: isbn13,
             title: title,
             author: author,
             status: status,

@@ -3,5 +3,5 @@
 import Foundation
 
 struct BookDetailRequestDTO: DictionaryRepresentable {
-    let isbn: String
+    let isbn13: String
 }

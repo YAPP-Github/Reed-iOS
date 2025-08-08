@@ -9,6 +9,7 @@ struct FetchHomeResponseDTO: Decodable {
 
 struct HomeDTO: Decodable {
     let userBookId: String
+    let isbn13: String
     let title: String
     let author: String
     let publisher: String
@@ -21,6 +22,7 @@ extension HomeDTO {
     func toEntity() -> HomeInfo {
         return HomeInfo(
             userBookId: userBookId,
+            isbn13: isbn13,
             title: title,
             author: author,
             publisher: publisher,
