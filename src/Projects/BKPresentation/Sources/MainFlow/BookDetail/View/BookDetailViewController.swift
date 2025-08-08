@@ -1,6 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import BKDomain
 import Combine
 import UIKit
 
@@ -108,7 +109,7 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
             .receive(on: DispatchQueue.main)
             .filter { $0.isStatusButtonTriggered }
             .sink { [weak self] in
-                self?.presentBookRegistration(with: $0.currentBook?.isbn ?? "")
+                self?.presentBookRegistration($0.currentBook)
                 self?.viewModel.send(.changeStatusHandled)
             }
             .store(in: &cancellable)
@@ -146,8 +147,11 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
 }
 
 private extension BookDetailViewController {
-    func presentBookRegistration(with isbn: String) {
+    func presentBookRegistration(_ book: Book? = nil) {
+        guard let book = book else { return }
+        
         let statusView = BookRegistrationStatusView()
+        statusView.setInitialSelection(.from(book.userBookStatus))
         
         let sheet = BKBottomSheetViewController(
             title: "도서 상태",
@@ -158,13 +162,18 @@ private extension BookDetailViewController {
             ) { [weak self] in
                 guard let selected = statusView.selectedStatus else { return }
                 self?.dismiss(animated: true)
-                self?.viewModel.send(.upsert(isbn: isbn, status: selected))
+                self?.viewModel.send(.upsert(isbn: book.isbn, status: selected))
             }
         )
-        sheet.button?.primaryButton?.isEnabled = false
-        statusView.onSelected = {
-            sheet.button?.primaryButton?.isEnabled = true
+        let currentRegistrationStatus: BookRegistrationStatus = .from(book.userBookStatus)
+        let initialButtonEnabled = currentRegistrationStatus != statusView.selectedStatus
+        sheet.button?.primaryButton?.isEnabled = initialButtonEnabled
+
+        statusView.onSelected = { [weak sheet, currentRegistrationStatus] in
+            let isDifferentFromCurrent = statusView.selectedStatus != currentRegistrationStatus
+            sheet?.button?.primaryButton?.isEnabled = isDifferentFromCurrent
         }
+        
         sheet.show(from: self, animated: true)
     }
     

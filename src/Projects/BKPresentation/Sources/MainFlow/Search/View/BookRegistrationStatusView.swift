@@ -26,6 +26,10 @@ final class BookRegistrationStatusView: UIView {
         super.init(coder: coder)
         setupView()
     }
+    
+    public func setInitialSelection(_ status: BookRegistrationStatus) {
+        select(status: status)
+    }
 }
 
 private extension BookRegistrationStatusView {
