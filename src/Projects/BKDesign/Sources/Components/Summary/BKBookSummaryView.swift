@@ -45,6 +45,8 @@ public enum BKBookSummaryViewStyle {
 
 public class BKBookSummaryView: UIView {
     private let thumbnail = UIImageView()
+    private let thubmnailCoverView = UIView()
+    
     private let labelStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -140,8 +142,10 @@ public class BKBookSummaryView: UIView {
             
             /// style setting
             self.backgroundColor = .bkBackgroundColor(.disable)
-            thumbnail.backgroundColor = UIColor(hex: "000000").withAlphaComponent(0.4)
+            thubmnailCoverView.backgroundColor = UIColor(hex: "000000").withAlphaComponent(0.4)
 
+            addSubviews(thubmnailCoverView)
+            
             [titleLabel, authorLabel, separatorLabel, publisherLabel].forEach {
                 $0.setColor(color: .bkContentColor(.disable))
             }
@@ -201,6 +205,12 @@ public class BKBookSummaryView: UIView {
                 $0.leading.equalTo(recordLabel.snp.trailing).offset(LayoutConstants.labelStackSpacing)
                 $0.centerY.equalTo(recordLabel)
             }
+            
+        case .alreadyEnroll:
+            thubmnailCoverView.snp.makeConstraints {
+                $0.edges.equalTo(thumbnail)
+            }
+            
         default:
             break
         }
@@ -219,21 +229,33 @@ public class BKBookSummaryView: UIView {
         publisherLabel.setText(text: publisher)
         thumbnail.clipsToBounds = true
         thumbnail.layer.cornerRadius = LayoutConstants.imageRadius
+        
         if let imageURL = image {
             thumbnail.kf.setImage(with: imageURL)
         } else {
             thumbnail.kf.setImage(with: style.placeholderImage)
         }
-
-        if style == .record {
+        
+        switch style {
+        case .record:
             if let count = recordCount {
                 recordCountLabel.setText(text: "\(count)")
                 recordView.isHidden = false
             } else {
                 recordView.isHidden = true
             }
-        } else if style.showsExtraLabel, let text = extraText {
-            extraLabel.setText(text: text)
+            
+        case .alreadyEnroll:
+            thubmnailCoverView.clipsToBounds = true
+            thubmnailCoverView.layer.cornerRadius = LayoutConstants.imageRadius
+            
+            if style.showsExtraLabel, let text = extraText {
+                extraLabel.setText(text: text)
+            }
+        default:
+            if style.showsExtraLabel, let text = extraText {
+                extraLabel.setText(text: text)
+            }
         }
     }
 
