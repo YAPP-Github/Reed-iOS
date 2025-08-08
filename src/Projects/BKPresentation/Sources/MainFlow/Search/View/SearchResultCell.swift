@@ -38,7 +38,7 @@ final class SearchResultCell: UICollectionViewCell {
         description: BookDescription,
         image: URL?,
         canSelect: Bool = true,
-        recordCount: Int? = nil,
+        recordCount: Int? = nil
     ) {
         if resultView == nil {
             let view = BKBookSummaryView(
