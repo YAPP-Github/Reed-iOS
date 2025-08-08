@@ -65,7 +65,6 @@ final class NoteViewModel: BaseViewModel {
             newState.isLoading = true
             effects.append(.submit(noteForm))
             
-        case .submitNoteFormSuccessed:
         case .submitNoteFormSuccessed(let recordInfo):
             newState.isLoading = false
             newState.createCompleted = true

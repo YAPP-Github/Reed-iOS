@@ -88,13 +88,11 @@ final class SettingViewModel: BaseViewModel {
         case .logoutSuccessed:
             newState.isLoading = false
             newState.isLoggedOut = true
-        case .logoutFailed:
-            newState.isLoading = false
-            newState.errorMessage = "Logout Failed"
-            newState.isLoggedOut = false
             
         case .errorOccured(let error):
+            newState.isLoading = false
             newState.error = error
+            newState.isLoggedOut = false
             
         case .errorHandled:
             newState.error = nil
