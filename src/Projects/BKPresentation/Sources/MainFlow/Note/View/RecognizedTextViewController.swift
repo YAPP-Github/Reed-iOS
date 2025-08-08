@@ -58,6 +58,8 @@ final class RecognizedTextViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .bkBaseColor(.primary)
         collectionView.showsVerticalScrollIndicator = false
+        collectionView.scrollsToTop = false
+        collectionView.bounces = false
         setupTitleAndCloseButton()
         setupCollectionView()
         setupConstraints()

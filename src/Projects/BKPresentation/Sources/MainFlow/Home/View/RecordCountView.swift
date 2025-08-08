@@ -5,7 +5,7 @@ import SnapKit
 import UIKit
 
 final class RecordCountView: UIView {
-    private let image = UIView()
+    private let image = UIImageView(image: BKImage.Graphics.homeSeed)
     private let title = BKLabel()
     
     override init(frame: CGRect) {
@@ -25,12 +25,11 @@ final class RecordCountView: UIView {
         
         addSubviews(image, title)
         
-        image.backgroundColor = .bkBaseColor(.primary)
+        image.backgroundColor = .clear
         
         image.snp.makeConstraints {
             $0.size.equalTo(LayoutConstants.iconSize)
-            $0.verticalEdges.equalToSuperview()
-                .inset(LayoutConstants.verticalInset)
+            $0.centerY.equalToSuperview()
             $0.leading.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
         }
@@ -43,6 +42,12 @@ final class RecordCountView: UIView {
             $0.trailing.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
         }
+        
+        title.setContentHuggingPriority(.required, for: .horizontal)
+        title.setContentCompressionResistancePriority(.required, for: .horizontal)
+        
+        setContentHuggingPriority(.required, for: .horizontal)
+        setContentCompressionResistancePriority(.required, for: .horizontal)
     }
     
     public func configure(count: Int) {

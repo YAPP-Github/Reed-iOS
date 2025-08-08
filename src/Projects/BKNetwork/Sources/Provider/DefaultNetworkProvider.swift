@@ -23,7 +23,7 @@ public struct DefaultNetworkProvider: NetworkProvider {
                 try self.decodeResponse(data: data, response: response, type: type)
             }
             .debugError("Decoding Failed", logger: AppLogger.network)
-            .mapError { $0 as? NetworkError ?? .invalidResponse }
+            .mapError { self.mapToNetworkError($0) }
             .eraseToAnyPublisher()
     }
 }
@@ -35,7 +35,7 @@ private extension DefaultNetworkProvider {
         target.makeURLRequest()
             .flatMap { request in
                 self.requestor.data(for: request)
-                    .mapError { $0 as? NetworkError ?? .invalidResponse }
+                    .mapError { self.mapToNetworkError($0) }
             }
             .eraseToAnyPublisher()
     }

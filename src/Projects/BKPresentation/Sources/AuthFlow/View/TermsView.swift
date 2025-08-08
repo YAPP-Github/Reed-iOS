@@ -9,8 +9,8 @@ import UIKit
 enum TermsViewEvent {
     case agreeAllTapped
     case termTapped(index: Int)
-     case showTermDetail(url: URL)
-     case startButtonTapped
+    case showTermDetail(docsType: DocsType)
+    case startButtonTapped
 }
 
 final class TermsView: BaseView {
@@ -171,8 +171,8 @@ final class TermsView: BaseView {
             }
             
             cell.onDetailTapped = { [weak self] in
-                if let url = term.url {
-                    self?.events.send(.showTermDetail(url: url))
+                if let docsType = term.docsType {
+                    self?.events.send(.showTermDetail(docsType: docsType))
                 }
             }
         }

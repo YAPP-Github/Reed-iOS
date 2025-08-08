@@ -12,7 +12,7 @@ struct HomeDTO: Decodable {
     let title: String
     let author: String
     let publisher: String
-    let coverImageUrl: String
+    let coverImageUrl: URL
     let lastRecordedAt: String
     let recordCount: Int
 }
@@ -24,7 +24,7 @@ extension HomeDTO {
             title: title,
             author: author,
             publisher: publisher,
-            coverImageUrl: URL(string: coverImageUrl),
+            coverImageUrl: coverImageUrl,
             lastRecordedAt: DateParser.parse(lastRecordedAt),
             recordCount: recordCount
         )

@@ -10,12 +10,12 @@ public struct DefaultHomeRepository: HomeRepository {
         self.networkProvider = networkProvider
     }
     
-    public func fetch() -> AnyPublisher<[HomeInfo], Error> {
+    public func fetch() -> AnyPublisher<[HomeInfo], DomainError> {
         networkProvider.request(
             target: HomeAPI.fetch,
             type: FetchHomeResponseDTO.self
         )
-        .mapError { $0 as Error }
+        .mapError { $0.toDomainError() }
         .map { $0.recentBooks.map { $0.toEntity() }}
         .eraseToAnyPublisher()
     }

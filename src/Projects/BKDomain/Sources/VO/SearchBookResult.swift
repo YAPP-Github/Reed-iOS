@@ -7,8 +7,8 @@ public struct SearchBookResult: Decodable {
     public let title: String
     public let author: String
     public let publisher: String
-    public let coverImageUrl: String
-    public let userBookStatus: String
+    public let coverImageUrl: URL
+    public let userBookStatus: BookStatus
 }
 
 public extension SearchBookResult {
@@ -18,7 +18,7 @@ public extension SearchBookResult {
             title: title,
             author: author,
             publisher: publisher,
-            thumbnail: URL(string: coverImageUrl),
+            thumbnail: coverImageUrl,
             userBookStatus: userBookStatus
         )
     }

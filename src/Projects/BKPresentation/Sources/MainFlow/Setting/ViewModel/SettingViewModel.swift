@@ -29,6 +29,7 @@ final class SettingViewModel: BaseViewModel {
         var errorMessage: String?
         var isLoggedOut: Bool = false
         var isLoading: Bool = false
+        var error: DomainError? = nil
     }
     
     enum Action {
@@ -36,7 +37,8 @@ final class SettingViewModel: BaseViewModel {
         case fetchAppVersionSuccessed(String)
         case logoutButtonTapped
         case logoutSuccessed
-        case logoutFailed
+        case errorOccured(DomainError)
+        case errorHandled
 //        case withdrawButtonTapped
     }
     
@@ -75,11 +77,14 @@ final class SettingViewModel: BaseViewModel {
         switch action {
         case .onAppear:
             effects.append(.appVersion)
+            
         case .fetchAppVersionSuccessed(let version):
             newState.appVersion = version
+            
         case .logoutButtonTapped:
             newState.isLoading = true
             effects.append(.logout)
+            
         case .logoutSuccessed:
             newState.isLoading = false
             newState.isLoggedOut = true
@@ -87,6 +92,12 @@ final class SettingViewModel: BaseViewModel {
             newState.isLoading = false
             newState.errorMessage = "Logout Failed"
             newState.isLoggedOut = false
+            
+        case .errorOccured(let error):
+            newState.error = error
+            
+        case .errorHandled:
+            newState.error = nil
         }
         
         return (newState, effects)
@@ -101,7 +112,7 @@ final class SettingViewModel: BaseViewModel {
         case .logout:
             return logoutUseCase.execute()
                 .map { _ in Action.logoutSuccessed }
-                .catch { _ in Just(Action.logoutFailed) }
+                .catch { _ in Just(Action.errorOccured(.unauthorized)) }
                 .eraseToAnyPublisher()
         }
     }

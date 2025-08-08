@@ -7,17 +7,43 @@ final class BookDetailCoordinator: Coordinator {
     var childCoordinators = [Coordinator]()
     var navigationController: UINavigationController
     
+    private let isbn: String
+    private let userBookId: String
+    
     init(
         parentCoordinator: Coordinator?,
-        navigationController: UINavigationController
+        navigationController: UINavigationController,
+        isbn: String,
+        userBookId: String
     ) {
         self.parentCoordinator = parentCoordinator
         self.navigationController = navigationController
+        self.isbn = isbn
+        self.userBookId = userBookId
     }
     
     func start() {
-        let viewController = BookDetailViewController(viewModel: BookDetailViewModel())
+        let viewController = BookDetailViewController(
+            viewModel: BookDetailViewModel(
+                isbn: isbn,
+                userBookId: userBookId
+            )
+        )
         viewController.coordinator = self
         navigationController.pushViewController(viewController, animated: true)
+    }
+}
+
+extension BookDetailCoordinator: SessionExpirationNotifying, ErrorHandleable {}
+
+extension BookDetailCoordinator {
+    func didTapAddNoteButton(bookId: String) {
+        let noteCoordinator = NoteCoordinator(
+            parentCoordinator: self,
+            navigationController: navigationController,
+            bookId: bookId
+        )
+        addChildCoordinator(noteCoordinator)
+        noteCoordinator.start()
     }
 }

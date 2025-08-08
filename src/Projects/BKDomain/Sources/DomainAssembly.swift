@@ -165,5 +165,33 @@ public struct DomainAssembly: Assembly {
             @Autowired var repository: HomeRepository
             return DefaultFetchHomeUseCase(repository: repository)
         }
+        
+        container.register(
+            type: FetchRecordDetailUseCase.self
+        ) { _ in
+            @Autowired var repository: RecordRepository
+            return DefaultFetchRecordDetailUseCase(repository: repository)
+        }
+        
+        container.register(
+            type: FetchRecordsUseCase.self
+        ) { _ in
+            @Autowired var repository: RecordRepository
+            return DefaultFetchRecordsUseCase(repository: repository)
+        }
+        
+        container.register(
+            type: FetchSeedStatsUseCase.self
+        ) { _ in
+            @Autowired var repository: SeedRepository
+            return DefaultFetchSeedStatsUseCase(repository: repository)
+        }
+        
+        container.register(
+            type: FetchBookDetailUseCase.self
+        ) { _ in
+            @Autowired var repository: BookRepository
+            return DefaultFetchBookDetailUseCase(repository: repository)
+        }
     }
 }

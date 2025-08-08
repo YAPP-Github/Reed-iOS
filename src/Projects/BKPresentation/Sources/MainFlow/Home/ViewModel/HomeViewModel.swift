@@ -8,11 +8,16 @@ final class HomeViewModel: BaseViewModel {
     struct State: Equatable {
         var homeInfos: [HomeBookInfo] = []
         var isLoading: Bool = false
+        var shouldPlayAnimation: Bool = false
+        var error: DomainError? = nil
     }
     
     enum Action {
         case onAppear
+        case onDisappear
         case fetchHomeSuccessed([HomeBookInfo])
+        case errorOccured(DomainError)
+        case errorHandled
     }
     
     enum SideEffect {
@@ -47,9 +52,19 @@ final class HomeViewModel: BaseViewModel {
         case .onAppear:
             newState.isLoading = true
             effects.append(.fetch)
+            newState.shouldPlayAnimation = true
+        case .onDisappear:
+            newState.shouldPlayAnimation = false
+
         case .fetchHomeSuccessed(let homeInfos):
             newState.isLoading = false // TODO : 추후에 failed 케이스 생기면 거기에도 추가 @dyk429
             newState.homeInfos = homeInfos
+            
+        case .errorOccured(let error):
+            newState.error = error
+            
+        case .errorHandled:
+            newState.error = nil
         }
         
         return (newState, effects)
@@ -59,9 +74,9 @@ final class HomeViewModel: BaseViewModel {
         switch effect {
         case .fetch:
             fetchHomeUseCase.execute()
-                .catch { _ in Empty() }
                 .map { $0.map { HomeBookInfo.from($0) }}
                 .map { Action.fetchHomeSuccessed($0) }
+                .catch { Just(Action.errorOccured($0)) }
                 .eraseToAnyPublisher()
         }
     }

@@ -7,7 +7,7 @@ import UIKit
 
 enum HomeViewEvent: Equatable {
     case didTapRecordButton(String)
-    case didTapBook(String)
+    case didTapBook(isbn: String, userBookId: String)
     case didTapSearchButton
     case didTapEmptyBook
 }
@@ -16,8 +16,9 @@ final class HomeViewController: BaseViewController<HomeView> {
     weak var coordinator: MainFlowCoordinator?
     
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
-        .home(
+        .homeWithImage(
             viewController: self,
+            image: BKImage.Logos.smallLogo,
             target: self,
             gearAction: #selector(goToSettingViewController)
         )
@@ -38,15 +39,23 @@ final class HomeViewController: BaseViewController<HomeView> {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
+        
         viewModel.send(.onAppear)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.navigationBar.shadowImage = nil
+        
+        viewModel.send(.onDisappear)
     }
     
     override func bindAction() {
         contentView.eventPublisher
             .sink { [weak self] event in
                 switch event {
-                case .didTapBook(let _):
-                    self?.coordinator?.didTapBookDetailButton()
+                case .didTapBook(let isbn, let userBookId):
+                    self?.coordinator?.didTapBookDetailButton(isbn: isbn, userBookId: userBookId)
                 case .didTapRecordButton(let bookId):
                     self?.coordinator?.didTapNoteButton(bookId: bookId)
                 case .didTapSearchButton:
@@ -78,6 +87,27 @@ final class HomeViewController: BaseViewController<HomeView> {
                 } else {
                     self?.hideLoading()
                 }
+            }
+            .store(in: &cancellable)
+                   
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .map(\.shouldPlayAnimation)
+            .removeDuplicates()
+            .sink { [weak self] shouldPlayAnimation in
+                self?.contentView.playAnimation(shouldPlayAnimation)
+            }
+            .store(in: &cancellable)
+
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .map(\.error)
+            .removeDuplicates()
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.coordinator?.handleError(error)
+                self?.viewModel.send(.errorHandled)
             }
             .store(in: &cancellable)
     }

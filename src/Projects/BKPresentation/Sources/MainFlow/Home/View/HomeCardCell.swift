@@ -20,27 +20,33 @@ final class HomeCardCell: UICollectionViewCell {
     
     private let authorLabel = BKLabel(
         fontStyle: .label1(weight: .medium),
-        color: .bkContentColor(.disable)
+        color: .bkContentColor(.disable),
+        alignment: .right
     )
     
     private let separatorLabel = BKLabel(
-        text: " | ",
+        text: "|",
         fontStyle: .label1(weight: .medium),
-        color: .bkContentColor(.disable)
+        color: .bkContentColor(.disable),
+        alignment: .center
     )
     
     private let publisherLabel = BKLabel(
         fontStyle: .label1(weight: .medium),
-        color: .bkContentColor(.disable)
+        color: .bkContentColor(.disable),
+        alignment: .left
     )
     
     private let descriptionStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = .zero
-        stackView.alignment = .leading
+        stackView.spacing = 4
+        stackView.alignment = .center
+        stackView.distribution = .fillProportionally
         return stackView
     }()
+    
+    private let infoArea = UIView()
     
     private let recordCountView = RecordCountView()
     private let addNoteButton = BKButton(style: .primary, size: .medium)
@@ -73,11 +79,14 @@ final class HomeCardCell: UICollectionViewCell {
         
         titleLabel.numberOfLines = 1
         authorLabel.numberOfLines = 1
+        
         titleLabel.setText(text: title)
         authorLabel.setText(text: author)
         publisherLabel.setText(text: publisher)
+        
         titleLabel.lineBreakMode = .byTruncatingTail
         authorLabel.lineBreakMode = .byTruncatingTail
+        publisherLabel.lineBreakMode = .byTruncatingTail
         
         recordCountView.configure(count: recordCount)
         
@@ -93,6 +102,8 @@ final class HomeCardCell: UICollectionViewCell {
     }
     
     func setupView() {
+        clipsToBounds = false
+        contentView.clipsToBounds = false
         contentView.addSubview(containerView)
         containerView.backgroundColor = .white
         containerView.layer.cornerRadius = BKRadius.medium
@@ -104,8 +115,10 @@ final class HomeCardCell: UICollectionViewCell {
         
         titleLabel.numberOfLines = 1
         authorLabel.numberOfLines = 1
+        
         titleLabel.lineBreakMode = .byTruncatingTail
         authorLabel.lineBreakMode = .byTruncatingTail
+        publisherLabel.lineBreakMode = .byTruncatingTail
         
         addNoteButton.leftIcon = BKImage.Icon.edit3
         addNoteButton.title = "기록하기"
@@ -113,12 +126,15 @@ final class HomeCardCell: UICollectionViewCell {
         containerView.addSubviews(
             thumbnail,
             titleLabel,
-            descriptionStack,
+            infoArea,
             recordCountView,
             addNoteButton
         )
         
-        [authorLabel, separatorLabel, publisherLabel].forEach(descriptionStack.addArrangedSubview(_:))
+        infoArea.addSubview(descriptionStack)
+        [authorLabel, separatorLabel, publisherLabel].forEach { label in
+            descriptionStack.addArrangedSubview(label)
+        }
         
         setupConstraints()
         addNoteButton.addTarget(self, action: #selector(handleNoteButtonTap), for: .touchUpInside)
@@ -128,6 +144,38 @@ final class HomeCardCell: UICollectionViewCell {
         containerView.snp.makeConstraints {
             $0.edges.equalToSuperview()
                 .inset(LayoutConstants.containerInset)
+        }
+        
+        thumbnail.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(LayoutConstants.thumbnailTopSpacing)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(LayoutConstants.thumbnailSize.width)
+            $0.height.equalTo(LayoutConstants.thumbnailSize.height)
+        }
+        
+        titleLabel.snp.makeConstraints {
+            $0.top.equalTo(thumbnail.snp.bottom).offset(LayoutConstants.titleTopSpacing)
+            $0.leading.trailing.equalToSuperview()
+                .inset(LayoutConstants.sidePadding)
+        }
+        
+        infoArea.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(LayoutConstants.despStackTopSpacing)
+            $0.leading.trailing.equalToSuperview().inset(LayoutConstants.sidePadding)
+            $0.height.equalTo(LayoutConstants.infoAreaHeight)
+        }
+        
+        descriptionStack.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.width.lessThanOrEqualToSuperview()
+        }
+        
+        publisherLabel.snp.makeConstraints {
+            $0.width.lessThanOrEqualTo(infoArea.snp.width).multipliedBy(0.3)
+        }
+        
+        authorLabel.snp.makeConstraints {
+            $0.width.lessThanOrEqualTo(infoArea.snp.width).multipliedBy(0.7)
         }
         
         recordCountView.snp.makeConstraints {
@@ -145,33 +193,7 @@ final class HomeCardCell: UICollectionViewCell {
                 .inset(LayoutConstants.sidePadding)
             $0.centerY.equalTo(recordCountView)
         }
-        
-        descriptionStack.snp.makeConstraints {
-            $0.bottom.equalTo(addNoteButton.snp.top)
-                .offset(LayoutConstants.stackBottomSpacing)
-            $0.centerX.equalToSuperview()
-            $0.leading.greaterThanOrEqualToSuperview()
-                .inset(LayoutConstants.sidePadding)
-            $0.trailing.lessThanOrEqualToSuperview()
-                .inset(LayoutConstants.sidePadding)
-        }
-        
-        titleLabel.snp.makeConstraints {
-            $0.bottom.equalTo(descriptionStack.snp.top)
-                .offset(LayoutConstants.titleBottomSpacing)
-            $0.leading.trailing.equalToSuperview()
-                .inset(LayoutConstants.sidePadding)
-        }
-        
-        thumbnail.snp.makeConstraints {
-            $0.bottom.equalTo(titleLabel.snp.top)
-                .offset(LayoutConstants.thumbnailBottomSpacing)
-            $0.centerX.equalToSuperview()
-            $0.width.equalTo(LayoutConstants.thumbnailSize.width)
-            $0.height.equalTo(LayoutConstants.thumbnailSize.height)
-            $0.top.greaterThanOrEqualToSuperview()
-                .inset(LayoutConstants.thumbnailTopSpacing)
-        }
+
     }
     
     @objc private func handleNoteButtonTap() {
@@ -184,15 +206,17 @@ private extension HomeCardCell {
         static let shadowOffset = CGSize(width: 0, height: 2)
         static let shadowRadius: CGFloat = 8
         static let shadowOpacity: Float = 0.1
-        static let containerInset = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+        static let containerInset = UIEdgeInsets(top: 12, left: 0, bottom: 20, right: 0)
         static let sidePadding: CGFloat = 20
         static let bottomPadding: CGFloat = 20
-        static let recordCountHeight: CGFloat = 44
+        static let recordCountHeight: CGFloat = 46
         static let recordCountSpacing: CGFloat = 12
-        static let stackBottomSpacing: CGFloat = -24
-        static let titleBottomSpacing: CGFloat = -4
-        static let thumbnailBottomSpacing: CGFloat = -24
-        static let thumbnailTopSpacing: CGFloat = 24
-        static let thumbnailSize = CGSize(width: 86, height: 125)
+        static let buttonTopSpacing: CGFloat = 24
+        static let despStackTopSpacing: CGFloat = 4
+        static let infoAreaHeight: CGFloat = 22
+        
+        static let titleTopSpacing: CGFloat = 16
+        static let thumbnailTopSpacing: CGFloat = 32
+        static let thumbnailSize = CGSize(width: 95.6, height: 140)
     }
 }

@@ -15,8 +15,13 @@ enum LoginViewEvent {
 final class LoginView: BaseView {
     let eventPublisher = PassthroughSubject<LoginViewEvent, Never>()
     
-    // TODO : 추후 로고 이미지뷰로 전환
     private let logoImageView = UIView()
+    private let imageView = UIImageView(image: BKImage.Logos.bigLogo)
+    private let sloganLabel = BKLabel(
+        text: "책 덮기 전 한 문장을 기록해보세요",
+        fontStyle: .headline2(weight: .semiBold),
+        color: .bkContentColor(.brand)
+    )
 
     private let appleSignInButton = BKButton(
         style: .custom(
@@ -35,13 +40,17 @@ final class LoginView: BaseView {
     )
     
     override func setupView() {
-        logoImageView.backgroundColor = .bkBackgroundColor(.secondary)
+        imageView.backgroundColor = .clear
+        imageView.contentMode = .scaleAspectFit
+        logoImageView.backgroundColor = .clear
         
         appleSignInButton.title = "Apple로 시작하기"
         appleSignInButton.leftIcon = BKImage.Icon.apple
 
         kakaoSignInButton.title = "카카오로 시작하기"
         kakaoSignInButton.leftIcon = BKImage.Icon.kakao
+        
+        logoImageView.addSubviews(imageView, sloganLabel)
         
         addSubviews(logoImageView, appleSignInButton, kakaoSignInButton)
     }
@@ -75,6 +84,16 @@ final class LoginView: BaseView {
                 .offset(-LayoutConstants.buttonSpacing)
         }
         
+        imageView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.top.equalToSuperview().offset(LayoutConstants.imageTopInset)
+        }
+        
+        sloganLabel.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.top.equalTo(imageView.snp.bottom).offset(LayoutConstants.horizontalInset)
+        }
+        
         logoImageView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(LayoutConstants.logoHeight)
@@ -101,5 +120,6 @@ private extension LoginView {
         static let buttonSpacing: CGFloat = BKSpacing.spacing2
         static let logoBottomOffset: CGFloat = 200
         static let logoHeight: CGFloat = 200
+        static let imageTopInset: CGFloat = 44.5
     }
 }

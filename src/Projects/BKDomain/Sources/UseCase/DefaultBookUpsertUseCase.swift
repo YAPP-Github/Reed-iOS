@@ -12,7 +12,7 @@ public struct DefaultBookUpsertUseCase: BookUpsertUseCase {
     public func execute(
         isbn: String,
         status: BookStatus
-    ) -> AnyPublisher<BookInfo, Error> {
+    ) -> AnyPublisher<BookInfo, DomainError> {
         return repository.upsert(isbn, status)
             .eraseToAnyPublisher()
     }
