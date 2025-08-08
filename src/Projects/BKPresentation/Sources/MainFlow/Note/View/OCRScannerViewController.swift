@@ -224,6 +224,19 @@ final class OCRScannerViewController: UIViewController {
                 self?.render(state)
             }
             .store(in: &cancellables)
+        
+        viewModel.statePublisher
+            .map { $0.isLoading }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                if isLoading {
+                    self?.showLoading()
+                } else {
+                    self?.hideLoading()
+                }
+            }
+            .store(in: &cancellables)
     }
     
     private func render(_ state: OCRScannerViewModel.State) {

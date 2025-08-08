@@ -13,6 +13,8 @@ final class RecognizedTextViewModel: BaseViewModel {
         var selectedSentences: Set<Int> = []
         var isConfirmButtonEnabled: Bool = false
         var errorMessage: String?
+        
+        var isLoading: Bool = false
     }
     
     struct SentenceItem: Equatable, Hashable {
@@ -91,10 +93,12 @@ final class RecognizedTextViewModel: BaseViewModel {
             )
             
         case .confirmButtonTapped:
+            newState.isLoading = true
             let selectedTexts = newState.sentences
                 .filter { $0.isSelected }
                 .map { $0.text }
             
+            newState.isLoading = false
             if !selectedTexts.isEmpty {
                 let combinedText = selectedTexts.joined(separator: " ")
                 effects.append(.confirmWithSelectedText(combinedText))

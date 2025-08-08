@@ -10,6 +10,7 @@ final class NoteViewModel: BaseViewModel {
         var selectedGuideText: String = ""
         var createCompleted: Bool = false
         var shouldStartEditing: Bool = false
+        var isLoading: Bool = false
     }
     
     enum Action {
@@ -54,9 +55,11 @@ final class NoteViewModel: BaseViewModel {
             newState.shouldStartEditing = true
             
         case .submitNoteForm(let noteForm):
+            newState.isLoading = true
             effects.append(.submit(noteForm))
             
         case .submitNoteFormSuccessed:
+            newState.isLoading = false
             newState.createCompleted = true
         }
         
