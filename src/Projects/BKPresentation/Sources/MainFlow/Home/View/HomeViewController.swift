@@ -39,11 +39,14 @@ final class HomeViewController: BaseViewController<HomeView> {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
+        
         viewModel.send(.onAppear)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         navigationController?.navigationBar.shadowImage = nil
+        
         viewModel.send(.onDisappear)
     }
     
