@@ -54,20 +54,27 @@ public enum BKImage {
     }
     
     public enum Graphics {
-        public static let mascot = BKDesignAsset.mascot.image
-        public static let onboarding2 = BKDesignAsset.onboarding2.image
-        public static let homeChar = BKDesignAsset.homeCharacter.image
-        public static let empty = BKDesignAsset.empty.image
-        public static let emptyBook = BKDesignAsset.emptybook.image
-        public static let warmth = BKDesignAsset.warmth.image
-        public static let sadness = BKDesignAsset.sadness.image
-        public static let joy = BKDesignAsset.joy.image
-        public static let nervous = BKDesignAsset.nervous.image
+        public static let coinCheck = BKDesignAsset.coinCheck.image
         public static let homeSeed = BKDesignAsset.homeSeed.image
+        public static let emptyBook = BKDesignAsset.emptybook.image
+        public static let insight = BKDesignAsset.insight.image
+        public static let insightEmotion = BKDesignAsset.insightEmotion.image
+        public static let joy = BKDesignAsset.joy.image
+        public static let joyEmotion = BKDesignAsset.joyEmotion.image
+        public static let mascot = BKDesignAsset.mascot.image
+        public static let noteCompleted = BKDesignAsset.noteCompleted.image
+        public static let onboarding1 = BKDesignAsset.onboarding1.image
+        public static let onboarding2 = BKDesignAsset.onboarding2.image
+        public static let onboarding3 = BKDesignAsset.onboarding3.image
+        public static let sad = BKDesignAsset.sad.image
+        public static let sadEmotion = BKDesignAsset.sadEmotion.image
+        public static let warm = BKDesignAsset.warm.image
+        public static let warmEmotion = BKDesignAsset.warmEmotion.image
     }
     
     public enum Logos {
         public static let bigLogo = BKDesignAsset.bigLogo.image
         public static let smallLogo = BKDesignAsset.smallLogo.image
+        public static let splash = BKDesignAsset.splash.image
     }
 }

@@ -192,7 +192,7 @@ private extension OnboardingView {
     enum Constants {
         static let pages: [OnboardingPage] = [
             OnboardingPage(
-                image: BKImage.Graphics.onboarding2,
+                image: BKImage.Graphics.onboarding1,
                 title: """
                 읽고 있는 책을 등록하고
                 바로 기록해보세요
@@ -216,7 +216,7 @@ private extension OnboardingView {
                 titleHighlightWord: "감상평 가이드"
             ),
             OnboardingPage(
-                image: BKImage.Graphics.onboarding2,
+                image: BKImage.Graphics.onboarding3,
                 title: """
                 독서 중 느낀 감정은
                 씨앗으로 남겨보세요

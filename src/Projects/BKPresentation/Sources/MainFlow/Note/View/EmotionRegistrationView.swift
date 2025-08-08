@@ -16,13 +16,13 @@ extension Emotion {
         
         switch self {
         case .warmth:
-            imageView.image = BKImage.Graphics.warmth
+            imageView.image = BKImage.Graphics.warmEmotion
         case .joy:
-            imageView.image = BKImage.Graphics.joy
-        case .nervous:
-            imageView.image = BKImage.Graphics.nervous
-        case .sadness:
-            imageView.image = BKImage.Graphics.sadness
+            imageView.image = BKImage.Graphics.joyEmotion
+        case .sad:
+            imageView.image = BKImage.Graphics.sadEmotion
+        case .insight:
+            imageView.image = BKImage.Graphics.insightEmotion
         }
         
         imageView.layer.cornerRadius = 12
@@ -65,8 +65,8 @@ final class EmotionRegistrationView: BaseView {
     
     private lazy var emotion1View = makeEmotionView(for: .warmth)
     private lazy var emotion2View = makeEmotionView(for: .joy)
-    private lazy var emotion3View = makeEmotionView(for: .nervous)
-    private lazy var emotion4View = makeEmotionView(for: .sadness)
+    private lazy var emotion3View = makeEmotionView(for: .sad)
+    private lazy var emotion4View = makeEmotionView(for: .insight)
     
     override func setupView() {
         addSubview(containerView)
@@ -105,8 +105,8 @@ extension EmotionRegistrationView: RegistrationFormProvidable, FormInputNotifiab
         [
             .warmth: emotion1View,
             .joy: emotion2View,
-            .nervous: emotion3View,
-            .sadness: emotion4View
+            .sad: emotion3View,
+            .insight: emotion4View
         ]
     }
     
@@ -142,13 +142,13 @@ private extension EmotionRegistrationView {
 
         switch emotion {
         case .warmth:
-            imageView.image = BKImage.Graphics.warmth
+            imageView.image = BKImage.Graphics.warmEmotion
         case .joy:
-            imageView.image = BKImage.Graphics.joy
-        case .nervous:
-            imageView.image = BKImage.Graphics.nervous
-        case .sadness:
-            imageView.image = BKImage.Graphics.sadness
+            imageView.image = BKImage.Graphics.joyEmotion
+        case .sad:
+            imageView.image = BKImage.Graphics.sadEmotion
+        case .insight:
+            imageView.image = BKImage.Graphics.insightEmotion
         }
 
         imageView.layer.cornerRadius = 12

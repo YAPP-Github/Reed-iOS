@@ -9,10 +9,15 @@ enum EmotionIcon: String {
     case warmth = "#따뜻함"
     case joy = "#즐거움"
     case sadness = "#슬픔"
-    case nervous = "#긴장됨"
+    case insight = "#깨달음"
     
     var icon: UIImage {
-        return BKImage.Graphics.empty
+        switch self {
+        case .warmth: return BKImage.Graphics.warm
+        case .joy: return BKImage.Graphics.joy
+        case .sadness: return BKImage.Graphics.sad
+        case .insight: return BKImage.Graphics.insight
+        }
     }
     
     static func from(emotion: Emotion) -> Self {
@@ -21,10 +26,10 @@ enum EmotionIcon: String {
             return .warmth
         case .joy:
             return .joy
-        case .sadness:
+        case .insight:
             return .sadness
-        case .nervous:
-            return .nervous
+        case .sad:
+            return .insight
         }
     }
 }

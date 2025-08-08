@@ -3,6 +3,6 @@
 public enum Emotion: String, CaseIterable, Decodable {
     case warmth
     case joy
-    case nervous
-    case sadness
+    case sad
+    case insight
 }

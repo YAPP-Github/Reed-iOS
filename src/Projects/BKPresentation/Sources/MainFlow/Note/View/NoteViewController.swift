@@ -166,7 +166,7 @@ private extension NoteViewController {
     }
     
     func presentRegistrationSuccessDialog(recordInfo: RecordInfo) {
-        let imageView = UIImageView(image: BKImage.Graphics.empty)
+        let imageView = UIImageView(image: BKImage.Graphics.noteCompleted)
         let dialog = BKDialog(
             title: "기록이 저장되었어요!",
             subtitle: "방금 남긴 기록을 확인해볼까요?",
