@@ -17,6 +17,7 @@ final class TermsViewModel: BaseViewModel {
         var isStartButtonEnabled: Bool = false
         var errorMessage: String?
         var didAgreementSucceed: Bool = false
+        var isLoading: Bool = false
     }
     
     enum Action {
@@ -63,16 +64,24 @@ final class TermsViewModel: BaseViewModel {
         
         switch action {
         case .viewDidLoad:
-            let dummyURL = URL(string: "https://www.naver.com")!
             newState.terms = [
-                Term(title: "(필수)서비스 이용약관", url: dummyURL, isRequired: true),
-                Term(title: "(필수)개인정보처리방침", url: dummyURL, isRequired: true),
+                Term(
+                    title: "(필수)서비스 이용약관",
+                    url: URL(string: "https://sites.google.com/view/reed-termsofuse")!,
+                    isRequired: true
+                ),
+                Term(
+                    title: "(필수)개인정보처리방침",
+                    url: URL(string: "https://sites.google.com/view/reed-privacypolicy")!,
+                    isRequired: true
+                ),
                 Term(title: "(필수)만 14세 이상입니다", isRequired: true)
             ]
             
         case .agreeAllTapped:
             let newAgreementState = !newState.isAllAgreed
             newState.isAllAgreed = newAgreementState
+            
             for i in newState.terms.indices {
                 newState.terms[i].isAgreed = newAgreementState
             }
@@ -83,12 +92,15 @@ final class TermsViewModel: BaseViewModel {
             
         case .startButtonTapped:
             guard state.isStartButtonEnabled else { break }
+            newState.isLoading = true
             effects.append(.agreeToTerms)
             
         case .agreementSuccess:
             newState.didAgreementSucceed = true
+            newState.isLoading = false
             
         case .agreementFailed(let error):
+            newState.isLoading = false
             newState.errorMessage = error.localizedDescription
         }
         

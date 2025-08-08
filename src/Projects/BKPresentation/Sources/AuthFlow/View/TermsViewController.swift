@@ -85,5 +85,18 @@ final class TermsViewController: BaseViewController<TermsView> {
                 self?.coordinator?.popAndFinish()
             }
             .store(in: &cancellables)
+        
+        viewModel.statePublisher
+            .map { $0.isLoading }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                if isLoading {
+                    self?.showLoading()
+                } else {
+                    self?.hideLoading()
+                }
+            }
+            .store(in: &cancellables)
     }
 }
