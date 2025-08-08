@@ -59,9 +59,10 @@ final class BookDetailView: BaseView {
         return stackView
     }()
 
-    private let readingStateButton: BKButton = {
+    private var readingStateButton: BKButton = {
         let button = BKButton(style: .secondary, size: .medium)
         button.rightIcon = BKImage.Icon.chevronDown
+        button.title = "초기 값"
         
         button.setContentHuggingPriority(.required, for: .horizontal)
         button.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -249,8 +250,8 @@ final class BookDetailView: BaseView {
             extraText: book.pubDate?.toKoreanYearString(),
             image: book.thumbnail
         )
-        // 버튼 title 세팅
-        readingStateButton.title = book.userBookStatus.rawValue
+
+        readingStateButton.title = book.userBookStatus.displayName
     }
 }
 
