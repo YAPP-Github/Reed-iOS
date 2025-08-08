@@ -3,5 +3,5 @@
 import Combine
 
 public protocol FetchSeedStatsUseCase {
-    func execute() -> AnyPublisher<[Seed], Error>
+    func execute() -> AnyPublisher<[Seed], DomainError>
 }

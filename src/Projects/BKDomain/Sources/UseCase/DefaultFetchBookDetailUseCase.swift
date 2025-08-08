@@ -9,7 +9,7 @@ public struct DefaultFetchBookDetailUseCase: FetchBookDetailUseCase {
         self.repository = repository
     }
     
-    public func execute(isbn: String) -> AnyPublisher<Book, Error> {
+    public func execute(isbn: String) -> AnyPublisher<Book, DomainError> {
         repository.detail(isbn: isbn)
     }
 }

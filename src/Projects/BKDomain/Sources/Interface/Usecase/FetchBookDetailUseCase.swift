@@ -3,5 +3,5 @@
 import Combine
 
 public protocol FetchBookDetailUseCase {
-    func execute(isbn: String) -> AnyPublisher<Book, Error>
+    func execute(isbn: String) -> AnyPublisher<Book, DomainError>
 }

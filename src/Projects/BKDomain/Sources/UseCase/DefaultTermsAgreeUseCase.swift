@@ -13,10 +13,11 @@ public struct DefaultTermsAgreeUseCase: TermsAgreeUseCase {
         self.authStateRepository = authStateRepository
     }
     
-    public func execute(_ isAgreed: Bool) -> AnyPublisher<Bool, AuthError> {
+    public func execute(_ isAgreed: Bool) -> AnyPublisher<Bool, DomainError> {
         authStateRepository
             .updateTermsAgreement(isAgreed: isAgreed)
             .debugError(logger: AppLogger.auth)
+            .mapError { _ in DomainError.internalServerError }
             .eraseToAnyPublisher()
     }
 }

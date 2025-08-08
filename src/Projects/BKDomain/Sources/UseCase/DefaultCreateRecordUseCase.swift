@@ -12,7 +12,7 @@ public struct DefaultCreateRecordUseCase: CreateRecordUseCase {
     public func execute(
         bookId: String,
         record: RecordVO
-    ) -> AnyPublisher<RecordInfo, Error> {
+    ) -> AnyPublisher<RecordInfo, DomainError> {
         repository.create(bookId: bookId, recordData: record)
             .eraseToAnyPublisher()
     }

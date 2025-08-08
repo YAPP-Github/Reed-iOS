@@ -9,7 +9,7 @@ public struct DefaultFetchHomeUseCase: FetchHomeUseCase {
         self.repository = repository
     }
     
-    public func execute() -> AnyPublisher<[HomeInfo], Error> {
+    public func execute() -> AnyPublisher<[HomeInfo], DomainError> {
         repository.fetch()
             .eraseToAnyPublisher()
     }
