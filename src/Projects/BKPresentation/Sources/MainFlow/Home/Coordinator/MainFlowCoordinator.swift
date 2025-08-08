@@ -24,6 +24,8 @@ final class MainFlowCoordinator: Coordinator, FinishNotifying {
     }
 }
 
+extension MainFlowCoordinator: SessionExpirationNotifying, ErrorHandleable {}
+
 extension MainFlowCoordinator {
     func didTapSettingButton() {
         let settingCoordinator = SettingCoordinator(

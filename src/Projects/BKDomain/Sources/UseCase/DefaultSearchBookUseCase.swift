@@ -12,7 +12,7 @@ public struct DefaultSearchBookUseCase: SearchBookUseCase {
     public func execute(
         query: String,
         startIndex: Int
-    ) -> AnyPublisher<(books: [Book], totalResults: Int), Never> {
+    ) -> AnyPublisher<(books: [Book], totalResults: Int), DomainError> {
         repository.search(
             SearchBookParameters(
                 query: query,

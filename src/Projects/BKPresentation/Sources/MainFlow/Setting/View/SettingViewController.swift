@@ -9,6 +9,7 @@ import UIKit
 enum SettingViewEvent {
     case logoutButtonTapped
     case withdrawalButtonTapped
+    case firstMenuTapped(FirstMenuItem)
 }
 
 final class SettingViewController: BaseViewController<SettingView> {
@@ -41,6 +42,17 @@ final class SettingViewController: BaseViewController<SettingView> {
                     self?.presentLogoutDialog()
                 case .withdrawalButtonTapped:
                     self?.presentWithdrawalSheet()
+                case .firstMenuTapped(let item):
+                    switch item {
+                    case .privacy:
+                        self?.coordinator?.presentWeb(url: DocsType.privacy.url)
+                    case .term:
+                        self?.coordinator?.presentWeb(url: DocsType.terms.url)
+                    case .license:
+                        self?.coordinator?.presentWeb(url: DocsType.licenses.url)
+                    case .version:
+                        break
+                    }
                 }
             }
             .store(in: &cancellable)
@@ -74,6 +86,17 @@ final class SettingViewController: BaseViewController<SettingView> {
             .removeDuplicates()
             .sink { [weak self] _ in
                 self?.coordinator?.notifyParentSessionExpired()
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map(\.error)
+            .removeDuplicates()
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.coordinator?.handleError(error)
+                self?.viewModel.send(.errorHandled)
             }
             .store(in: &cancellable)
     }

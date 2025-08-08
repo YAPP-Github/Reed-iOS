@@ -9,7 +9,7 @@ public struct DefaultFetchRecordDetailUseCase: FetchRecordDetailUseCase {
         self.repository = repository
     }
     
-    public func execute(id: String) -> AnyPublisher<RecordInfo, Error> {
+    public func execute(id: String) -> AnyPublisher<RecordInfo, DomainError> {
         repository.findBy(id: id).eraseToAnyPublisher()
     }
 }

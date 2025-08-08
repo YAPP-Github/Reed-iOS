@@ -14,6 +14,8 @@ final class BookDetailViewModel: BaseViewModel {
         var isAddNoteTriggered = false
         var isStatusButtonTriggered = false
         let userBookId: String
+        var error: DomainError? = nil
+        var isRetrying: Bool = false
     }
     
     enum Action {
@@ -28,6 +30,9 @@ final class BookDetailViewModel: BaseViewModel {
         case fetchRecordsSuccessed([BookDetailItem])
         case fetchSeedStatsSuccessed([Seed])
         case fetchBookDetailSuccessed(Book)
+        case errorOccured(DomainError)
+        case errorHandled
+        case retryTapped
     }
     
     enum SideEffect {
@@ -40,6 +45,7 @@ final class BookDetailViewModel: BaseViewModel {
     @Published private var state: State
     private var cancellables = Set<AnyCancellable>()
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
+    private var lastEffect: SideEffect? = nil
     
     @Autowired private var fetchRecordsUseCase: FetchRecordsUseCase
     @Autowired private var fetchSeedStatsUseCase: FetchSeedStatsUseCase
@@ -106,6 +112,22 @@ final class BookDetailViewModel: BaseViewModel {
             
         case .fetchSeedStatsSuccessed(let seeds):
             newState.seeds = seeds
+            
+        case .errorOccured(let error):
+            if newState.isRetrying == false {
+                newState.isRetrying = true
+            } else {
+                newState.isRetrying = false
+                newState.error = error
+            }
+
+        case .retryTapped:
+            if let last = lastEffect {
+                effects.append(last)
+            }
+            
+        case .errorHandled:
+            newState.error = nil
         }
         
         return (newState, effects)
@@ -119,26 +141,38 @@ final class BookDetailViewModel: BaseViewModel {
                 status: status.toBookStatus()
             )
             .map { Action.upsertSuccessed($0.toBook()) }
-            .catch { _ in Empty() }
+            .catch { [weak self] in
+                self?.lastEffect = .upsertBook(isbn: isbn, status: status)
+                return Just(Action.errorOccured($0))
+            }
             .eraseToAnyPublisher()
             
         case .fetchBookDetail:
             return fetchBookDetailUseCase.execute(isbn: isbn)
                 .map { Action.fetchBookDetailSuccessed($0)}
-                .catch { _ in Empty() }
+                .catch { [weak self] in
+                    self?.lastEffect = .fetchBookDetail
+                    return Just(Action.errorOccured($0))
+                }
                 .eraseToAnyPublisher()
             
         case .fetchRecords:
             return fetchRecordsUseCase.execute(id: state.userBookId)
                 .map { $0.map { BookDetailItem.from(recordInfo: $0) } }
                 .map { Action.fetchRecordsSuccessed($0) }
-                .catch { _ in Empty() }
+                .catch { [weak self] in
+                    self?.lastEffect = .fetchRecords
+                    return Just(Action.errorOccured($0))
+                }
                 .eraseToAnyPublisher()
             
         case .fetchSeedStats:
             return fetchSeedStatsUseCase.execute()
                 .map { Action.fetchSeedStatsSuccessed($0) }
-                .catch { _ in Empty() }
+                .catch { [weak self] in
+                    self?.lastEffect = .fetchSeedStats
+                    return Just(Action.errorOccured($0))
+                }
                 .eraseToAnyPublisher()
         }
     }

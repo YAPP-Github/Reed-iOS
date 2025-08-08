@@ -22,6 +22,8 @@ final class ArchiveCoordinator: Coordinator {
     }
 }
 
+extension ArchiveCoordinator: SessionExpirationNotifying, ErrorHandleable {}
+
 extension ArchiveCoordinator {
     // Archive 관련 네비게이션 메서드들을 여기에 추가
     func didTapSearchButton() {

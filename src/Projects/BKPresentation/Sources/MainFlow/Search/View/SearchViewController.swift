@@ -107,6 +107,36 @@ final class SearchViewController: BaseViewController<SearchView> {
                 self?.coordinator?.didBookRegistered(bookId: bookId)
             }
             .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map(\.error)
+            .removeDuplicates()
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.coordinator?.handleError(error)
+                self?.viewModel.send(.errorHandled)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map(\.isRetrying)
+            .removeDuplicates()
+            .filter { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.coordinator?.presentCustomErrorAlert(
+                    subtitle: """
+                    일시적인 오류로 
+                    데이터를 불러올 수 없어요
+                    """,
+                    onConfirm: { [weak self] in
+                        self?.viewModel.send(.retryTapped)
+                    }
+                )
+                self?.viewModel.send(.errorHandled)
+            }
+            .store(in: &cancellable)
     }
 }
 

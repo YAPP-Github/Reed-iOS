@@ -50,8 +50,8 @@ final class TermsViewController: BaseViewController<TermsView> {
                     self?.viewModel.send(.termTapped(index: index))
                 case .startButtonTapped:
                     self?.viewModel.send(.startButtonTapped)
-                case .showTermDetail(let url):
-                    self?.coordinator?.showWebView(url: url)
+                case .showTermDetail(let docsType):
+                    self?.coordinator?.presentWeb(url: docsType.url)
                 }
             }
             .store(in: &cancellables)
@@ -66,13 +66,12 @@ final class TermsViewController: BaseViewController<TermsView> {
             .store(in: &cancellables)
         
         viewModel.statePublisher
-            .map(\.errorMessage)
+            .map(\.error)
             .removeDuplicates()
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)
-            .sink { message in
-                // TODO: 에러 메시지를 알림창 등으로 표시
-                print("Error: \(message)")
+            .sink { [weak self] error in
+                self?.coordinator?.handleError(error)
             }
             .store(in: &cancellables)
         

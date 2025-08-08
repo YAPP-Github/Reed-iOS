@@ -67,6 +67,17 @@ final class HomeViewController: BaseViewController<HomeView> {
                 self?.contentView.updateBooks(homeInfos)
             }
             .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map(\.error)
+            .removeDuplicates()
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.coordinator?.handleError(error)
+                self?.viewModel.send(.errorHandled)
+            }
+            .store(in: &cancellable)
     }
     
     @objc private func goToSettingViewController() {

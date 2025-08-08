@@ -11,7 +11,7 @@ public struct DefaultFetchRecordsUseCase: FetchRecordsUseCase {
     
     public func execute(
         id: String
-    ) -> AnyPublisher<[RecordInfo], Error> {
+    ) -> AnyPublisher<[RecordInfo], DomainError> {
         repository.fetch(
             bookId: id,
             sortType: .pageNumberDesc

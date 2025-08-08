@@ -3,5 +3,5 @@
 import Combine
 
 public protocol FetchRecordDetailUseCase {
-    func execute(id: String) -> AnyPublisher<RecordInfo, Error>
+    func execute(id: String) -> AnyPublisher<RecordInfo, DomainError>
 }

@@ -3,5 +3,5 @@
 import Combine
 
 public protocol SeedRepository {
-    func stats() -> AnyPublisher<[Seed], Error>
+    func stats() -> AnyPublisher<[Seed], DomainError>
 }

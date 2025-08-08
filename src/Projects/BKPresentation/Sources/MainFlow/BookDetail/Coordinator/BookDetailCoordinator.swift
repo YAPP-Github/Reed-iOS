@@ -34,6 +34,8 @@ final class BookDetailCoordinator: Coordinator {
     }
 }
 
+extension BookDetailCoordinator: SessionExpirationNotifying, ErrorHandleable {}
+
 extension BookDetailCoordinator {
     func didTapAddNoteButton(bookId: String) {
         let noteCoordinator = NoteCoordinator(
