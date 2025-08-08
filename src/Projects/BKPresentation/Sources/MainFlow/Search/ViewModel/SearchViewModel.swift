@@ -54,6 +54,7 @@ final class SearchViewModel: BaseViewModel {
         var hasMoreData = true
         var totalResults = 0
         var error: DomainError? = nil
+        var isRetrying: Bool = false
     }
     
     enum Action {
@@ -69,6 +70,7 @@ final class SearchViewModel: BaseViewModel {
         case upsertBookSuccessed(String)
         case errorOccured(DomainError)
         case errorHandled
+        case retryTapped
     }
     
     enum SideEffect {
@@ -87,6 +89,7 @@ final class SearchViewModel: BaseViewModel {
     private var currentQuery: String?
     private var currentPage = 1
     private let searchViewType: SearchViewType
+    private var lastEffect: SideEffect? = nil
     
     private lazy var fetchRecentSearchUseCase: FetchRecentSearchUseCase = {
         @Autowired(name: searchViewType.rawValue) var useCase: FetchRecentSearchUseCase
@@ -122,7 +125,10 @@ final class SearchViewModel: BaseViewModel {
     func send(_ action: Action) {
         let (newState, effects) = reduce(action: action, state: state)
         state = newState
-        effects.forEach { sideEffectSubject.send($0) }
+        effects.forEach {
+            lastEffect = $0
+            sideEffectSubject.send($0)
+        }
     }
     
     func reduce(action: Action, state: State) -> (State, [SideEffect]) {
@@ -196,7 +202,17 @@ final class SearchViewModel: BaseViewModel {
             newState.bookId = bookId
             
         case .errorOccured(let error):
-            newState.error = error
+            if newState.isRetrying == false {
+                newState.isRetrying = true
+            } else {
+                newState.isRetrying = false
+                newState.error = error
+            }
+
+        case .retryTapped:
+            if let last = lastEffect {
+                effects.append(last)
+            }
             
         case .errorHandled:
             newState.error = nil
