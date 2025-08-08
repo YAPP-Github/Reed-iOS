@@ -140,7 +140,7 @@ public class BKBookSummaryView: UIView {
             
             /// style setting
             self.backgroundColor = .bkBackgroundColor(.disable)
-            thumbnail.tintColor = UIColor(hex: "000000").withAlphaComponent(0.4)
+            thumbnail.backgroundColor = UIColor(hex: "000000").withAlphaComponent(0.4)
 
             [titleLabel, authorLabel, separatorLabel, publisherLabel].forEach {
                 $0.setColor(color: .bkContentColor(.disable))
