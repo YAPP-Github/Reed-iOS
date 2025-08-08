@@ -15,7 +15,7 @@ extension Target {
     ) -> Target {
         Target.target(
             name: name,
-            destinations: .init([.iPad, .iPhone]),
+            destinations: .init([.iPhone]),
             product: product,
             bundleId: bundleId ?? Project.bundleID + "." + name.lowercased(),
             deploymentTargets: .iOS(Project.iosVersion),

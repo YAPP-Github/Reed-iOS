@@ -95,6 +95,5 @@ final class ArchiveViewController: BaseViewController<ArchiveView> {
     // MARK: - Private Methods
     private func handleBookTapped(_ book: ArchiveBook) {
         coordinator?.didTapBookDetailButton(isbn: book.isbn, userBookId: book.bookId)
-        print("기록 선택됨: \(book.title)")
     }
 }

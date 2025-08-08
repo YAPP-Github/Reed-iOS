@@ -6,7 +6,7 @@ import Combine
 import SnapKit
 import UIKit
 
-final class ArchiveView: BaseView {
+final class ArchiveView: BaseView, UIGestureRecognizerDelegate {
     private var eventPublisher = PassthroughSubject<ArchiveViewEvent, Never>()
     
     var events: AnyPublisher<ArchiveViewEvent, Never> {
@@ -42,6 +42,8 @@ final class ArchiveView: BaseView {
         layout.minimumInteritemSpacing = 0
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.allowsSelection = true
+        collectionView.delaysContentTouches = false
         collectionView.backgroundColor = .bkBaseColor(.primary)
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -54,6 +56,7 @@ final class ArchiveView: BaseView {
     
     private let emptyStateView: UIView = {
         let containerView = UIView()
+        containerView.isUserInteractionEnabled = false
         
         let titleLabel = BKLabel(
             text: "아직 등록된 책이 없어요",
@@ -101,6 +104,22 @@ final class ArchiveView: BaseView {
         addSubviews(chipScrollView, bookCollectionView, emptyStateView)
         setupLayout()
         updateEmptyState()
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleCollectionTap(_:)))
+        tap.cancelsTouchesInView = false
+        tap.delaysTouchesEnded = false
+        tap.delegate = self
+        bookCollectionView.addGestureRecognizer(tap)
+
+        // didSelect 중복 방지
+        bookCollectionView.allowsSelection = false
+    }
+    
+    @objc private func handleCollectionTap(_ gr: UITapGestureRecognizer) {
+        let p = gr.location(in: bookCollectionView)
+        guard let indexPath = bookCollectionView.indexPathForItem(at: p) else { return }
+        let book = books[indexPath.item]
+        eventPublisher.send(.bookTapped(book: book))
     }
     
     private func setupChipActions() {
@@ -170,6 +189,12 @@ final class ArchiveView: BaseView {
     private func updateEmptyState() {
         emptyStateView.isHidden = !books.isEmpty
         bookCollectionView.isHidden = books.isEmpty
+        
+        if books.isEmpty {
+            bringSubviewToFront(emptyStateView)
+        } else {
+            bringSubviewToFront(bookCollectionView)
+        }
     }
     
 }
@@ -200,6 +225,12 @@ extension ArchiveView: UICollectionViewDataSource {
             image: book.imageURL,
             recordCount: book.recordCount
         )
+        
+        cell.onTap = { [weak self] in
+            guard let self else { return }
+            let book = self.books[indexPath.item]
+            self.eventPublisher.send(.bookTapped(book: book))
+        }
         
         return cell
     }
@@ -232,6 +263,15 @@ extension ArchiveView: UICollectionViewDelegateFlowLayout {
     ) {
         let book = books[indexPath.item]
         eventPublisher.send(.bookTapped(book: book))
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
+        print("shouldHighlight \(indexPath)")
+        return true
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
+        print("didHighlight \(indexPath)")
     }
     
     func collectionView(

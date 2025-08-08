@@ -6,6 +6,7 @@ import SnapKit
 import UIKit
 
 final class ArchiveCell: UICollectionViewCell {
+    var onTap: (() -> Void)?
     struct BookDescription {
         let author: String
         let publisher: String
@@ -17,6 +18,7 @@ final class ArchiveCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        resultView.isUserInteractionEnabled = false
         contentView.addSubviews(resultView, dividerView)
 
         resultView.snp.makeConstraints {
@@ -52,4 +54,6 @@ final class ArchiveCell: UICollectionViewCell {
             image: image
         )
     }
+    
+    @objc private func handleTap() { onTap?() }
 }
