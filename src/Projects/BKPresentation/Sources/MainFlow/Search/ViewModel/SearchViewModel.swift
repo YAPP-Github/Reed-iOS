@@ -206,6 +206,7 @@ final class SearchViewModel: BaseViewModel {
             newState.bookId = bookId
             
         case .errorOccured(let error):
+            newState.isLoading = false
             if newState.isRetrying == false {
                 newState.isRetrying = true
             } else {
@@ -215,6 +216,7 @@ final class SearchViewModel: BaseViewModel {
 
         case .retryTapped:
             if let last = lastEffect {
+                newState.isLoading = true
                 effects.append(last)
             }
             
