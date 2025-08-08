@@ -28,6 +28,8 @@ final class SearchCoordinator: Coordinator {
     }
 }
 
+extension SearchCoordinator: SessionExpirationNotifying, ErrorHandleable {}
+
 extension SearchCoordinator {
     func didBookRegistered(bookId: String) {
         let noteCoordinator = NoteCoordinator(

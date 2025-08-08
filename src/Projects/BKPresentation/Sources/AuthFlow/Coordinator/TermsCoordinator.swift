@@ -1,6 +1,5 @@
 // Copyright © 2025 Booket. All rights reserved
 
-import SafariServices
 import UIKit
 
 final class TermsCoordinator: Coordinator, FinishNotifying {
@@ -25,9 +24,4 @@ final class TermsCoordinator: Coordinator, FinishNotifying {
     }
 }
 
-extension TermsCoordinator {
-    func showWebView(url: URL) {
-        let safariViewController = SFSafariViewController(url: url)
-        navigationController.present(safariViewController, animated: true)
-    }
-}
+extension TermsCoordinator: SessionExpirationNotifying, ErrorHandleable, WebPresenting {}

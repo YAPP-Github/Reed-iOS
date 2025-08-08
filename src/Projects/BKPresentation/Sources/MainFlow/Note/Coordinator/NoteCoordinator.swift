@@ -4,7 +4,7 @@ import UIKit
 import BKDomain
 import Combine
 
-final class NoteCoordinator: Coordinator, SessionExpirationNotifying {
+final class NoteCoordinator: Coordinator {
     weak var parentCoordinator: Coordinator?
     var childCoordinators = [Coordinator]()
     var navigationController: UINavigationController
@@ -36,6 +36,8 @@ final class NoteCoordinator: Coordinator, SessionExpirationNotifying {
         navigationController.pushViewController(viewController, animated: true)
     }
 }
+
+extension NoteCoordinator: SessionExpirationNotifying, ErrorHandleable {}
 
 extension NoteCoordinator {
     func didCompleteNoteCreation(recordInfo: RecordInfo) {
