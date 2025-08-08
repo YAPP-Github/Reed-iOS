@@ -7,7 +7,7 @@ import UIKit
 
 enum HomeViewEvent: Equatable {
     case didTapRecordButton(String)
-    case didTapBook(String)
+    case didTapBook(isbn: String, userBookId: String)
     case didTapSearchButton
     case didTapEmptyBook
 }
@@ -45,8 +45,8 @@ final class HomeViewController: BaseViewController<HomeView> {
         contentView.eventPublisher
             .sink { [weak self] event in
                 switch event {
-                case .didTapBook(let _):
-                    self?.coordinator?.didTapBookDetailButton()
+                case .didTapBook(let isbn, let userBookId):
+                    self?.coordinator?.didTapBookDetailButton(isbn: isbn, userBookId: userBookId)
                 case .didTapRecordButton(let bookId):
                     self?.coordinator?.didTapNoteButton(bookId: bookId)
                 case .didTapSearchButton:

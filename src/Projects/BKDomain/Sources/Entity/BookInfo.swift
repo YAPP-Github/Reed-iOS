@@ -8,7 +8,7 @@ public struct BookInfo: Equatable {
     public let title: String
     public let author: String
     public let status: BookStatus
-    public let imageUrl: URL?
+    public let imageUrl: URL
     public let publisher: String
     public let createdAt: Date?
     public let updatedAt: Date?
@@ -20,7 +20,7 @@ public struct BookInfo: Equatable {
         title: String,
         author: String,
         status: BookStatus,
-        imageUrl: URL?,
+        imageUrl: URL,
         publisher: String,
         createdAt: Date?,
         updatedAt: Date?,
@@ -45,7 +45,7 @@ public struct BookInfo: Equatable {
             author: author,
             publisher: publisher,
             thumbnail: imageUrl,
-            userBookStatus: status.rawValue,
+            userBookStatus: status,
             recordCount: recordCount
         )
     }

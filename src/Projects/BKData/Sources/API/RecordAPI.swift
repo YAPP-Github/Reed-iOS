@@ -6,6 +6,7 @@ import Foundation
 enum RecordAPI {
     case insert(userBookId: String, recordData: RecordVO)
     case fetch(userBookId: String, dto: FetchRecordRequestDTO)
+    case detail(userRecordId: String)
 }
 
 extension RecordAPI: RequestTarget {
@@ -19,6 +20,8 @@ extension RecordAPI: RequestTarget {
             return "/\(userBookId)"
         case .fetch(let userBookId, _):
             return "/\(userBookId)"
+        case .detail(let userRecordId):
+            return "/\(userRecordId)"
         }
     }
 
@@ -26,12 +29,12 @@ extension RecordAPI: RequestTarget {
         switch self {
         case .insert:
             return .post
-        case .fetch:
+        case .fetch, .detail:
             return .get
         }
     }
 
-    var headers: [String : String] {
+    var headers: [String: String] {
         switch self {
         default:
             return [
@@ -40,11 +43,11 @@ extension RecordAPI: RequestTarget {
         }
     }
 
-    var body: (any Encodable)? {
+    var body: Encodable? {
         switch self {
         case .insert(_, let data):
             return InsertRecordRequestDTO(data: data)
-        case .fetch:
+        case .fetch, .detail:
             return nil
         }
     }
@@ -55,6 +58,8 @@ extension RecordAPI: RequestTarget {
             return [:]
         case .fetch(_, let dto):
             return dto.toDictionary()
+        case .detail(let isbn):
+            return BookDetailRequestDTO(isbn: isbn).toDictionary()
         }
     }
     

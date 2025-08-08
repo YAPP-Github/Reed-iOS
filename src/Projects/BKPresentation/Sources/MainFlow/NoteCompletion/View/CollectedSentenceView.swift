@@ -22,7 +22,8 @@ final class CollectedSentenceView: BaseView {
     }()
     
     private let collectedSentenceLabel = BKLabel(
-        fontStyle: .label1(weight: .medium)
+        fontStyle: .label1(weight: .medium),
+        alignment: .left
     )
     
     private let pageLabel = BKLabel(
@@ -62,6 +63,10 @@ final class CollectedSentenceView: BaseView {
         rootStack.snp.makeConstraints {
             $0.edges.equalToSuperview()
                 .inset(LayoutConstants.rootStackInset)
+        }
+        
+        collectedSentenceLabel.snp.makeConstraints {
+            $0.width.equalToSuperview()
         }
         
         pageLabel.snp.makeConstraints {

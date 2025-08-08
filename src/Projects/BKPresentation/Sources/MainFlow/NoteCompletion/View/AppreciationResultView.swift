@@ -1,6 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import BKDomain
 import SnapKit
 import UIKit
 
@@ -14,7 +15,7 @@ enum EmotionIcon: String {
         return BKImage.Graphics.empty
     }
     
-    static func toEmotionIcon(from emotion: Emotion) -> EmotionIcon {
+    static func from(emotion: Emotion) -> Self {
         switch emotion {
         case .warmth:
             return .warmth
@@ -112,6 +113,10 @@ final class AppreciationResultView: BaseView {
                 .inset(LayoutConstants.rootStackInset)
         }
         
+        appreciationLabel.snp.makeConstraints {
+            $0.width.equalToSuperview()
+        }
+        
         summaryStack.snp.makeConstraints {
             $0.width.equalToSuperview()
         }
@@ -128,12 +133,12 @@ final class AppreciationResultView: BaseView {
     
     func apply(
         emotion: EmotionIcon,
-        creationDate: String,
+        creationDate: Date,
         appreciation: String
     ) {
         emotionIcon.image = emotion.icon
         emotionLabel.setText(text: emotion.rawValue)
-        creationLabel.setText(text: creationDate)
+        creationLabel.setText(text: creationDate.toKoreanDateString())
         appreciationLabel.setText(text: appreciation)
     }
 }

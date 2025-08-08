@@ -12,9 +12,8 @@ public struct DefaultCreateRecordUseCase: CreateRecordUseCase {
     public func execute(
         bookId: String,
         record: RecordVO
-    ) -> AnyPublisher<Void, Error> {
+    ) -> AnyPublisher<RecordInfo, Error> {
         repository.create(bookId: bookId, recordData: record)
-            .map { _ in }
             .eraseToAnyPublisher()
     }
 }

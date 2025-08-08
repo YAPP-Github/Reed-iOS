@@ -9,13 +9,13 @@ enum UserAPI {
 
 extension UserAPI: RequestTarget {
     var baseURL: String {
-        return "\(APIConfig.baseURL)/users"
+        return "\(APIConfig.baseURL)/users/me"
     }
     
     var path: String {
         switch self {
         case .me:
-            return "/me"
+            return ""
         case .termsAgreement:
             return "/terms-agreement"
         }

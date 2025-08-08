@@ -72,11 +72,13 @@ final class BookDetailViewCell: UICollectionViewCell {
     func configure(
         with item: BookDetailItem
     ) {
+        let emotion = item.emotion ?? .joy
+        
         noteLabel.setText(text: item.note)
-        emotionIcon.image = item.emotion.image
+        emotionIcon.image = emotion.image
         emotionIcon.layer.cornerRadius = LayoutConstants.imageCornerRadius
         emotionIcon.clipsToBounds = true
-        emotionLabel.setText(text: "#\(item.emotion.rawValue)")
+        emotionLabel.setText(text: "#\(emotion.rawValue)")
         creationLabel.setText(
             text: DateFormatter.localizedString(
                 from: item.createdAt,

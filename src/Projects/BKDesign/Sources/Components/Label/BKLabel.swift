@@ -122,6 +122,7 @@ private extension BKLabel {
         let range = NSRange(location: 0, length: attributedString.length)
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = alignment
+        paragraphStyle.lineBreakMode = self.lineBreakMode
         
         attributedString.addAttribute(
             .paragraphStyle,
