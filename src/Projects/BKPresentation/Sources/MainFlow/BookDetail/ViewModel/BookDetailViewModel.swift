@@ -15,6 +15,7 @@ final class BookDetailViewModel: BaseViewModel {
         var isStatusButtonTriggered = false
         let userBookId: String
         var error: DomainError? = nil
+        var isRetrying: Bool = false
     }
     
     enum Action {
@@ -31,6 +32,7 @@ final class BookDetailViewModel: BaseViewModel {
         case fetchBookDetailSuccessed(Book)
         case errorOccured(DomainError)
         case errorHandled
+        case retryTapped
     }
     
     enum SideEffect {
@@ -43,6 +45,7 @@ final class BookDetailViewModel: BaseViewModel {
     @Published private var state: State
     private var cancellables = Set<AnyCancellable>()
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
+    private var lastEffect: SideEffect? = nil
     
     @Autowired private var fetchRecordsUseCase: FetchRecordsUseCase
     @Autowired private var fetchSeedStatsUseCase: FetchSeedStatsUseCase
@@ -67,7 +70,10 @@ final class BookDetailViewModel: BaseViewModel {
     func send(_ action: Action) {
         let (newState, effects) = reduce(action: action, state: state)
         state = newState
-        effects.forEach { sideEffectSubject.send($0) }
+        effects.forEach {
+            lastEffect = $0
+            sideEffectSubject.send($0)
+        }
     }
     
     func reduce(action: Action, state: State) -> (State, [SideEffect]) {
@@ -111,7 +117,17 @@ final class BookDetailViewModel: BaseViewModel {
             newState.seeds = seeds
             
         case .errorOccured(let error):
-            newState.error = error
+            if newState.isRetrying == false {
+                newState.isRetrying = true
+            } else {
+                newState.isRetrying = false
+                newState.error = error
+            }
+
+        case .retryTapped:
+            if let last = lastEffect {
+                effects.append(last)
+            }
             
         case .errorHandled:
             newState.error = nil
