@@ -62,8 +62,6 @@ final class BookDetailView: BaseView {
     private let readingStateButton: BKButton = {
         let button = BKButton(style: .secondary, size: .medium)
         button.rightIcon = BKImage.Icon.chevronDown
-        // TODO: - State에 따라 변경
-        button.title = "읽는 중"
         
         button.setContentHuggingPriority(.required, for: .horizontal)
         button.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -251,6 +249,8 @@ final class BookDetailView: BaseView {
             extraText: book.pubDate?.toKoreanYearString(),
             image: book.thumbnail
         )
+        // 버튼 title 세팅
+        readingStateButton.title = book.userBookStatus.rawValue
     }
 }
 
