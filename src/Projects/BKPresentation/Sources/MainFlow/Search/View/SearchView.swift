@@ -168,15 +168,32 @@ private extension SearchView {
             return UICollectionViewCell()
         }
         
-        cell.configure(
-            title: book.title,
-            description: .init(
-                author: book.author,
-                publisher: book.publisher
-            ),
-            image: book.thumbnail,
-            recordCount: book.recordCount
-        )
+        switch book.userBookStatus {
+        case .beforeRegistration:
+            cell.configure(
+                title: book.title,
+                description: .init(
+                    author: book.author,
+                    publisher: book.publisher
+                ),
+                image: book.thumbnail,
+                canSelect: true,
+                recordCount: book.recordCount
+            )
+            
+        default:
+            cell.configure(
+                title: book.title,
+                description: .init(
+                    author: book.author,
+                    publisher: book.publisher
+                ),
+                image: book.thumbnail,
+                canSelect: false,
+                recordCount: book.recordCount
+            )
+        }
+
         return cell
     }
 

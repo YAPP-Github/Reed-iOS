@@ -114,23 +114,43 @@ public class BKBookSummaryView: UIView {
     }
 
     private func setupViews() {
-        titleLabel.lineBreakMode = .byTruncatingTail
         authorLabel.lineBreakMode = .byTruncatingTail
         publisherLabel.lineBreakMode = .byTruncatingTail
         
         addSubviews(thumbnail, labelStack)
         labelStack.spacing = style.labelStackSpacing
         labelStack.addArrangedSubview(titleLabel)
-
-        if style == .record {
+        
+        switch style {
+        case .record:
             labelStack.addArrangedSubview(descriptionStack)
             labelStack.addArrangedSubview(recordView)
+            
             recordView.addSubviews(recordLabel, recordCountLabel)
             descriptionStack.addArrangedSubview(authorLabel)
             descriptionStack.addArrangedSubview(separatorLabel)
             descriptionStack.addArrangedSubview(publisherLabel)
             labelStack.setCustomSpacing(BKSpacing.spacing3, after: descriptionStack)
-        } else {
+            
+        case .alreadyEnroll:
+            labelStack.removeArrangedSubview(titleLabel)
+            descriptionStack.addArrangedSubview(authorLabel)
+            descriptionStack.addArrangedSubview(separatorLabel)
+            descriptionStack.addArrangedSubview(publisherLabel)
+            
+            /// style setting
+            self.backgroundColor = .bkBackgroundColor(.disable)
+            thumbnail.tintColor = UIColor(hex: "000000").withAlphaComponent(0.4)
+
+            [titleLabel, authorLabel, separatorLabel, publisherLabel].forEach {
+                $0.setColor(color: .bkContentColor(.disable))
+            }
+            
+            [guideLabel, titleLabel, descriptionStack].forEach {
+                labelStack.addArrangedSubview($0)
+            }
+            
+        default:
             let descriptionBlock = UIStackView(arrangedSubviews: [descriptionStack])
             descriptionBlock.axis = .vertical
             descriptionBlock.alignment = .leading
@@ -171,7 +191,8 @@ public class BKBookSummaryView: UIView {
         titleLabel.numberOfLines = style.titleLabelNumberOfLines
         titleLabel.lineBreakMode = .byTruncatingTail
 
-        if style == .record {
+        switch style {
+        case .record:
             recordLabel.snp.makeConstraints {
                 $0.leading.top.equalToSuperview()
                 $0.bottom.equalToSuperview()
@@ -180,6 +201,8 @@ public class BKBookSummaryView: UIView {
                 $0.leading.equalTo(recordLabel.snp.trailing).offset(LayoutConstants.labelStackSpacing)
                 $0.centerY.equalTo(recordLabel)
             }
+        default:
+            break
         }
     }
 

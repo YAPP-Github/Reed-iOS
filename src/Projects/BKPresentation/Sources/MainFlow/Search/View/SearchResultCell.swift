@@ -37,12 +37,16 @@ final class SearchResultCell: UICollectionViewCell {
         title: String,
         description: BookDescription,
         image: URL?,
-        recordCount: Int? = nil
+        canSelect: Bool = true,
+        recordCount: Int? = nil,
     ) {
         if resultView == nil {
             let view = BKBookSummaryView(
-                style: recordCount != nil ? .record : .regular
+                style: recordCount != nil ? .record : (
+                    canSelect ? .regular : .alreadyEnroll
+                )
             )
+            
             contentView.addSubview(view)
             view.snp.makeConstraints {
                 $0.top.leading.trailing.equalToSuperview()
