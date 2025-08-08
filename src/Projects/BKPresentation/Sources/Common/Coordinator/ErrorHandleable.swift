@@ -4,8 +4,7 @@ import BKDesign
 import BKDomain
 import UIKit
 
-protocol ErrorHandleable: AnyObject {
-}
+protocol ErrorHandleable: AnyObject {}
 
 extension ErrorHandleable where Self: Coordinator & SessionExpirationNotifying {
     func handleError(_ error: DomainError) {
@@ -18,7 +17,32 @@ extension ErrorHandleable where Self: Coordinator & SessionExpirationNotifying {
             presentTimeoutAlert()
         }
     }
+    
+    func presentCustomErrorAlert(
+        title: String = "",
+        subtitle: String,
+        confirmTitle: String = "재시도",
+        onConfirm: @escaping () -> Void
+    ) {
+        let dialog = BKDialog(
+            title: title,
+            subtitle: subtitle,
+            config: .init(
+                leftButtonTitle: confirmTitle,
+                leftButtonAction: { [weak self] in
+                    guard let self else { return }
+                    self.presentedViewController?.dismiss(animated: true) {
+                        onConfirm()
+                    }
+                }
+            )
+        )
+        let dialogVC = BKDialogViewController(dialog: dialog)
+        topViewController?.present(dialogVC, animated: true)
+    }
+}
 
+private extension ErrorHandleable where Self: Coordinator & SessionExpirationNotifying {
     private func presentSessionExpiredAlert() {
         let dialog = BKDialog(
             title: "",
