@@ -14,6 +14,7 @@ final class BookDetailViewModel: BaseViewModel {
         var isAddNoteTriggered = false
         var isStatusButtonTriggered = false
         let userBookId: String
+        var error: DomainError? = nil
     }
     
     enum Action {
@@ -28,6 +29,8 @@ final class BookDetailViewModel: BaseViewModel {
         case fetchRecordsSuccessed([BookDetailItem])
         case fetchSeedStatsSuccessed([Seed])
         case fetchBookDetailSuccessed(Book)
+        case errorOccured(DomainError)
+        case errorHandled
     }
     
     enum SideEffect {
@@ -106,6 +109,12 @@ final class BookDetailViewModel: BaseViewModel {
             
         case .fetchSeedStatsSuccessed(let seeds):
             newState.seeds = seeds
+            
+        case .errorOccured(let error):
+            newState.error = error
+            
+        case .errorHandled:
+            newState.error = nil
         }
         
         return (newState, effects)
@@ -119,26 +128,26 @@ final class BookDetailViewModel: BaseViewModel {
                 status: status.toBookStatus()
             )
             .map { Action.upsertSuccessed($0.toBook()) }
-            .catch { _ in Empty() }
+            .catch { Just(Action.errorOccured($0)) }
             .eraseToAnyPublisher()
             
         case .fetchBookDetail:
             return fetchBookDetailUseCase.execute(isbn: isbn)
                 .map { Action.fetchBookDetailSuccessed($0)}
-                .catch { _ in Empty() }
+                .catch { Just(Action.errorOccured($0)) }
                 .eraseToAnyPublisher()
             
         case .fetchRecords:
             return fetchRecordsUseCase.execute(id: state.userBookId)
                 .map { $0.map { BookDetailItem.from(recordInfo: $0) } }
                 .map { Action.fetchRecordsSuccessed($0) }
-                .catch { _ in Empty() }
+                .catch { Just(Action.errorOccured($0)) }
                 .eraseToAnyPublisher()
             
         case .fetchSeedStats:
             return fetchSeedStatsUseCase.execute()
                 .map { Action.fetchSeedStatsSuccessed($0) }
-                .catch { _ in Empty() }
+                .catch { Just(Action.errorOccured($0)) }
                 .eraseToAnyPublisher()
         }
     }

@@ -10,13 +10,16 @@ final class NoteViewModel: BaseViewModel {
         var selectedGuideText: String = ""
         var createCompleted: Bool = false
         var shouldStartEditing: Bool = false
-        var recordInfo: RecordInfo? = nil
+        var recordInfo: RecordInfo?
+        var error: DomainError? = nil
     }
     
     enum Action {
         case appreciationGuideSelected(String)
         case submitNoteForm(NoteForm)
         case submitNoteFormSuccessed(RecordInfo)
+        case errorOccured(DomainError)
+        case errorHandled
     }
     
     enum SideEffect {
@@ -60,6 +63,12 @@ final class NoteViewModel: BaseViewModel {
         case .submitNoteFormSuccessed(let recordInfo):
             newState.createCompleted = true
             newState.recordInfo = recordInfo
+            
+        case .errorOccured(let error):
+            newState.error = error
+            
+        case .errorHandled:
+            newState.error = nil
         }
         
         return (newState, effects)
@@ -73,7 +82,7 @@ final class NoteViewModel: BaseViewModel {
                 record: noteForm.toRecordVO()
             )
             .map { Action.submitNoteFormSuccessed($0) }
-            .catch { _ in Empty() }
+            .catch { Just(Action.errorOccured($0)) }
             .eraseToAnyPublisher()
         }
     }

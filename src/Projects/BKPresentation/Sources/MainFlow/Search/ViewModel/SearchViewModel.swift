@@ -53,6 +53,7 @@ final class SearchViewModel: BaseViewModel {
         var isLoading = false
         var hasMoreData = true
         var totalResults = 0
+        var error: DomainError? = nil
     }
     
     enum Action {
@@ -66,6 +67,8 @@ final class SearchViewModel: BaseViewModel {
         case fetchSearchResultSuccessed((books: [Book], totalResults: Int))
         case fetchNextPageSuccessed([Book])
         case upsertBookSuccessed(String)
+        case errorOccured(DomainError)
+        case errorHandled
     }
     
     enum SideEffect {
@@ -191,6 +194,12 @@ final class SearchViewModel: BaseViewModel {
             
         case .upsertBookSuccessed(let bookId):
             newState.bookId = bookId
+            
+        case .errorOccured(let error):
+            newState.error = error
+            
+        case .errorHandled:
+            newState.error = nil
         }
         
         return (newState, effects)
@@ -218,10 +227,12 @@ final class SearchViewModel: BaseViewModel {
                     startIndex: currentPage
                 ),
                 storeRecentSearchUseCase.execute(query: query)
+                    .setFailureType(to: DomainError.self)
             )
             .map { (result, _) in
                 Action.fetchSearchResultSuccessed(result)
             }
+            .catch { Just(Action.errorOccured($0)) }
             .eraseToAnyPublisher()
             
         case .loadNextPage:
@@ -233,6 +244,7 @@ final class SearchViewModel: BaseViewModel {
                 startIndex: currentPage
             )
             .map { Action.fetchNextPageSuccessed($0.books) }
+            .catch { Just(Action.errorOccured($0)) }
             .eraseToAnyPublisher()
             
         case .upsert(let isbn, let status):
@@ -241,7 +253,7 @@ final class SearchViewModel: BaseViewModel {
                 status: status.toBookStatus()
             )
             .map { Action.upsertBookSuccessed($0.bookId) }
-            .catch { _ in Empty() }
+            .catch { Just(Action.errorOccured($0)) }
             .eraseToAnyPublisher()
         }
     }
