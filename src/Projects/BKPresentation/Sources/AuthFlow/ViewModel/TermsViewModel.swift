@@ -64,17 +64,10 @@ final class TermsViewModel: BaseViewModel {
         
         switch action {
         case .viewDidLoad:
+            let dummyURL = URL(string: "https://www.naver.com")!
             newState.terms = [
-                Term(
-                    title: "(필수)서비스 이용약관",
-                    url: URL(string: "https://sites.google.com/view/reed-termsofuse")!,
-                    isRequired: true
-                ),
-                Term(
-                    title: "(필수)개인정보처리방침",
-                    url: URL(string: "https://sites.google.com/view/reed-privacypolicy")!,
-                    isRequired: true
-                ),
+                Term(title: "(필수)서비스 이용약관", url: dummyURL, isRequired: true),
+                Term(title: "(필수)개인정보처리방침", url: dummyURL, isRequired: true),
                 Term(title: "(필수)만 14세 이상입니다", isRequired: true)
             ]
             
