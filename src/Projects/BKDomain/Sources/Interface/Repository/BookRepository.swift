@@ -11,7 +11,7 @@ public protocol BookRepository {
     /// 내 서재 검색에 특화된 기능입니다.
     func searchMyLibrary(
         _ parameters: MyLibraryParameters
-    ) -> AnyPublisher<([Book], totalResults: Int), DomainError>
+    ) -> AnyPublisher<([BookInfo], totalResults: BookCountSet), DomainError>
     
     /// 내 서재를 조회합니다.
     func myLibrary(

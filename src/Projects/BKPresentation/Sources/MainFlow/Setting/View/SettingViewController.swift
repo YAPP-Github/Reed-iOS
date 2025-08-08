@@ -148,8 +148,8 @@ private extension SettingViewController {
             agreementText: "확인하였으며 이에 동의합니다",
             cancelAction: { [weak self] in self?.dismiss(animated: true) },
             confirmAction: { [weak self] in
-                Log.debug("[WithdrawalSheet] confirmed", logger: AppLogger.ui)
-                // self?.viewModel.send()
+                self?.viewModel.send(.withdrawButtonTapped)
+                self?.dismiss(animated: true)
             }
         )
         

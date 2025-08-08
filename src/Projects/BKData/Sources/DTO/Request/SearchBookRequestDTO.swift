@@ -3,7 +3,7 @@
 import BKDomain
 
 struct SearchBookRequestDTO: DictionaryRepresentable {
-    let query: String
+    let query: String?
     let queryType: SearchQueryType?
     let searchTarget: SearchTarget?
     let maxResults: Int?

@@ -230,6 +230,7 @@ extension SearchView: UICollectionViewDelegate {
         willDisplay cell: UICollectionViewCell,
         forItemAt indexPath: IndexPath
     ) {
+        guard layoutMode == .afterSearch else { return }
         let section = indexPath.section
         let totalItems = collectionView.numberOfItems(inSection: section)
         if indexPath.item == totalItems - 1 {

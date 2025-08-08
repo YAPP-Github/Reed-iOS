@@ -3,5 +3,7 @@
 import Combine
 
 public protocol FetchSeedStatsUseCase {
-    func execute() -> AnyPublisher<[Seed], DomainError>
+    func execute(
+        id recordId: String
+    ) -> AnyPublisher<[Seed], DomainError>
 }

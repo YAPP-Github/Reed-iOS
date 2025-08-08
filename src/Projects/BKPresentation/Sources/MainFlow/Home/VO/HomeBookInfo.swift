@@ -5,6 +5,7 @@ import Foundation
 
 public struct HomeBookInfo: Equatable {
     let userBookId: String
+    let isbn13: String
     let title: String
     let author: String
     let publisher: String
@@ -14,6 +15,7 @@ public struct HomeBookInfo: Equatable {
     
     public init(
         userBookId: String,
+        isbn13: String,
         title: String,
         author: String,
         publisher: String,
@@ -22,6 +24,7 @@ public struct HomeBookInfo: Equatable {
         recordCount: Int
     ) {
         self.userBookId = userBookId
+        self.isbn13 = isbn13
         self.title = title
         self.author = author
         self.publisher = publisher
@@ -33,6 +36,7 @@ public struct HomeBookInfo: Equatable {
     static func from(_ homeInfo: HomeInfo) -> Self {
         return HomeBookInfo(
             userBookId: homeInfo.userBookId,
+            isbn13: homeInfo.isbn13,
             title: homeInfo.title,
             author: homeInfo.author,
             publisher: homeInfo.publisher,

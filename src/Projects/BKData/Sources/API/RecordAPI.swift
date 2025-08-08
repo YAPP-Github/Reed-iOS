@@ -7,6 +7,7 @@ enum RecordAPI {
     case insert(userBookId: String, recordData: RecordVO)
     case fetch(userBookId: String, dto: FetchRecordRequestDTO)
     case detail(userRecordId: String)
+    case seed(userRecordId: String)
 }
 
 extension RecordAPI: RequestTarget {
@@ -22,6 +23,8 @@ extension RecordAPI: RequestTarget {
             return "/\(userBookId)"
         case .detail(let userRecordId):
             return "/\(userRecordId)"
+        case .seed(let userRecordId):
+            return "/\(userRecordId)/seed/stats"
         }
     }
 
@@ -29,7 +32,7 @@ extension RecordAPI: RequestTarget {
         switch self {
         case .insert:
             return .post
-        case .fetch, .detail:
+        case .fetch, .detail, .seed:
             return .get
         }
     }
@@ -47,19 +50,19 @@ extension RecordAPI: RequestTarget {
         switch self {
         case .insert(_, let data):
             return InsertRecordRequestDTO(data: data)
-        case .fetch, .detail:
+        case .fetch, .detail, .seed:
             return nil
         }
     }
 
     var query: [String: Any] {
         switch self {
-        case .insert:
+        case .insert, .seed:
             return [:]
         case .fetch(_, let dto):
             return dto.toDictionary()
         case .detail(let isbn):
-            return BookDetailRequestDTO(isbn: isbn).toDictionary()
+            return BookDetailRequestDTO(isbn13: isbn).toDictionary()
         }
     }
     

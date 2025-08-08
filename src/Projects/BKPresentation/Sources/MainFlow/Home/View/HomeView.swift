@@ -1,7 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
-import BKDesign
 import BKCore
+import BKDesign
 import Combine
 import Lottie
 import SnapKit
@@ -253,7 +253,7 @@ extension HomeView: UICollectionViewDelegateFlowLayout {
         didSelectItemAt indexPath: IndexPath
     ) {
         let selectedBook = books[indexPath.item]
-        eventPublisher.send(.didTapBook(isbn: "9791193737330", userBookId: selectedBook.userBookId))
+        eventPublisher.send(.didTapBook(isbn: selectedBook.isbn13, userBookId: selectedBook.userBookId))
     }
 }
 
