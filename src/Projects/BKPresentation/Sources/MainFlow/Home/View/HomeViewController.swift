@@ -44,6 +44,7 @@ final class HomeViewController: BaseViewController<HomeView> {
     
     override func viewWillDisappear(_ animated: Bool) {
         navigationController?.navigationBar.shadowImage = nil
+        viewModel.send(.onDisappear)
     }
     
     override func bindAction() {
@@ -70,6 +71,15 @@ final class HomeViewController: BaseViewController<HomeView> {
             .map { $0.homeInfos }
             .sink { [weak self] homeInfos in
                 self?.contentView.updateBooks(homeInfos)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates()
+            .map(\.shouldPlayAnimation)
+            .sink { [weak self] shouldPlayAnimation in
+                self?.contentView.playAnimation(shouldPlayAnimation)
             }
             .store(in: &cancellable)
     }

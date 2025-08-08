@@ -1,7 +1,9 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import BKCore
 import Combine
+import Lottie
 import SnapKit
 import UIKit
 
@@ -24,7 +26,9 @@ final class HomeView: BaseView {
     )
     
     private let searchButton = BookSearchEntryView()
-    private let graphicImageView = UIImageView(image: BKImage.Graphics.homeChar)
+    
+    private let graphicImageView = LottieAnimationView(name: "home_seed")
+    
     private let bookSectionTitleLabel = BKLabel(
         text: "요즘 읽는 책",
         fontStyle: .headline2(weight: .medium),
@@ -129,7 +133,7 @@ final class HomeView: BaseView {
             $0.height.equalTo(22)
         }
         
-        // TODO : 파일 교체 예정
+        graphicImageView.contentMode = .scaleAspectFit
         graphicImageView.snp.makeConstraints {
             $0.top.bottom.trailing.equalToSuperview()
             $0.height.width.equalTo(144)
@@ -166,6 +170,16 @@ final class HomeView: BaseView {
         pageControl.numberOfPages = books.count
         collectionView.reloadData()
         homeEmptyView.isHidden = !books.isEmpty
+    }
+    
+    func playAnimation(_ isPlay: Bool) {
+//        debugPulse(isPlay)
+        if isPlay {
+            graphicImageView.loopMode = .loop
+            graphicImageView.play()
+        } else {
+            graphicImageView.stop()
+        }
     }
 }
 

@@ -7,10 +7,12 @@ import Combine
 final class HomeViewModel: BaseViewModel {
     struct State: Equatable {
         var homeInfos: [HomeBookInfo] = []
+        var shouldPlayAnimation: Bool = false
     }
     
     enum Action {
         case onAppear
+        case onDisappear
         case fetchHomeSuccessed([HomeBookInfo])
     }
     
@@ -45,6 +47,9 @@ final class HomeViewModel: BaseViewModel {
         switch action {
         case .onAppear:
             effects.append(.fetch)
+            newState.shouldPlayAnimation = true
+        case .onDisappear:
+            newState.shouldPlayAnimation = false
         case .fetchHomeSuccessed(let homeInfos):
             newState.homeInfos = homeInfos
         }
