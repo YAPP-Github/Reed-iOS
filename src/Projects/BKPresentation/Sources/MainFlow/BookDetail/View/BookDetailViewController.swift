@@ -112,6 +112,17 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
                 self?.viewModel.send(.changeStatusHandled)
             }
             .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map(\.error)
+            .removeDuplicates()
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.coordinator?.handleError(error)
+                self?.viewModel.send(.errorHandled)
+            }
+            .store(in: &cancellable)
     }
 }
 

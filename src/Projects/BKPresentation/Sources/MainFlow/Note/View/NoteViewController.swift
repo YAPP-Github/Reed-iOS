@@ -103,6 +103,17 @@ final class NoteViewController: BaseViewController<NoteView> {
                 self?.presentRegistrationSuccessDialog(recordInfo: $0)
             }
             .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map(\.error)
+            .removeDuplicates()
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.coordinator?.handleError(error)
+                self?.viewModel.send(.errorHandled)
+            }
+            .store(in: &cancellable)
     }
 }
 

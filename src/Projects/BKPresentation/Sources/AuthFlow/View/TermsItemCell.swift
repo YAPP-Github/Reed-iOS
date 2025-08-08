@@ -94,7 +94,7 @@ final class TermsItemCell: UICollectionViewListCell {
         contentView.backgroundColor = .bkBaseColor(.primary)
 
         checkBox.tintColor = term.isAgreed ? .bkContentColor(.brand) : .bkContentColor(.tertiary)
-        chevronIconView.isHidden = (term.url == nil)
+        chevronIconView.isHidden = (term.docsType == nil)
     }
     
     private func setupActions() {

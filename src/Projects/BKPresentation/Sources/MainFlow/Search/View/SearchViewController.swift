@@ -107,6 +107,17 @@ final class SearchViewController: BaseViewController<SearchView> {
                 self?.coordinator?.didBookRegistered(bookId: bookId)
             }
             .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map(\.error)
+            .removeDuplicates()
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.coordinator?.handleError(error)
+                self?.viewModel.send(.errorHandled)
+            }
+            .store(in: &cancellable)
     }
 }
 
