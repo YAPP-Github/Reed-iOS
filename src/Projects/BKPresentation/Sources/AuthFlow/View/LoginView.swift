@@ -41,6 +41,7 @@ final class LoginView: BaseView {
     
     override func setupView() {
         imageView.backgroundColor = .clear
+        imageView.contentMode = .scaleAspectFit
         logoImageView.backgroundColor = .clear
         
         appleSignInButton.title = "Apple로 시작하기"

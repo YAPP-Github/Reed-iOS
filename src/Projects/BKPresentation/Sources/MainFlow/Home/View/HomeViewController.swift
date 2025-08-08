@@ -76,8 +76,8 @@ final class HomeViewController: BaseViewController<HomeView> {
         
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
-            .removeDuplicates()
             .map(\.shouldPlayAnimation)
+            .removeDuplicates()
             .sink { [weak self] shouldPlayAnimation in
                 self?.contentView.playAnimation(shouldPlayAnimation)
             }

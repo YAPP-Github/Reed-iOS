@@ -124,7 +124,6 @@ final class HomeView: BaseView {
         mainTitleLabel.snp.makeConstraints {
             $0.top.leading.equalToSuperview()
         }
-        mainTitleLabel.sizeToFit()
         
         searchButton.snp.makeConstraints {
             $0.top.equalTo(mainTitleLabel.snp.bottom)
@@ -135,7 +134,7 @@ final class HomeView: BaseView {
         
         graphicImageView.contentMode = .scaleAspectFit
         graphicImageView.snp.makeConstraints {
-            $0.top.bottom.trailing.equalToSuperview()
+            $0.top.trailing.equalToSuperview()
             $0.height.width.equalTo(144)
         }
         
