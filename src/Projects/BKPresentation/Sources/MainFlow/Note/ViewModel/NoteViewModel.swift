@@ -12,6 +12,7 @@ final class NoteViewModel: BaseViewModel {
         var shouldStartEditing: Bool = false
         var recordInfo: RecordInfo?
         var error: DomainError? = nil
+        var isRetrying: Bool = false
     }
     
     enum Action {
@@ -20,6 +21,7 @@ final class NoteViewModel: BaseViewModel {
         case submitNoteFormSuccessed(RecordInfo)
         case errorOccured(DomainError)
         case errorHandled
+        case retryTapped
     }
     
     enum SideEffect {
@@ -30,6 +32,7 @@ final class NoteViewModel: BaseViewModel {
     private var cancellables = Set<AnyCancellable>()
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
     private let bookId: String
+    private var lastEffect: SideEffect? = nil
     
     @Autowired var createRecordUseCase: CreateRecordUseCase
     
@@ -45,7 +48,10 @@ final class NoteViewModel: BaseViewModel {
     func send(_ action: Action) {
         let (newState, effects) = reduce(action: action, state: state)
         state = newState
-        effects.forEach { sideEffectSubject.send($0) }
+        effects.forEach {
+            lastEffect = $0
+            sideEffectSubject.send($0)
+        }
     }
     
     func reduce(action: Action, state: State) -> (State, [SideEffect]) {
@@ -65,7 +71,17 @@ final class NoteViewModel: BaseViewModel {
             newState.recordInfo = recordInfo
             
         case .errorOccured(let error):
-            newState.error = error
+            if newState.isRetrying == false {
+                newState.isRetrying = true
+            } else {
+                newState.isRetrying = false
+                newState.error = error
+            }
+
+        case .retryTapped:
+            if let last = lastEffect {
+                effects.append(last)
+            }
             
         case .errorHandled:
             newState.error = nil
