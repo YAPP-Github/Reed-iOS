@@ -55,8 +55,9 @@ private extension ErrorHandleable where Self: Coordinator & SessionExpirationNot
             config: .init(
                 leftButtonTitle: "확인",
                 leftButtonAction: { [weak self] in
-                    self?.presentedViewController?.dismiss(animated: true)
-                    self?.notifyParentSessionExpired()
+                    self?.presentedViewController?.dismiss(animated: true) {
+                        self?.notifyParentSessionExpired()
+                    }
                 })
             )
         
