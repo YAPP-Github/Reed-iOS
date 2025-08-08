@@ -148,6 +148,7 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
 private extension BookDetailViewController {
     func presentBookRegistration(with isbn: String) {
         let statusView = BookRegistrationStatusView()
+        
         let sheet = BKBottomSheetViewController(
             title: "도서 상태",
             style: .leadingCloseButton,
