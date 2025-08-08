@@ -25,6 +25,7 @@ final class SentenceListCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        
         updateSelectionState(isSelected: false)
     }
     
@@ -64,6 +65,7 @@ final class SentenceListCell: UICollectionViewCell {
         } else {
             contentView.backgroundColor = .bkBackgroundColor(.secondary)
             contentView.layer.borderColor = UIColor.clear.cgColor
+            sentenceLabel.setColor(color: .bkContentColor(.primary))
         }
         
         UIView.animate(withDuration: 0.2) {

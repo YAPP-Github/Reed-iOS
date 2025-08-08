@@ -16,8 +16,9 @@ final class HomeViewController: BaseViewController<HomeView> {
     weak var coordinator: MainFlowCoordinator?
     
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
-        .home(
+        .homeWithImage(
             viewController: self,
+            image: BKImage.Logos.smallLogo,
             target: self,
             gearAction: #selector(goToSettingViewController)
         )
@@ -38,7 +39,15 @@ final class HomeViewController: BaseViewController<HomeView> {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
+        
         viewModel.send(.onAppear)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.navigationBar.shadowImage = nil
+        
+        viewModel.send(.onDisappear)
     }
     
     override func bindAction() {
@@ -69,6 +78,16 @@ final class HomeViewController: BaseViewController<HomeView> {
             .store(in: &cancellable)
         
         viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .map(\.shouldPlayAnimation)
+            .removeDuplicates()
+            .sink { [weak self] shouldPlayAnimation in
+                self?.contentView.playAnimation(shouldPlayAnimation)
+            }
+            .store(in: &cancellable)
+
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
             .map(\.error)
             .removeDuplicates()
             .compactMap { $0 }

@@ -63,5 +63,11 @@ public enum BKImage {
         public static let sadness = BKDesignAsset.sadness.image
         public static let joy = BKDesignAsset.joy.image
         public static let nervous = BKDesignAsset.nervous.image
+        public static let homeSeed = BKDesignAsset.homeSeed.image
+    }
+    
+    public enum Logos {
+        public static let bigLogo = BKDesignAsset.bigLogo.image
+        public static let smallLogo = BKDesignAsset.smallLogo.image
     }
 }

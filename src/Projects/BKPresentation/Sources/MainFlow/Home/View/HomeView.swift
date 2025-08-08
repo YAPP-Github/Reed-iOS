@@ -1,7 +1,9 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import BKCore
 import Combine
+import Lottie
 import SnapKit
 import UIKit
 
@@ -24,7 +26,9 @@ final class HomeView: BaseView {
     )
     
     private let searchButton = BookSearchEntryView()
-    private let graphicImageView = UIImageView(image: BKImage.Graphics.homeChar)
+    
+    private let graphicImageView = LottieAnimationView(name: "home_seed")
+    
     private let bookSectionTitleLabel = BKLabel(
         text: "요즘 읽는 책",
         fontStyle: .headline2(weight: .medium),
@@ -102,7 +106,7 @@ final class HomeView: BaseView {
     
     override func setupLayout() {
         backgroundColorView.snp.makeConstraints {
-            $0.top.equalToSuperview()
+            $0.top.equalTo(safeAreaLayoutGuide)
             $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
             $0.height.equalTo(LayoutConstants.backgroundHeight)
         }
@@ -125,12 +129,13 @@ final class HomeView: BaseView {
             $0.top.equalTo(mainTitleLabel.snp.bottom)
                 .offset(LayoutConstants.titleToSearchButtonSpacing)
             $0.leading.equalToSuperview()
+            $0.height.equalTo(22)
         }
         
+        graphicImageView.contentMode = .scaleAspectFit
         graphicImageView.snp.makeConstraints {
-            $0.top.bottom.trailing.equalToSuperview()
-            $0.leading.equalTo(mainTitleLabel.snp.trailing)
-                .offset(LayoutConstants.titleToGraphicSpacing)
+            $0.top.trailing.equalToSuperview()
+            $0.height.width.equalTo(144)
         }
         
         bookSectionTitleLabel.snp.makeConstraints {
@@ -142,7 +147,6 @@ final class HomeView: BaseView {
         
         bookCollectionView.snp.makeConstraints {
             $0.top.equalTo(bookSectionTitleLabel.snp.bottom)
-                .offset(LayoutConstants.collectionTopSpacing)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(LayoutConstants.collectionHeight)
         }
@@ -155,7 +159,6 @@ final class HomeView: BaseView {
         
         pageControl.snp.makeConstraints {
             $0.top.equalTo(bookCollectionView.snp.bottom)
-                .offset(LayoutConstants.pageControlTopSpacing)
             $0.centerX.equalToSuperview()
             $0.height.equalTo(LayoutConstants.pageControlHeight)
         }
@@ -166,6 +169,16 @@ final class HomeView: BaseView {
         pageControl.numberOfPages = books.count
         collectionView.reloadData()
         homeEmptyView.isHidden = !books.isEmpty
+    }
+    
+    func playAnimation(_ isPlay: Bool) {
+//        debugPulse(isPlay)
+        if isPlay {
+            graphicImageView.loopMode = .loop
+            graphicImageView.play()
+        } else {
+            graphicImageView.stop()
+        }
     }
 }
 
@@ -211,8 +224,7 @@ extension HomeView: UICollectionViewDelegateFlowLayout {
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
         let width = collectionView.frame.width - LayoutConstants.cellWidthOffset
-        let height = collectionView.frame.height
-        return CGSize(width: width, height: height)
+        return CGSize(width: width, height: 362)
     }
     
     func collectionView(
@@ -263,11 +275,11 @@ private extension HomeView {
 
 private extension HomeView {
     enum LayoutConstants {
-        static let backgroundHeight: CGFloat = 259
+        static let backgroundHeight: CGFloat = 155
         static let topAreaTopInset: CGFloat = 16
         static let topAreaLeading: CGFloat = 24
         static let topAreaTrailing: CGFloat = 20
-        static let topAreaHeight: CGFloat = 160
+        static let topAreaHeight: CGFloat = 144
 
         static let titleToSearchButtonSpacing: CGFloat = 12
         static let titleToGraphicSpacing: CGFloat = 20
@@ -276,7 +288,7 @@ private extension HomeView {
         static let sectionTitleHorizontalInset: CGFloat = 20
 
         static let collectionTopSpacing: CGFloat = 12
-        static let collectionHeight: CGFloat = 330
+        static let collectionHeight: CGFloat = 362
 
         static let pageControlTopSpacing: CGFloat = 20
         static let pageControlHeight: CGFloat = 6
