@@ -180,6 +180,19 @@ final class RecognizedTextViewController: UIViewController {
                 self?.handleSideEffect(sideEffect)
             }
             .store(in: &cancellables)
+        
+        viewModel.statePublisher
+            .map { $0.isLoading }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                if isLoading {
+                    self?.showLoading()
+                } else {
+                    self?.hideLoading()
+                }
+            }
+            .store(in: &cancellables)
     }
     
     private func render(_ state: RecognizedTextViewModel.State) {
@@ -212,6 +225,7 @@ final class RecognizedTextViewController: UIViewController {
     }
     
     // MARK: - Helpers
+    // TODO : BK다이얼로그로 교체하기 @dyk429
     private func showAlert(message: String) {
         let alert = UIAlertController(
             title: nil,

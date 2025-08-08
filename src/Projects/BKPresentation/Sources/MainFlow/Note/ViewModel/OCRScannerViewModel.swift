@@ -18,6 +18,8 @@ final class OCRScannerViewModel: BaseViewModel {
         var shouldShowAlert: Bool = false
         var shouldShowDialog: Bool = false
         var failureCount: Int = 0
+        
+        var isLoading: Bool = false
     }
     
     enum Action {
@@ -94,11 +96,12 @@ final class OCRScannerViewModel: BaseViewModel {
             
         case .captureButtonTapped(let scanAreaFrame):
             debugPulse("\(newState.failureCount)")
-            
+            newState.isLoading = true
             let capturedTexts = extractTextsInScanArea(
                 items: currentRecognizedItems,
                 scanAreaFrame: scanAreaFrame
             )
+            
             if !capturedTexts.isEmpty {
                 newState.failureCount = 0
                 
@@ -106,9 +109,11 @@ final class OCRScannerViewModel: BaseViewModel {
                 let combinedText = capturedTexts.joined(separator: "\n")
                 
                 newState.capturedText = combinedText
+                newState.isLoading = false
                 effects.append(.showRecognizedSentences(capturedTexts))
             } else {
                 newState.failureCount += 1
+                newState.isLoading = false
                 
                 if newState.failureCount >= 3 {
                     newState.shouldShowDialog = true

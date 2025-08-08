@@ -7,6 +7,7 @@ import Combine
 final class HomeViewModel: BaseViewModel {
     struct State: Equatable {
         var homeInfos: [HomeBookInfo] = []
+        var isLoading: Bool = false
         var shouldPlayAnimation: Bool = false
         var error: DomainError? = nil
     }
@@ -49,12 +50,14 @@ final class HomeViewModel: BaseViewModel {
         
         switch action {
         case .onAppear:
+            newState.isLoading = true
             effects.append(.fetch)
             newState.shouldPlayAnimation = true
         case .onDisappear:
             newState.shouldPlayAnimation = false
 
         case .fetchHomeSuccessed(let homeInfos):
+            newState.isLoading = false // TODO : 추후에 failed 케이스 생기면 거기에도 추가 @dyk429
             newState.homeInfos = homeInfos
             
         case .errorOccured(let error):

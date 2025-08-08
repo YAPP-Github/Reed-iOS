@@ -137,6 +137,7 @@ final class SearchViewModel: BaseViewModel {
         
         switch action {
         case .onAppear:
+            newState.isLoading = true
             effects.append(.recentQueries)
             
         case .search(let query):
@@ -147,6 +148,7 @@ final class SearchViewModel: BaseViewModel {
             effects.append(.searchResult(query))
             
         case .fetchRecentQueriesSuccessed(let queries):
+            newState.isLoading = false
             newState.searchState = .recent(
                 RecentState(
                     queries: queries,
@@ -196,9 +198,11 @@ final class SearchViewModel: BaseViewModel {
             effects.append(.deleteRecentQuery(query))
             
         case .upsertBook(let isbn, let status):
+            newState.isLoading = true
             effects.append(.upsert(isbn: isbn, status: status))
             
         case .upsertBookSuccessed(let bookId):
+            newState.isLoading = false // TODO : 실패케이스에 동일하게 추가 @dyk429
             newState.bookId = bookId
             
         case .errorOccured(let error):

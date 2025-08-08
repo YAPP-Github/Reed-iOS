@@ -17,6 +17,7 @@ final class TermsViewModel: BaseViewModel {
         var isStartButtonEnabled: Bool = false
         var error: DomainError?
         var didAgreementSucceed: Bool = false
+        var isLoading: Bool = false
     }
     
     enum Action {
@@ -72,6 +73,7 @@ final class TermsViewModel: BaseViewModel {
         case .agreeAllTapped:
             let newAgreementState = !newState.isAllAgreed
             newState.isAllAgreed = newAgreementState
+            
             for i in newState.terms.indices {
                 newState.terms[i].isAgreed = newAgreementState
             }
@@ -82,12 +84,15 @@ final class TermsViewModel: BaseViewModel {
             
         case .startButtonTapped:
             guard state.isStartButtonEnabled else { break }
+            newState.isLoading = true
             effects.append(.agreeToTerms)
             
         case .agreementSuccess:
             newState.didAgreementSucceed = true
+            newState.isLoading = false
             
         case .agreementFailed(let error):
+            newState.isLoading = false
             newState.error = error
         }
         

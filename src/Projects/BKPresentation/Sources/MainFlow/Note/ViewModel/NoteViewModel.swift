@@ -10,6 +10,7 @@ final class NoteViewModel: BaseViewModel {
         var selectedGuideText: String = ""
         var createCompleted: Bool = false
         var shouldStartEditing: Bool = false
+        var isLoading: Bool = false
         var recordInfo: RecordInfo?
         var error: DomainError? = nil
         var isRetrying: Bool = false
@@ -61,9 +62,11 @@ final class NoteViewModel: BaseViewModel {
             newState.shouldStartEditing = true
             
         case .submitNoteForm(let noteForm):
+            newState.isLoading = true
             effects.append(.submit(noteForm))
             
         case .submitNoteFormSuccessed(let recordInfo):
+            newState.isLoading = false
             newState.createCompleted = true
             newState.recordInfo = recordInfo
             

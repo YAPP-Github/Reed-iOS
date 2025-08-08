@@ -78,6 +78,19 @@ final class HomeViewController: BaseViewController<HomeView> {
             .store(in: &cancellable)
         
         viewModel.statePublisher
+            .map { $0.isLoading }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                if isLoading {
+                    self?.showLoading()
+                } else {
+                    self?.hideLoading()
+                }
+            }
+            .store(in: &cancellable)
+                   
+        viewModel.statePublisher
             .receive(on: DispatchQueue.main)
             .map(\.shouldPlayAnimation)
             .removeDuplicates()
