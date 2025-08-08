@@ -1,5 +1,6 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKDomain
 import UIKit
 
 struct ChipData: Hashable, Equatable {
@@ -38,6 +39,15 @@ enum ChipType: Int, CaseIterable {
         switch self {
         case .total: return .total
         case .toRead: return .toRead
+        case .reading: return .reading
+        case .completed: return .completed
+        }
+    }
+    
+    var domainBookStatus: BKDomain.BookStatus? {
+        switch self {
+        case .total: return .none
+        case .toRead: return .beforeReading
         case .reading: return .reading
         case .completed: return .completed
         }

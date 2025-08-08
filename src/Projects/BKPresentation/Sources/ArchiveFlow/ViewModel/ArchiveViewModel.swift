@@ -21,14 +21,11 @@ final class ArchiveViewModel: BaseViewModel {
         var isLoading = false
         var selectedChipIndex = 0
         var totalBooks = 0
+        var error: DomainError?
         
         static func createInitialChips() -> [ChipData] {
-            return ChipType.allCases.enumerated().map { index, type in
-                ChipData(
-                    title: type.title,
-                    count: 0,
-                    isSelected: index == 0
-                )
+            ChipType.allCases.enumerated().map { index, type in
+                ChipData(title: type.title, count: 0, isSelected: index == 0)
             }
         }
     }
@@ -37,32 +34,31 @@ final class ArchiveViewModel: BaseViewModel {
         case onAppear
         case chipTapped(index: Int)
         case loadNextPage
-        case fetchBooksSuccessed(([ArchiveBook], totalCount: Int))
-        case fetchChipsSuccessed([ChipData])
+
+        case fetchBooksSuccessed(books: [ArchiveBook], totalCount: Int, counts: BookCountSet)
+        case errorOccured(DomainError)
+        case errorHandled
     }
     
     enum SideEffect {
-        case fetchBooks(status: BookStatus?)
-        case loadNextPage(status: BookStatus?)
-        case fetchChips
+        case fetchBooks(page: Int, status: BKDomain.BookStatus?)
+        case fetchNextPage(page: Int, status: BKDomain.BookStatus?)
     }
     
     @Published private var state = State()
+    @Autowired private var fetchMyLibraryUseCase: FetchMyLibraryUseCase
     
     private var cancellables = Set<AnyCancellable>()
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
     
     private var allBooks: [ArchiveBook] = []
-    private var currentPage = 1
-    private var currentStatus: BookStatus? = .total
+    private var currentPage = 0
+    private let pageSize = 10
+    private var inflightPage: Int? = nil
     
-    var statePublisher: AnyPublisher<State, Never> {
-        $state.eraseToAnyPublisher()
-    }
+    var statePublisher: AnyPublisher<State, Never> { $state.eraseToAnyPublisher() }
     
-    init() {
-        bindSideEffects()
-    }
+    init() { bindSideEffects() }
     
     func send(_ action: Action) {
         let (newState, effects) = reduce(action: action, state: state)
@@ -73,79 +69,67 @@ final class ArchiveViewModel: BaseViewModel {
     func reduce(action: Action, state: State) -> (State, [SideEffect]) {
         var newState = state
         var effects: [SideEffect] = []
+        let status = statusForChip(index: state.selectedChipIndex)
         
         switch action {
         case .onAppear:
             newState.isLoading = true
-            effects.append(.fetchChips)
-            effects.append(.fetchBooks(status: currentStatus))
+            currentPage = 0
+            allBooks = []
+            effects.append(.fetchBooks(page: 0, status: status))
             
         case .chipTapped(let index):
-            if index == state.selectedChipIndex {
-                break
-            }
-            
+            guard index != state.selectedChipIndex else { break }
             newState.selectedChipIndex = index
             newState.isLoading = true
-            currentPage = 1
+            currentPage = 0
             allBooks = []
+            newState.totalBooks = 0
             
-            let status = bookStatusForChipIndex(index)
-            currentStatus = status
-            effects.append(.fetchBooks(status: status))
-            
+            // 칩 선택 즉시 반영 + 리스트 비우기
             let currentChips = getCurrentChips(from: state.archiveState)
-            let updatedChips = currentChips.enumerated().map { (i, chip) -> ChipData in
-                var newChip = chip
-                newChip.isSelected = (i == index)
-                return newChip
+            let updated = currentChips.enumerated().map { (i, chip) -> ChipData in
+                var c = chip
+                c.isSelected = (i == index)
+                return c
             }
+            newState.archiveState = .books(updated, [])
             
-            if case .empty = newState.archiveState {
-                newState.archiveState = .empty(updatedChips)
-            } else if case .books(_, let books) = newState.archiveState {
-                newState.archiveState = .books(updatedChips, books)
-            }
+            // 선택된 칩 기준 status로 0페이지 호출
+            let nextStatus = statusForChip(index: index)
+            effects.append(.fetchBooks(page: 0, status: nextStatus))
             
         case .loadNextPage:
-            guard !state.isLoading else { break }
+            guard !state.isLoading,
+                  inflightPage == nil,
+                  allBooks.count < state.totalBooks else { break }
             newState.isLoading = true
-            currentPage += 1
-            effects.append(.loadNextPage(status: currentStatus))
+            inflightPage = currentPage
+            effects.append(.fetchNextPage(page: currentPage, status: status)) // ✅ off-by-one 방지
             
-        case .fetchChipsSuccessed(let chips):
-            let updatedChips = ChipType.allCases.enumerated().map { index, type in
-                let count = chips[index].count
-                return ChipData(
-                    title: type.title,
-                    count: count,
-                    isSelected: index == newState.selectedChipIndex
-                )
-            }
-            
-            if case .empty = state.archiveState {
-                newState.archiveState = .empty(updatedChips)
-            } else if case .books(_, let books) = state.archiveState {
-                newState.archiveState = .books(updatedChips, books)
-            }
-            
-        case .fetchBooksSuccessed(let (books, totalCount)):
-            allBooks = books
-            newState.totalBooks = totalCount
+        case .fetchBooksSuccessed(let books, let totalCount, let counts):
             newState.isLoading = false
+            inflightPage = nil
+            newState.totalBooks = totalCount
             
-            let currentChips = getCurrentChips(from: state.archiveState)
-            let updatedChipsBasedOnSelection = currentChips.enumerated().map { (i, chip) -> ChipData in
-                var newChip = chip
-                newChip.isSelected = (i == newState.selectedChipIndex)
-                return newChip
-            }
-            
-            if books.isEmpty {
-                newState.archiveState = .empty(updatedChipsBasedOnSelection)
+            if currentPage == 0 {
+                allBooks = books
             } else {
-                newState.archiveState = .books(updatedChipsBasedOnSelection, books)
+                let unique = books.filter { b in !allBooks.contains(where: { $0.isbn == b.isbn }) }
+                allBooks += unique
             }
+            currentPage += 1
+            
+            let chips = buildChips(from: counts, selectedIndex: newState.selectedChipIndex)
+            newState.archiveState = allBooks.isEmpty ? .empty(chips) : .books(chips, allBooks)
+            
+        case .errorOccured(let error):
+            newState.isLoading = false
+            inflightPage = nil
+            newState.error = error
+            
+        case .errorHandled:
+            newState.error = nil
         }
         
         return (newState, effects)
@@ -153,151 +137,76 @@ final class ArchiveViewModel: BaseViewModel {
     
     func handle(_ effect: SideEffect) -> AnyPublisher<Action, Never> {
         switch effect {
-        case .fetchChips:
-            return Just(createMockChips())
-                .map(Action.fetchChipsSuccessed)
-                .eraseToAnyPublisher()
-            
-        case .fetchBooks(let status):
-            return Just(createMockBooks(for: status))
-                .map { books in
-                    Action.fetchBooksSuccessed((books, totalCount: books.count))
+        case let .fetchBooks(page, status),
+             let .fetchNextPage(page, status):
+            return fetchMyLibraryUseCase
+                .execute(query: nil, startIndex: page, status: status)
+                .map { result -> Action in
+                    let mapped = result.books.map(self.mapToArchiveBook(_:))
+                    return .fetchBooksSuccessed(
+                        books: mapped,
+                        totalCount: result.totalResults.totalCount,
+                        counts: result.totalResults
+                    )
                 }
-                .eraseToAnyPublisher()
-            
-        case .loadNextPage(let status):
-            return Just(createMockBooks(for: status))
-                .map { books in
-                    let uniqueBooks = books.filter { book in
-                        !self.allBooks.contains { $0 == book }
-                    }
-                    let updatedBooks = self.allBooks + uniqueBooks
-                    return Action.fetchBooksSuccessed((updatedBooks, totalCount: updatedBooks.count))
-                }
+                .catch { Just(.errorOccured($0)) }
                 .eraseToAnyPublisher()
         }
     }
     
     private func bindSideEffects() {
         sideEffectSubject
-            .flatMap { [weak self] effect in
+            .map { [weak self] effect in
                 self?.handle(effect) ?? Empty().eraseToAnyPublisher()
             }
+            .switchToLatest()
             .sink(receiveValue: send(_:))
             .store(in: &cancellables)
     }
     
-    // MARK: - Helper Methods
-    
-    private func bookStatusForChipIndex(_ index: Int) -> BookStatus? {
-        guard index < ChipType.allCases.count else { return nil }
-        return ChipType.allCases[index].bookStatus
-    }
-    
     private func getCurrentChips(from archiveState: ArchiveState) -> [ChipData] {
         switch archiveState {
-        case .empty(let chips):
-            return chips
-        case .books(let chips, _):
-            return chips
+        case .empty(let chips): return chips
+        case .books(let chips, _): return chips
         }
     }
     
-    // MARK: - Mock Data -> API 연결 후 삭제
-    
-    private func createMockChips() -> [ChipData] {
-        return [
-            ChipData(title: "전체", count: 13),
-            ChipData(title: "읽기 전", count: 3),
-            ChipData(title: "읽는 중", count: 5),
-            ChipData(title: "완독", count: 5)
+    private func buildChips(from counts: BookCountSet, selectedIndex: Int) -> [ChipData] {
+        let numbers: [Int] = [
+            counts.totalCount,
+            counts.beforeReadingCount,
+            counts.readingCount,
+            counts.completedCount
         ]
+        return ChipType.allCases.enumerated().map { i, type in
+            ChipData(
+                title: type.title,
+                count: numbers[safe: i] ?? 0,
+                isSelected: i == selectedIndex
+            )
+        }
     }
     
-    private func createMockBooks(for status: BookStatus?) -> [ArchiveBook] {
-        // 임시 Mock 데이터 -> API 연결 후 삭제
-        switch status {
-        case .total: // 전체 (4개)
-            return [
-                ArchiveBook(
-                    isbn: "1234",
-                    title: "여름은 오래 그곳에 남아",
-                    author: "미쓰이에 다카시",
-                    publisher: "비채",
-                    imageURL: URL(string: "https://image.aladin.co.kr/product/7492/9/cover500/8934972203_1.jpg"),
-                    recordCount: 24
-                ),
-                ArchiveBook(
-                    isbn: "5678",
-                    title: "쇼펜하우어 인생수업",
-                    author: "쇼펜하우어",
-                    publisher: "민음사",
-                    imageURL: URL(string: "https://image.aladin.co.kr/product/33464/3/cover500/k082938849_3.jpg"),
-                    recordCount: 15
-                ),
-                ArchiveBook(
-                    isbn: "9101",
-                    title: "작별인사",
-                    author: "김영하",
-                    publisher: "복복서가",
-                    imageURL: URL(string: "https://image.aladin.co.kr/product/29281/68/cover500/k122837904_2.jpg"),
-                    recordCount: 0
-                ),
-                ArchiveBook(
-                    isbn: "1121",
-                    title: "불편한 편의점",
-                    author: "김호연",
-                    publisher: "나무옆의자",
-                    imageURL: URL(string: "https://image.aladin.co.kr/product/29045/74/cover500/k192836746_2.jpg"),
-                    recordCount: 0
-                )
-            ]
-            
-        case .toRead: // 읽기 전 (2개)
-            return [
-                ArchiveBook(
-                    isbn: "9101",
-                    title: "작별인사",
-                    author: "김영하",
-                    publisher: "복복서가",
-                    imageURL: URL(string: "https://image.aladin.co.kr/product/29281/68/cover500/k122837904_2.jpg"),
-                    recordCount: 0
-                ),
-                ArchiveBook(
-                    isbn: "1121",
-                    title: "불편한 편의점",
-                    author: "김호연",
-                    publisher: "나무옆의자",
-                    imageURL: URL(string: "https://image.aladin.co.kr/product/29045/74/cover500/k192836746_2.jpg"),
-                    recordCount: 0
-                )
-            ]
-            
-        case .reading: // 읽는 중 (2개)
-            return [
-                ArchiveBook(
-                    isbn: "1234",
-                    title: "여름은 오래 그곳에 남아",
-                    author: "미쓰이에 다카시",
-                    publisher: "비채",
-                    imageURL: URL(string: "https://image.aladin.co.kr/product/7492/9/cover500/8934972203_1.jpg"),
-                    recordCount: 24
-                ),
-                ArchiveBook(
-                    isbn: "5678",
-                    title: "쇼펜하우어 인생수업",
-                    author: "쇼펜하우어",
-                    publisher: "민음사",
-                    imageURL: URL(string: "https://image.aladin.co.kr/product/33464/3/cover500/k082938849_3.jpg"),
-                    recordCount: 15
-                )
-            ]
-            
-        case .completed: // 완독 (0개)
-            return []
-            
-        default:
-            return []
-        }
+    private func statusForChip(index: Int) -> BKDomain.BookStatus? {
+        ChipType.allCases[safe: index]?.domainBookStatus
+    }
+    
+    private func mapToArchiveBook(_ book: BookInfo) -> ArchiveBook {
+        ArchiveBook(
+            isbn: book.isbn,
+            bookId: book.bookId,
+            title: book.title,
+            author: book.author,
+            publisher: book.publisher,
+            status: book.status,
+            imageURL: book.imageUrl,
+            recordCount: book.recordCount
+        )
+    }
+}
+
+private extension Array {
+    subscript(safe index: Index) -> Element? {
+        indices.contains(index) ? self[index] : nil
     }
 }
