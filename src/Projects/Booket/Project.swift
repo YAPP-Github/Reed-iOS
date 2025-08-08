@@ -2,7 +2,7 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 let appTarget = Target.target(
-    name: "Booket",
+    name: "Reed",
     product: .app,
     bundleId: Project.bundleID,
     infoPlist: .file(path: .relativeToRoot("SupportingFiles/Booket/Info.plist")),
