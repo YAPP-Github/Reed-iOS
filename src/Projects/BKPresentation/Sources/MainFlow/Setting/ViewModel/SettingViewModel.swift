@@ -28,6 +28,7 @@ final class SettingViewModel: BaseViewModel {
         var appVersion: String = ""
         var errorMessage: String?
         var isLoggedOut: Bool = false
+        var isLoading: Bool = false
     }
     
     enum Action {
@@ -66,6 +67,7 @@ final class SettingViewModel: BaseViewModel {
         effects.forEach { sideEffectSubject.send($0) }
     }
     
+    // TODO : withdraw 케이스에도 로딩 추가 필요 @dyk429
     func reduce(action: Action, state: State) -> (State, [SideEffect]) {
         var newState = state
         var effects: [SideEffect] = []
@@ -76,10 +78,13 @@ final class SettingViewModel: BaseViewModel {
         case .fetchAppVersionSuccessed(let version):
             newState.appVersion = version
         case .logoutButtonTapped:
+            newState.isLoading = true
             effects.append(.logout)
         case .logoutSuccessed:
+            newState.isLoading = false
             newState.isLoggedOut = true
         case .logoutFailed:
+            newState.isLoading = false
             newState.errorMessage = "Logout Failed"
             newState.isLoggedOut = false
         }
