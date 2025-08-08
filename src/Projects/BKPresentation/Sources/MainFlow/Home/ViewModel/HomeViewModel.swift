@@ -7,6 +7,7 @@ import Combine
 final class HomeViewModel: BaseViewModel {
     struct State: Equatable {
         var homeInfos: [HomeBookInfo] = []
+        var isLoading: Bool = false
     }
     
     enum Action {
@@ -44,8 +45,10 @@ final class HomeViewModel: BaseViewModel {
         
         switch action {
         case .onAppear:
+            newState.isLoading = true
             effects.append(.fetch)
         case .fetchHomeSuccessed(let homeInfos):
+            newState.isLoading = false // TODO : 추후에 failed 케이스 생기면 거기에도 추가 @dyk429
             newState.homeInfos = homeInfos
         }
         

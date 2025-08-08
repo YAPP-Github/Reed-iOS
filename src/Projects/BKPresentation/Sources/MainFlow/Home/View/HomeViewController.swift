@@ -67,6 +67,19 @@ final class HomeViewController: BaseViewController<HomeView> {
                 self?.contentView.updateBooks(homeInfos)
             }
             .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map { $0.isLoading }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                if isLoading {
+                    self?.showLoading()
+                } else {
+                    self?.hideLoading()
+                }
+            }
+            .store(in: &cancellable)
     }
     
     @objc private func goToSettingViewController() {

@@ -9,6 +9,7 @@ final class BookDetailViewModel: BaseViewModel {
         var items: [BookDetailItem] = []
         var currentBook: Book? = nil
         var sortOption: SortOption = .pageDescending
+//        var isLoading: Bool = false
     }
     
     enum Action {
