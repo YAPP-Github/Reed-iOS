@@ -9,10 +9,11 @@ public enum BKBookSummaryViewStyle {
     case compact
     case big
     case record
+    case alreadyEnroll
 
     var thumbnailSize: CGSize {
         switch self {
-        case .regular, .big, .record:
+        case .regular, .big, .record, .alreadyEnroll:
             return CGSize(width: 68, height: 100)
         case .compact:
             return CGSize(width: 46, height: 68)
@@ -21,7 +22,7 @@ public enum BKBookSummaryViewStyle {
 
     var placeholderImage: URL? {
         switch self {
-        case .regular, .big, .record:
+        case .regular, .big, .record, .alreadyEnroll:
             return URL(string: "https://dummyimage.com/68x100/2f9647/ffffff")
         case .compact:
             return URL(string: "https://dummyimage.com/46x68/2f9647/ffffff")
@@ -30,7 +31,7 @@ public enum BKBookSummaryViewStyle {
 
     var labelStackSpacing: CGFloat {
         switch self {
-        case .regular, .compact, .record:
+        case .regular, .compact, .record, .alreadyEnroll:
             return BKSpacing.spacing1
         case .big:
             return BKSpacing.spacing2
@@ -59,16 +60,46 @@ public class BKBookSummaryView: UIView {
         stackView.alignment = .leading
         return stackView
     }()
-    private let authorLabel = BKLabel(fontStyle: .label1(weight: .medium), color: .bkContentColor(.disable))
-    private let separatorLabel = BKLabel(text: " | ", fontStyle: .label1(weight: .medium), color: .bkContentColor(.disable))
-    private let publisherLabel = BKLabel(fontStyle: .label1(weight: .medium), color: .bkContentColor(.disable))
-    private let extraLabel = BKLabel(fontStyle: .label1(weight: .regular), color: .bkContentColor(.disable))
+    private let authorLabel = BKLabel(
+        fontStyle: .label1(weight: .medium),
+        color: .bkContentColor(.disable)
+    )
+    private let separatorLabel = BKLabel(
+        text: " | ",
+        fontStyle: .label1(weight: .medium),
+        color: .bkContentColor(
+            .disable
+        )
+    )
+    private let publisherLabel = BKLabel(
+        fontStyle: .label1(weight: .medium),
+        color: .bkContentColor(.disable)
+    )
+    private let extraLabel = BKLabel(
+        fontStyle: .label1(weight: .regular),
+        color: .bkContentColor(.disable)
+    )
 
     // Record mode views
     private let recordView = UIView()
-    private let recordLabel = BKLabel(text: "남긴 기록", fontStyle: .label2(weight: .regular), color: .bkContentColor(.primary))
-    private let recordCountLabel = BKLabel(fontStyle: .label2(weight: .semiBold), color: .bkContentColor(.brand))
+    private let recordLabel = BKLabel(
+        text: "남긴 기록",
+        fontStyle: .label2(weight: .regular),
+        color: .bkContentColor(
+            .primary
+        )
+    )
+    private let recordCountLabel = BKLabel(
+        fontStyle: .label2(weight: .semiBold),
+        color: .bkContentColor(.brand)
+    )
 
+    // Already Record mode views
+    private let guideLabel = BKLabel(
+        text: "이미 등록된 책입니다",
+        fontStyle: .label2(weight: .regular),
+        color: .bkContentColor(.success)
+    )
     private let style: BKBookSummaryViewStyle
 
     public init(frame: CGRect = .zero, style: BKBookSummaryViewStyle = .regular) {
@@ -83,6 +114,10 @@ public class BKBookSummaryView: UIView {
     }
 
     private func setupViews() {
+        titleLabel.lineBreakMode = .byTruncatingTail
+        authorLabel.lineBreakMode = .byTruncatingTail
+        publisherLabel.lineBreakMode = .byTruncatingTail
+        
         addSubviews(thumbnail, labelStack)
         labelStack.spacing = style.labelStackSpacing
         labelStack.addArrangedSubview(titleLabel)
