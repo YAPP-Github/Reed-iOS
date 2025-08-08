@@ -57,8 +57,15 @@ final class LoginViewController: BaseViewController<LoginView> {
             .map { $0.errorMessage }
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
-            .sink { error in
-                print("error occurred: \(String(describing: error))")
+            .sink { [weak self] error in
+                self?.coordinator?.presentCustomErrorAlert(
+                    title: "로그인 오류",
+                    subtitle: """
+                    예기치 않은 오류가 발생했습니다.
+                    다시 로그인 해주세요.
+                    """,
+                    onConfirm: {}
+                )
             }
             .store(in: &cancellable)
         

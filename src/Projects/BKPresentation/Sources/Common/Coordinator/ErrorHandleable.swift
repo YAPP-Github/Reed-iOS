@@ -17,7 +17,9 @@ extension ErrorHandleable where Self: Coordinator & SessionExpirationNotifying {
             presentTimeoutAlert()
         }
     }
-    
+}
+
+extension ErrorHandleable where Self: Coordinator {
     func presentCustomErrorAlert(
         title: String = "",
         subtitle: String,
