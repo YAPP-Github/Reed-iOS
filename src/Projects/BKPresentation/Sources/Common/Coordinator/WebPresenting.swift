@@ -29,9 +29,9 @@ enum DocsType {
         case .privacy:
             return URL(string: "https://sites.google.com/view/reed-privacypolicy")
         case .terms:
-            return URL(string: "https://sites.google.com/view/reed-opensourcelicense-ios")
-        case .licenses:
             return URL(string: "https://sites.google.com/view/reed-termsofuse")
+        case .licenses:
+            return URL(string: "https://sites.google.com/view/reed-oss/")
         }
     }
 }
