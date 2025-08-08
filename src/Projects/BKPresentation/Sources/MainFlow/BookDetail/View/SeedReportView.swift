@@ -8,19 +8,24 @@ import UIKit
 enum EmotionSeed: String, CaseIterable {
     case warmth = "따뜻함"
     case joy = "즐거움"
-    case tension = "긴장감"
-    case sadness = "슬픔"
+    case insight = "깨달음"
+    case sad = "슬픔"
     
     var image: UIImage {
-        return BKImage.Graphics.empty
+        switch self {
+        case .warmth: return BKImage.Graphics.warm
+        case .joy: return BKImage.Graphics.joy
+        case .insight: return BKImage.Graphics.insight
+        case .sad: return BKImage.Graphics.sad
+        }
     }
     
     var color: UIColor {
         switch self {
         case .warmth: return .bkEmotionColor(.warmth)
         case .joy: return .bkEmotionColor(.joy)
-        case .tension: return .bkEmotionColor(.tension)
-        case .sadness: return .bkEmotionColor(.sadness)
+        case .insight: return .bkEmotionColor(.tension)
+        case .sad: return .bkEmotionColor(.sadness)
         }
     }
     
@@ -28,16 +33,16 @@ enum EmotionSeed: String, CaseIterable {
         switch self {
         case .warmth: return .bkEmotionBaseColor(.warmth)
         case .joy: return .bkEmotionBaseColor(.joy)
-        case .tension: return .bkEmotionBaseColor(.tension)
-        case .sadness: return .bkEmotionBaseColor(.sadness)
+        case .insight: return .bkEmotionBaseColor(.tension)
+        case .sad: return .bkEmotionBaseColor(.sadness)
         }
     }
     
     static func from(emotion: Emotion) -> Self {
         switch emotion {
         case .joy: return .joy
-        case .nervous: return .tension
-        case .sadness: return .sadness
+        case .sad: return .insight
+        case .insight: return .sad
         case .warmth: return .warmth
         }
     }
