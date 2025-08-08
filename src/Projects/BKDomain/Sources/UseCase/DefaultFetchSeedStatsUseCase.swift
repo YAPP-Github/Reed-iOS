@@ -9,7 +9,9 @@ public struct DefaultFetchSeedStatsUseCase: FetchSeedStatsUseCase {
         self.repository = repository
     }
     
-    public func execute() -> AnyPublisher<[Seed], DomainError> {
-        repository.stats()
+    public func execute(
+        id recordId: String
+    ) -> AnyPublisher<[Seed], DomainError> {
+        repository.stats(id: recordId)
     }
 }

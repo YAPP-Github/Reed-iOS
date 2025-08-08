@@ -77,11 +77,10 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(
-            type: SearchBookUseCase.self,
-            name: "MyLibrary"
+            type: MyLibrarySearchBookUseCase.self
         ) { _ in
             @Autowired var repository: BookRepository
-            return MyLibrarySearchBookUseCase(repository: repository)
+            return DefaultMyLibrarySearchBookUseCase(repository: repository)
         }
         
         // Default RecentSearch UseCases
@@ -192,6 +191,20 @@ public struct DomainAssembly: Assembly {
         ) { _ in
             @Autowired var repository: BookRepository
             return DefaultFetchBookDetailUseCase(repository: repository)
+        }
+        
+        container.register(
+            type: FetchMyLibraryUseCase.self
+        ) { _ in
+            @Autowired var repository: BookRepository
+            return DefaultFetchMyLibraryUseCase(repository: repository)
+        }
+        
+        container.register(
+            type: WithdrawAccountUseCase.self
+        ) { _ in
+            @Autowired var repository: AuthRepository
+            return DefautWithdrawAccountUseCase(repository: repository)
         }
     }
 }

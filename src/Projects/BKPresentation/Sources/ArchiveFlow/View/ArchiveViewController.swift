@@ -89,14 +89,12 @@ final class ArchiveViewController: BaseViewController<ArchiveView> {
     
     @objc
     private func settingsButtonTapped() {
-        //        coordinator?.didTapSettingButton()
-        print("세팅 버튼 눌림")
+        coordinator?.didTapSettingButton()
     }
     
     // MARK: - Private Methods
     private func handleBookTapped(_ book: ArchiveBook) {
-        // 책 상세 화면으로 이동하거나 기록 화면으로 이동
-        //        coordinator?.showBookDetail(book: book)
+        coordinator?.didTapBookDetailButton(isbn: book.isbn, userBookId: book.bookId)
         print("기록 선택됨: \(book.title)")
     }
 }

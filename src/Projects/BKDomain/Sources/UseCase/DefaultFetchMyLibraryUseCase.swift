@@ -2,7 +2,7 @@
 
 import Combine
 
-public struct MyLibrarySearchBookUseCase: SearchBookUseCase {
+public struct DefaultFetchMyLibraryUseCase: FetchMyLibraryUseCase {
     private let repository: BookRepository
     
     public init(repository: BookRepository) {
@@ -10,11 +10,13 @@ public struct MyLibrarySearchBookUseCase: SearchBookUseCase {
     }
     
     public func execute(
-        query: String,
-        startIndex: Int
-    ) -> AnyPublisher<(books: [Book], totalResults: Int), DomainError> {
+        query: String?,
+        startIndex: Int?,
+        status: BookStatus?
+    ) -> AnyPublisher<(books: [BookInfo], totalResults: BookCountSet), DomainError> {
         repository.searchMyLibrary(
             MyLibraryParameters(
+                status: status,
                 pageNumber: startIndex,
                 title: query
             )

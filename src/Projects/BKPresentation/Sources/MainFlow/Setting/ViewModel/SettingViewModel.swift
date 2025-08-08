@@ -26,7 +26,6 @@ final class SettingViewModel: BaseViewModel {
         var firstMenuItems = FirstMenuItem.allCases
         var secondMenuItems = SecondMenuItem.allCases
         var appVersion: String = ""
-        var errorMessage: String?
         var isLoggedOut: Bool = false
         var isLoading: Bool = false
         var error: DomainError? = nil
@@ -39,13 +38,14 @@ final class SettingViewModel: BaseViewModel {
         case logoutSuccessed
         case errorOccured(DomainError)
         case errorHandled
-//        case withdrawButtonTapped
+        case withdrawButtonTapped
+        case withdrawSuccessed
     }
     
     enum SideEffect {
         case appVersion
         case logout
-//        case withdraw
+        case withdraw
     }
     
     @Published private var state = State()
@@ -54,6 +54,7 @@ final class SettingViewModel: BaseViewModel {
     
     @Autowired private var appVersionUseCase: AppVersionUseCase
     @Autowired private var logoutUseCase: LogoutUseCase
+    @Autowired private var withdrawAccountUseCase: WithdrawAccountUseCase
     
     var statePublisher: AnyPublisher<State, Never> {
         $state.eraseToAnyPublisher()
@@ -96,6 +97,14 @@ final class SettingViewModel: BaseViewModel {
             
         case .errorHandled:
             newState.error = nil
+            
+        case .withdrawButtonTapped:
+            newState.isLoading = true
+            effects.append(.withdraw)
+            
+        case .withdrawSuccessed:
+            newState.isLoading = false
+            newState.isLoggedOut = true
         }
         
         return (newState, effects)
@@ -110,6 +119,12 @@ final class SettingViewModel: BaseViewModel {
         case .logout:
             return logoutUseCase.execute()
                 .map { _ in Action.logoutSuccessed }
+                .catch { _ in Just(Action.errorOccured(.unauthorized)) }
+                .eraseToAnyPublisher()
+            
+        case .withdraw:
+            return withdrawAccountUseCase.execute()
+                .map { _ in Action.withdrawSuccessed }
                 .catch { _ in Just(Action.errorOccured(.unauthorized)) }
                 .eraseToAnyPublisher()
         }

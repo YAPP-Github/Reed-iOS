@@ -5,7 +5,7 @@ import Foundation
 
 struct LibraryRequestDTO: DictionaryRepresentable {
     let title: String?
-    let status: BookStatus?
+    let status: String?
     let sort: LibrarySortType?
     let page: Int?
     let size: Int?
@@ -22,7 +22,7 @@ struct LibraryRequestDTO: DictionaryRepresentable {
         pageSize: Int? = nil
     ) {
         self.title = title
-        self.status = status
+        self.status = status?.rawValue
         self.sort = sortType
         self.page = pageNumber
         self.size = pageSize

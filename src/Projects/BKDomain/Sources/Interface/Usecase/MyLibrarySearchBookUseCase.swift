@@ -2,9 +2,9 @@
 
 import Combine
 
-public protocol SearchBookUseCase {
+public protocol MyLibrarySearchBookUseCase {
     func execute(
         query: String?,
         startIndex: Int?
-    ) -> AnyPublisher<(books: [Book], totalResults: Int), DomainError>
+    ) -> AnyPublisher<(books: [BookInfo], totalResults: Int), DomainError>
 }

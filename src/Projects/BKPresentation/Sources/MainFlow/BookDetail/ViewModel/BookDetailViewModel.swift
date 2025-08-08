@@ -8,13 +8,13 @@ import Foundation
 final class BookDetailViewModel: BaseViewModel {
     struct State {
         var items: [BookDetailItem] = []
-        var currentBook: Book? = nil
+        var currentBook: Book?
         var sortOption: SortOption = .pageDescending
         var seeds = [Seed]()
         var isAddNoteTriggered = false
         var isStatusButtonTriggered = false
         let userBookId: String
-        var error: DomainError? = nil
+        var error: DomainError?
         var isRetrying: Bool = false
     }
     
@@ -149,7 +149,7 @@ final class BookDetailViewModel: BaseViewModel {
             
         case .fetchBookDetail:
             return fetchBookDetailUseCase.execute(isbn: isbn)
-                .map { Action.fetchBookDetailSuccessed($0)}
+                .map { Action.fetchBookDetailSuccessed($0) }
                 .catch { [weak self] in
                     self?.lastEffect = .fetchBookDetail
                     return Just(Action.errorOccured($0))
@@ -167,7 +167,7 @@ final class BookDetailViewModel: BaseViewModel {
                 .eraseToAnyPublisher()
             
         case .fetchSeedStats:
-            return fetchSeedStatsUseCase.execute()
+            return fetchSeedStatsUseCase.execute(id: state.userBookId)
                 .map { Action.fetchSeedStatsSuccessed($0) }
                 .catch { [weak self] in
                     self?.lastEffect = .fetchSeedStats

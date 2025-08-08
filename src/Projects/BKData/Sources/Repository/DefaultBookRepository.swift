@@ -41,18 +41,14 @@ public struct DefaultBookRepository: BookRepository {
     
     public func searchMyLibrary(
         _ parameters: MyLibraryParameters
-    ) -> AnyPublisher<([Book], totalResults: Int), DomainError> {
+    ) -> AnyPublisher<([BookInfo], totalResults: BookCountSet), DomainError> {
         networkProvider.request(
             target: BookAPI.myLibrary(
                 parameter: LibraryRequestDTO(parameters)
             ),
             type: UserLibraryResponseDTO.self
         )
-        .map { ($0.getBookInfos(), $0.books.page.totalElements) }
-        .map { bookInfo, count in
-            let books = bookInfo.map { $0.toBook() }
-            return (books, count)
-        }
+        .map { ($0.getBookInfos(), $0.toBookCountSet()) }
         .mapError { $0.toDomainError() }
         .eraseToAnyPublisher()
     }
@@ -85,7 +81,7 @@ public struct DefaultBookRepository: BookRepository {
         networkProvider.request(
             target: BookAPI.upsert(
                 dto: UserBookRegisterRequestDTO(
-                    bookIsbn: bookIsbn,
+                    isbn13: bookIsbn,
                     bookStatus: status
                 )
             ),

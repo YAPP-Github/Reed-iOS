@@ -70,13 +70,10 @@ public struct DefaultAuthRepository: AuthRepository {
         .eraseToAnyPublisher()
     }
     
-    public func deleteAccount(
-        provider: AuthProvider,
-        token: String?
-    ) -> AnyPublisher<Void, AuthError> {
+    public func withdraw() -> AnyPublisher<Void, AuthError> {
         // TODO: - 현재 탈퇴 API가 없으므로 logout으로 대체
         return oauthProvider.request(
-            target: AuthAPI.logout,
+            target: AuthAPI.withdraw,
             type: EmptyResponse.self
         )
         .mapError { AuthError.serverError(message: "\($0)") }

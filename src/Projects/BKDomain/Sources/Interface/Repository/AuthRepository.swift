@@ -32,8 +32,5 @@ public protocol AuthRepository {
     ///   - token: 탈퇴 처리에 필요한 소셜 인증 토큰(String?) (authorizationToken 등)
     /// - Returns: 정상 처리 시 빈 값(Void)을 방출하는 퍼블리셔
     /// - Failure: `AuthError` 유형의 에러
-    func deleteAccount(
-        provider: AuthProvider,
-        token: String?
-    ) -> AnyPublisher<Void, AuthError>
+    func withdraw() -> AnyPublisher<Void, AuthError>
 }

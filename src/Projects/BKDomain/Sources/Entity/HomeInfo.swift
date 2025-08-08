@@ -4,6 +4,7 @@ import Foundation
 
 public struct HomeInfo: Equatable {
     public let userBookId: String
+    public let isbn13: String
     public let title: String
     public let author: String
     public let publisher: String
@@ -13,6 +14,7 @@ public struct HomeInfo: Equatable {
     
     public init(
         userBookId: String,
+        isbn13: String,
         title: String,
         author: String,
         publisher: String,
@@ -21,6 +23,7 @@ public struct HomeInfo: Equatable {
         recordCount: Int
     ) {
         self.userBookId = userBookId
+        self.isbn13 = isbn13
         self.title = title
         self.author = author
         self.publisher = publisher

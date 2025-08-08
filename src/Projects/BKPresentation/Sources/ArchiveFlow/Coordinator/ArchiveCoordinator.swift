@@ -25,7 +25,6 @@ final class ArchiveCoordinator: Coordinator {
 extension ArchiveCoordinator: SessionExpirationNotifying, ErrorHandleable {}
 
 extension ArchiveCoordinator {
-    // Archive 관련 네비게이션 메서드들을 여기에 추가
     func didTapSearchButton() {
         let searchCoordinator = SearchCoordinator(
             parentCoordinator: self,
@@ -34,5 +33,28 @@ extension ArchiveCoordinator {
         )
         searchCoordinator.start()
         childCoordinators.append(searchCoordinator)
+    }
+    
+    func didTapSettingButton() {
+        let settingCoordinator = SettingCoordinator(
+            parentCoordinator: self,
+            navigationController: navigationController
+        )
+        childCoordinators.append(settingCoordinator)
+        settingCoordinator.start()
+    }
+    
+    func didTapBookDetailButton(
+        isbn: String,
+        userBookId: String
+    ) {
+        let bookDetailCoordinator = BookDetailCoordinator(
+            parentCoordinator: self,
+            navigationController: navigationController,
+            isbn: isbn,
+            userBookId: userBookId
+        )
+        childCoordinators.append(bookDetailCoordinator)
+        bookDetailCoordinator.start()
     }
 }

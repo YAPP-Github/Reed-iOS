@@ -1,7 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 public struct SearchBookParameters {
-    public var query: String
+    public var query: String?
     public var queryType: SearchQueryType? = nil
     public var searchTarget: SearchTarget? = nil
     public var maxResults: Int? = 10

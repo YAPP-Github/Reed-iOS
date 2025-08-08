@@ -197,10 +197,12 @@ private extension SearchViewController {
                 rightTitle: "네, 시작할게요!",
                 leftAction: { [weak self] in
                     self?.dismiss(animated: true)
+                    self?.hideLoading()
                 },
                 rightAction: { [weak self] in
                     self?.dismiss(animated: true)
                     self?.viewModel.send(.loadNoteFlow)
+                    self?.hideLoading()
                 }
             )
         )

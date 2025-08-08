@@ -179,7 +179,10 @@ extension ArchiveView: UICollectionViewDataSource {
         return books.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        cellForItemAt indexPath: IndexPath
+    ) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: ArchiveCell.identifier,
             for: indexPath
@@ -229,5 +232,17 @@ extension ArchiveView: UICollectionViewDelegateFlowLayout {
     ) {
         let book = books[indexPath.item]
         eventPublisher.send(.bookTapped(book: book))
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        willDisplay cell: UICollectionViewCell,
+        forItemAt indexPath: IndexPath
+    ) {
+        let section = indexPath.section
+        let totalItems = collectionView.numberOfItems(inSection: section)
+        if indexPath.item == totalItems - 1 {
+            eventPublisher.send(.loadNextPage)
+        }
     }
 }

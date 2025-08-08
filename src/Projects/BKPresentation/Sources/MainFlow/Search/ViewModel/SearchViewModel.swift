@@ -38,6 +38,20 @@ enum SearchViewType: String {
     }
 }
 
+struct MyLibrarySearchAdapter: SearchBookUseCase {
+    let wrapped: MyLibrarySearchBookUseCase
+    let map: (BookInfo) -> Book
+
+    func execute(
+        query: String?,
+        startIndex: Int?
+    ) -> AnyPublisher<(books: [Book], totalResults: Int), DomainError> {
+        wrapped.execute(query: query, startIndex: startIndex)
+            .map { (books: $0.books.map(map), totalResults: $0.totalResults) }
+            .eraseToAnyPublisher()
+    }
+}
+
 final class SearchViewModel: BaseViewModel {
     enum SearchState: Equatable {
         case recent(RecentState)
@@ -106,9 +120,19 @@ final class SearchViewModel: BaseViewModel {
         return useCase
     }()
     
+    @Autowired var defaultSearchUseCase: SearchBookUseCase
+    @Autowired var myLibrarySearchUseCase: MyLibrarySearchBookUseCase
+    
     private lazy var searchBookUseCase: SearchBookUseCase = {
-        @Autowired(name: searchViewType.rawValue) var useCase: SearchBookUseCase
-        return useCase
+        switch searchViewType {
+        case .defaultSearch:
+            return defaultSearchUseCase
+        case .myLibrarySearch:
+            return MyLibrarySearchAdapter(
+                wrapped: myLibrarySearchUseCase,
+                map: mapBookInfoToBook
+            )
+        }
     }()
     
     @Autowired private var upsertUseCase: BookUpsertUseCase
@@ -202,7 +226,7 @@ final class SearchViewModel: BaseViewModel {
             effects.append(.upsert(isbn: isbn, status: status))
             
         case .upsertBookSuccessed(let bookId):
-            newState.isLoading = false // TODO : 실패케이스에 동일하게 추가 @dyk429
+            newState.isLoading = false
             newState.bookId = bookId
             
         case .errorOccured(let error):
@@ -296,5 +320,17 @@ final class SearchViewModel: BaseViewModel {
             }
             .sink(receiveValue: send(_:))
             .store(in: &cancellables)
+    }
+    
+    private func mapBookInfoToBook(_ info: BookInfo) -> Book {
+        Book(
+            isbn: info.isbn,
+            title: info.title,
+            author: info.author,
+            publisher: info.publisher,
+            thumbnail: info.imageUrl,
+            userBookStatus: info.status,
+            recordCount: info.recordCount
+        )
     }
 }

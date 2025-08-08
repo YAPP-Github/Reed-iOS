@@ -60,7 +60,7 @@ extension BookAPI: RequestTarget {
     var query: [String: Any] {
         switch self {
         case .detail(let isbn):
-            return BookDetailRequestDTO(isbn: isbn).toDictionary()
+            return BookDetailRequestDTO(isbn13: isbn).toDictionary()
         case .myLibrary(let parameter):
             return parameter.dictionary
         case .search(let dto):

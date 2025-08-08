@@ -4,6 +4,6 @@ import BKDomain
 import Foundation
 
 struct UserBookRegisterRequestDTO: Encodable {
-    let bookIsbn: String
+    let isbn13: String
     let bookStatus: BookStatus
 }
