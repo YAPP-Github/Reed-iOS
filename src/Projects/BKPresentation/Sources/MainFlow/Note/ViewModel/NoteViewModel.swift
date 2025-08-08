@@ -48,10 +48,7 @@ final class NoteViewModel: BaseViewModel {
     func send(_ action: Action) {
         let (newState, effects) = reduce(action: action, state: state)
         state = newState
-        effects.forEach {
-            lastEffect = $0
-            sideEffectSubject.send($0)
-        }
+        effects.forEach { sideEffectSubject.send($0) }
     }
     
     func reduce(action: Action, state: State) -> (State, [SideEffect]) {
@@ -98,7 +95,10 @@ final class NoteViewModel: BaseViewModel {
                 record: noteForm.toRecordVO()
             )
             .map { Action.submitNoteFormSuccessed($0) }
-            .catch { Just(Action.errorOccured($0)) }
+            .catch { [weak self] in
+                self?.lastEffect = .submit(noteForm)
+                return Just(Action.errorOccured($0))
+            }
             .eraseToAnyPublisher()
         }
     }

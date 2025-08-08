@@ -70,10 +70,7 @@ final class BookDetailViewModel: BaseViewModel {
     func send(_ action: Action) {
         let (newState, effects) = reduce(action: action, state: state)
         state = newState
-        effects.forEach {
-            lastEffect = $0
-            sideEffectSubject.send($0)
-        }
+        effects.forEach { sideEffectSubject.send($0) }
     }
     
     func reduce(action: Action, state: State) -> (State, [SideEffect]) {
@@ -144,26 +141,38 @@ final class BookDetailViewModel: BaseViewModel {
                 status: status.toBookStatus()
             )
             .map { Action.upsertSuccessed($0.toBook()) }
-            .catch { Just(Action.errorOccured($0)) }
+            .catch { [weak self] in
+                self?.lastEffect = .upsertBook(isbn: isbn, status: status)
+                return Just(Action.errorOccured($0))
+            }
             .eraseToAnyPublisher()
             
         case .fetchBookDetail:
             return fetchBookDetailUseCase.execute(isbn: isbn)
                 .map { Action.fetchBookDetailSuccessed($0)}
-                .catch { Just(Action.errorOccured($0)) }
+                .catch { [weak self] in
+                    self?.lastEffect = .fetchBookDetail
+                    return Just(Action.errorOccured($0))
+                }
                 .eraseToAnyPublisher()
             
         case .fetchRecords:
             return fetchRecordsUseCase.execute(id: state.userBookId)
                 .map { $0.map { BookDetailItem.from(recordInfo: $0) } }
                 .map { Action.fetchRecordsSuccessed($0) }
-                .catch { Just(Action.errorOccured($0)) }
+                .catch { [weak self] in
+                    self?.lastEffect = .fetchRecords
+                    return Just(Action.errorOccured($0))
+                }
                 .eraseToAnyPublisher()
             
         case .fetchSeedStats:
             return fetchSeedStatsUseCase.execute()
                 .map { Action.fetchSeedStatsSuccessed($0) }
-                .catch { Just(Action.errorOccured($0)) }
+                .catch { [weak self] in
+                    self?.lastEffect = .fetchSeedStats
+                    return Just(Action.errorOccured($0))
+                }
                 .eraseToAnyPublisher()
         }
     }

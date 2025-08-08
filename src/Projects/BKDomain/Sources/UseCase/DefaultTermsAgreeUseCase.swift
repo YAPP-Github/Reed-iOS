@@ -17,7 +17,14 @@ public struct DefaultTermsAgreeUseCase: TermsAgreeUseCase {
         authStateRepository
             .updateTermsAgreement(isAgreed: isAgreed)
             .debugError(logger: AppLogger.auth)
-            .mapError { _ in DomainError.internalServerError }
+            .mapError { error in
+                switch error {
+                case .serverError:
+                    return .internalServerError
+                default:
+                    return .unauthorized
+                }
+            }
             .eraseToAnyPublisher()
     }
 }

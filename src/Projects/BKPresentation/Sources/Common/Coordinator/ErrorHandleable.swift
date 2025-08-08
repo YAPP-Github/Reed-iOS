@@ -39,8 +39,8 @@ extension ErrorHandleable where Self: Coordinator {
                 }
             )
         )
-        let dialogVC = BKDialogViewController(dialog: dialog)
-        topViewController?.present(dialogVC, animated: true)
+        let dialogViewController = BKDialogViewController(dialog: dialog)
+        topViewController?.present(dialogViewController, animated: true)
     }
 }
 

@@ -248,7 +248,10 @@ final class SearchViewModel: BaseViewModel {
             .map { (result, _) in
                 Action.fetchSearchResultSuccessed(result)
             }
-            .catch { Just(Action.errorOccured($0)) }
+            .catch { [weak self] in
+                self?.lastEffect = .searchResult(query)
+                return Just(Action.errorOccured($0))
+            }
             .eraseToAnyPublisher()
             
         case .loadNextPage:
@@ -260,7 +263,10 @@ final class SearchViewModel: BaseViewModel {
                 startIndex: currentPage
             )
             .map { Action.fetchNextPageSuccessed($0.books) }
-            .catch { Just(Action.errorOccured($0)) }
+            .catch { [weak self] in
+                self?.lastEffect = .loadNextPage
+                return Just(Action.errorOccured($0))
+            }
             .eraseToAnyPublisher()
             
         case .upsert(let isbn, let status):
@@ -269,7 +275,10 @@ final class SearchViewModel: BaseViewModel {
                 status: status.toBookStatus()
             )
             .map { Action.upsertBookSuccessed($0.bookId) }
-            .catch { Just(Action.errorOccured($0)) }
+            .catch { [weak self] in
+                self?.lastEffect = .upsert(isbn: isbn, status: status)
+                return Just(Action.errorOccured($0))
+            }
             .eraseToAnyPublisher()
         }
     }
