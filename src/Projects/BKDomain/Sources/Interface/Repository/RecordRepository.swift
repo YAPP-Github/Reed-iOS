@@ -7,14 +7,14 @@ public protocol RecordRepository {
     func create(
         bookId: String,
         recordData: RecordVO
-    ) -> AnyPublisher<RecordInfo, Error>
+    ) -> AnyPublisher<RecordInfo, DomainError>
     
     func fetch(
         bookId: String,
         sortType: LibrarySortType
-    ) -> AnyPublisher<[RecordInfo], Error>
+    ) -> AnyPublisher<[RecordInfo], DomainError>
     
     func findBy(
         id recordId: String
-    ) -> AnyPublisher<RecordInfo, Error>
+    ) -> AnyPublisher<RecordInfo, DomainError>
 }

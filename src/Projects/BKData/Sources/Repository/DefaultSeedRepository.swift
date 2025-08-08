@@ -11,12 +11,12 @@ public struct DefaultSeedRepository: SeedRepository {
         self.networkProvider = networkProvider
     }
     
-    public func stats() -> AnyPublisher<[Seed], Error> {
+    public func stats() -> AnyPublisher<[Seed], DomainError> {
         networkProvider.request(
             target: SeedAPI.stats,
             type: SeedStatsResponseDTO.self
         )
-        .mapError { $0 as Error }
+        .mapError { $0.toDomainError() }
         .debugError(logger: AppLogger.network)
         .map { $0.categories }
         .eraseToAnyPublisher()

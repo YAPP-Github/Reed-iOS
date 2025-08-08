@@ -3,5 +3,5 @@
 import Combine
 
 public protocol HomeRepository {
-    func fetch() -> AnyPublisher<[HomeInfo], Error>
+    func fetch() -> AnyPublisher<[HomeInfo], DomainError>
 }

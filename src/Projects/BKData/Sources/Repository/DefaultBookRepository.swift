@@ -14,7 +14,7 @@ public struct DefaultBookRepository: BookRepository {
     
     public func search(
         _ parameters: SearchBookParameters
-    ) -> AnyPublisher<([Book], totalResults: Int), Never> {
+    ) -> AnyPublisher<([Book], totalResults: Int), DomainError> {
         networkProvider.request(
             target: BookAPI.search(
                 dto: SearchBookRequestDTO(
@@ -31,17 +31,17 @@ public struct DefaultBookRepository: BookRepository {
             type: SearchBookResponseDTO.self
         )
         .debugError(logger: AppLogger.network)
+        .mapError { $0.toDomainError() }
         .map { dto in
             let books = dto.books.map { $0.toBook() }
             return (books, dto.totalResults)
         }
-        .catch { _ in Just(([], 0)) }
         .eraseToAnyPublisher()
     }
     
     public func searchMyLibrary(
         _ parameters: MyLibraryParameters
-    ) -> AnyPublisher<([Book], totalResults: Int), Never> {
+    ) -> AnyPublisher<([Book], totalResults: Int), DomainError> {
         networkProvider.request(
             target: BookAPI.myLibrary(
                 parameter: LibraryRequestDTO(parameters)
@@ -53,20 +53,20 @@ public struct DefaultBookRepository: BookRepository {
             let books = bookInfo.map { $0.toBook() }
             return (books, count)
         }
-        .catch { _ in Just(([], 0)) }
+        .mapError { $0.toDomainError() }
         .eraseToAnyPublisher()
     }
     
     public func myLibrary(
         _ parameters: MyLibraryParameters
-    ) -> AnyPublisher<LibraryInfo, Error> {
+    ) -> AnyPublisher<LibraryInfo, DomainError> {
         networkProvider.request(
             target: BookAPI.myLibrary(
                 parameter: LibraryRequestDTO(parameters)
             ),
             type: UserLibraryResponseDTO.self
         )
-        .mapError { return $0 as Error }
+        .mapError { $0.toDomainError() }
         .debugError(logger: AppLogger.network)
         .map {
             return LibraryInfo(
@@ -81,7 +81,7 @@ public struct DefaultBookRepository: BookRepository {
     public func upsert(
         _ bookIsbn: String,
         _ status: BookStatus
-    ) -> AnyPublisher<BookInfo, Error> {
+    ) -> AnyPublisher<BookInfo, DomainError> {
         networkProvider.request(
             target: BookAPI.upsert(
                 dto: UserBookRegisterRequestDTO(
@@ -91,21 +91,20 @@ public struct DefaultBookRepository: BookRepository {
             ),
             type: UserBookResponseDTO.self
         )
-        .mapError { return $0 as Error }
+        .mapError { $0.toDomainError() }
         .debugError(logger: AppLogger.network)
         .map { return $0.toBookInfo() }
         .eraseToAnyPublisher()
     }
     
-    
     public func detail(
         isbn: String
-    ) -> AnyPublisher<Book, Error> {
+    ) -> AnyPublisher<Book, DomainError> {
         networkProvider.request(
             target: BookAPI.detail(isbn: isbn),
             type: BookDetailResponseDTO.self
         )
-        .mapError { $0 as Error }
+        .mapError { $0.toDomainError() }
         .debugError(logger: AppLogger.network)
         .map { $0.toBook() }
         .eraseToAnyPublisher()
