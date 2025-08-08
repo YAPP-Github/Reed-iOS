@@ -27,11 +27,11 @@ enum DocsType {
     var url: URL? {
         switch self {
         case .privacy:
-            return URL(string: "https://clxxrlove.github.io/docs/privacy")
+            return URL(string: "https://sites.google.com/view/reed-privacypolicy")
         case .terms:
-            return URL(string: "https://clxxrlove.github.io/docs/terms")
+            return URL(string: "https://sites.google.com/view/reed-opensourcelicense-ios")
         case .licenses:
-            return URL(string: "https://clxxrlove.github.io/docs/licenses")
+            return URL(string: "https://sites.google.com/view/reed-termsofuse")
         }
     }
 }
