@@ -31,7 +31,7 @@ final class HomeEmptyView: BaseView {
     
     private let titleLabel = BKLabel(
         text: "아직 등록된 책이 없어요",
-        fontStyle: .heading1(weight: .semiBold)
+        fontStyle: .headline1(weight: .semiBold)
     )
     
     private let subtitleLabel = BKLabel(
