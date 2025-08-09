@@ -55,6 +55,10 @@ final class SearchResultCell: UICollectionViewCell {
             self.resultView = view
         }
         
+        if recordCount == nil && !canSelect {
+            isUserInteractionEnabled = false
+        }
+        
         resultView?.configure(
             title: title,
             author: description.author,

@@ -11,10 +11,18 @@ extension BKBottomSheetViewController {
     ) -> BKBottomSheetViewController {
         let containerView = UIView()
         let divider = BKDivider(type: .small)
-        let newestOption = makeOptionView(option: .newest, confirmAction: confirmAction)
-        let pageDescendingOption = makeOptionView(option: .pageDescending, confirmAction: confirmAction)
+        let newestOption = makeOptionView(
+            option: .newest,
+            isSelected: selectedOption == .newest,
+            confirmAction: confirmAction
+        )
+        let pageDescendingOption = makeOptionView(
+            option: .pageDescending,
+            isSelected: selectedOption == .pageDescending,
+            confirmAction: confirmAction
+        )
         
-        let stackView = UIStackView(arrangedSubviews: [newestOption, divider, pageDescendingOption])
+        let stackView = UIStackView(arrangedSubviews: [pageDescendingOption, divider, newestOption])
         stackView.axis = .vertical
         stackView.spacing = 0
         containerView.addSubview(stackView)
@@ -79,19 +87,20 @@ extension BKBottomSheetViewController {
     
     private static func makeOptionView(
         option: SortOption,
+        isSelected: Bool,
         confirmAction: @escaping (SortOption) -> Void
     ) -> UIView {
         let containerView = UIView()
         let titleLabel = BKLabel(
             text: option.rawValue,
             fontStyle: .body1(weight: .medium),
-            color: .bkContentColor(.primary)
+            color: isSelected ? .bkContentColor(.brand) : .bkContentColor(.secondary)
         )
         
         containerView.addSubview(titleLabel)
         titleLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
-                .inset(BKInset.inset6)
+                .inset(BKInset.inset3)
             $0.top.bottom.equalToSuperview()
             $0.height.equalTo(56)
         }

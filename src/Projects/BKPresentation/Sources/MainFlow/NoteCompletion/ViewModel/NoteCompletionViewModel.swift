@@ -6,13 +6,20 @@ import Combine
 
 final class NoteCompletionViewModel: BaseViewModel {
     struct State {
-        var recordInfo: RecordInfo
+        var recordInfo: RecordInfo?
+        var isLoading: Bool = false
+        var error: DomainError?
     }
     
     enum Action {
+        case onAppear
+        case fetchRecordDetailSuccessed(RecordInfo)
+        case errorOccured(DomainError)
+        case errorHandled
     }
     
     enum SideEffect {
+        case fetchRecordDetail(String)
     }
     
     @Published private var state: State
@@ -21,12 +28,15 @@ final class NoteCompletionViewModel: BaseViewModel {
     
     @Autowired private var fetchRecordDetailUseCase: FetchRecordDetailUseCase
     
+    private let recordId: String
+    
     var statePublisher: AnyPublisher<State, Never> {
         $state.eraseToAnyPublisher()
     }
     
-    init(recordInfo: RecordInfo) {
-        self.state = State(recordInfo: recordInfo)
+    init(recordId: String) {
+        self.recordId = recordId
+        self.state = State()
         bindSideEffects()
     }
     
@@ -41,6 +51,20 @@ final class NoteCompletionViewModel: BaseViewModel {
         var effects: [SideEffect] = []
         
         switch action {
+        case .onAppear:
+            newState.isLoading = true
+            effects.append(.fetchRecordDetail(recordId))
+            
+        case .fetchRecordDetailSuccessed(let recordInfo):
+            newState.recordInfo = recordInfo
+            newState.isLoading = false
+            
+        case .errorOccured(let error):
+            newState.error = error
+            newState.isLoading = false
+            
+        case .errorHandled:
+            newState.error = nil
         }
         
         return (newState, effects)
@@ -48,6 +72,11 @@ final class NoteCompletionViewModel: BaseViewModel {
     
     func handle(_ effect: SideEffect) -> AnyPublisher<Action, Never> {
         switch effect {
+        case .fetchRecordDetail(let id):
+            return fetchRecordDetailUseCase.execute(id: id)
+                .map { Action.fetchRecordDetailSuccessed($0) }
+                .catch { Just(Action.errorOccured($0)) }
+                .eraseToAnyPublisher()
         }
     }
     
@@ -60,4 +89,3 @@ final class NoteCompletionViewModel: BaseViewModel {
             .store(in: &cancellables)
     }
 }
-

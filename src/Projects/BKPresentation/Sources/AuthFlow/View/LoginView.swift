@@ -40,6 +40,7 @@ final class LoginView: BaseView {
     )
     
     override func setupView() {
+        imageView.tintColor = .bkBackgroundColor(.primary)
         imageView.backgroundColor = .clear
         imageView.contentMode = .scaleAspectFit
         logoImageView.backgroundColor = .clear

@@ -42,11 +42,10 @@ extension NoteCoordinator: SessionExpirationNotifying, ErrorHandleable {}
 extension NoteCoordinator {
     func didCompleteNoteCreation(recordInfo: RecordInfo) {
         let viewController = NoteCompletionViewController(
-            viewModel: NoteCompletionViewModel(
-                recordInfo: recordInfo
-            )
+            viewModel: NoteCompletionViewModel(recordId: recordInfo.recordId)
         )
         let noteNavigationController = UINavigationController(rootViewController: viewController)
+        
         noteNavigationController.modalPresentationStyle = .fullScreen
         navigationController.present(noteNavigationController, animated: true) {
             self.popAndFinish()

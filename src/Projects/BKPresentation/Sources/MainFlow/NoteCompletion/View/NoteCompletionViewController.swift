@@ -32,6 +32,8 @@ final class NoteCompletionViewController: BaseViewController<NoteCompletionView>
         )
         navigationItem.leftBarButtonItem = backButton
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        
+        viewModel.send(.onAppear)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -42,9 +44,41 @@ final class NoteCompletionViewController: BaseViewController<NoteCompletionView>
     override func bindState() {
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
-            .map { $0.recordInfo }
+            .compactMap { $0.recordInfo }
             .sink { [weak self] recordInfo in
                 self?.contentView.apply(recordInfo: recordInfo)
+            }
+            .store(in: &cancellable)
+        
+        
+        viewModel.statePublisher
+            .map { $0.isLoading }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                if isLoading {
+                    self?.showLoading()
+                } else {
+                    self?.hideLoading()
+                }
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .compactMap { $0.error }
+            .sink { [weak self] error in
+                // 에러 알림 표시 -> BKStyle로 교체 필요
+                let alert = UIAlertController(
+                    title: "오류",
+                    message: "기록을 불러올 수 없습니다.",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "확인", style: .default) { _ in
+                    self?.viewModel.send(.errorHandled)
+                    self?.dismiss(animated: true)
+                })
+                self?.present(alert, animated: true)
             }
             .store(in: &cancellable)
     }

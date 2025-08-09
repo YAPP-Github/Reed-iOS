@@ -9,6 +9,7 @@ enum BookDetailViewEvent: Equatable {
     case didTapStatusButton
     case didTapAddNoteButton
     case didTapSortMenuButton(SortOption?)
+    case didTapCell(recordId: String)
 }
 
 final class BookDetailViewController: BaseViewController<BookDetailView> {
@@ -28,13 +29,13 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
     }
     
     override func viewDidLoad() {
-        viewModel.send(.onAppear)
         super.viewDidLoad()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.tabBarController?.tabBar.isHidden = true
+        viewModel.send(.onAppear)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -64,6 +65,16 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
             }
             .sink { [weak self] option in
                 self?.presentBookDetailSortMenu(option)
+            }
+            .store(in: &cancellable)
+        
+        contentView.eventPublisher
+            .compactMap { event -> String? in
+                if case let .didTapCell(recordId) = event { return recordId }
+                return nil
+            }
+            .sink { [weak self] recordId in
+                self?.viewModel.send(.cellTapped(recordId: recordId))
             }
             .store(in: &cancellable)
     }
@@ -141,6 +152,16 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
                     }
                 )
                 self?.viewModel.send(.errorHandled)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .filter { $0.isCellTapped }
+            .sink { [weak self] state in
+                guard let recordId = state.selectedRecordId else { return }
+                self?.coordinator?.didTapCell(recordId: recordId)
+                self?.viewModel.send(.cellTapHandled)
             }
             .store(in: &cancellable)
     }

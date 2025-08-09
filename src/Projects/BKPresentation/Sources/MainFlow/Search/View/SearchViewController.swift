@@ -36,9 +36,19 @@ final class SearchViewController: BaseViewController<SearchView> {
         super.init()
     }
     
-    override func bindAction() {
-        viewModel.send(.onAppear)
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.tabBarController?.tabBar.isHidden = true
         
+        viewModel.send(.onAppear)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.tabBarController?.tabBar.isHidden = false
+    }
+    
+    override func bindAction() {
         contentView.eventPublisher
             .compactMap { event -> String? in
                 if case let .search(query) = event { return query }
@@ -184,7 +194,6 @@ private extension SearchViewController {
     }
     
     func presentNoteSuggestion(with isbn: String) {
-        // TODO: - 그래픽 디자인 작업 이후 변경
         let graphic = BKImage.Graphics.coinCheck
         let graphicView = UIImageView(image: graphic)
         graphicView.snp.makeConstraints {
