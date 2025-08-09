@@ -194,7 +194,6 @@ private extension SearchViewController {
     }
     
     func presentNoteSuggestion(with isbn: String) {
-        // TODO: - 그래픽 디자인 작업 이후 변경
         let graphic = BKImage.Graphics.coinCheck
         let graphicView = UIImageView(image: graphic)
         graphicView.snp.makeConstraints {
