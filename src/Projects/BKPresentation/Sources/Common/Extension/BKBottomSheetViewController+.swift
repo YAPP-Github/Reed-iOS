@@ -17,8 +17,8 @@ extension BKBottomSheetViewController {
             confirmAction: confirmAction
         )
         let pageDescendingOption = makeOptionView(
-            option: .pageAcending,
-            isSelected: selectedOption == .pageAcending,
+            option: .pageDescending,
+            isSelected: selectedOption == .pageDescending,
             confirmAction: confirmAction
         )
         

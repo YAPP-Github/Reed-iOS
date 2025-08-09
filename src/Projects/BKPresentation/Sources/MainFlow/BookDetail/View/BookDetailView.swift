@@ -32,15 +32,12 @@ struct BookDetailItem: Hashable {
 
 enum SortOption: String, CaseIterable {
     case newest = "최신 등록순"
-    case pageAcending = "페이지순"
-    case pageDescending = "기본"
+    case pageDescending = "페이지순"
     
     var sortingFunction: (BookDetailItem, BookDetailItem) -> Bool {
         switch self {
         case .newest:
             return { $0.createdAt > $1.createdAt }
-        case .pageAcending:
-            return { $0.page < $1.page }
         case .pageDescending:
             return { $0.page > $1.page }
         }
@@ -109,7 +106,7 @@ final class BookDetailView: BaseView {
         return label
     }()
     
-    private var currentSortOption: SortOption = .pageAcending
+    private var currentSortOption: SortOption = .pageDescending
 
     override func setupView() {
         addSubview(scrollView)
