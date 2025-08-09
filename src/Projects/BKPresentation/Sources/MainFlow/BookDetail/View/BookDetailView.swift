@@ -11,7 +11,8 @@ enum Section {
 }
 
 struct BookDetailItem: Hashable {
-    let id: String
+    let id: String // book id임
+    let recordId: String
     let note: String
     let emotion: EmotionSeed?
     let createdAt: Date
@@ -20,6 +21,7 @@ struct BookDetailItem: Hashable {
     static func from(recordInfo: RecordInfo) -> Self {
         return Self(
             id: recordInfo.bookId,
+            recordId: recordInfo.recordId,
             note: recordInfo.quote,
             emotion: EmotionSeed.from(emotion: recordInfo.emotionTags.first ?? .joy),
             createdAt: recordInfo.createdAt,
@@ -323,6 +325,14 @@ extension BookDetailView: UICollectionViewDelegateFlowLayout {
         )
         
         return CGSize(width: width, height: fittingSize.height)
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didSelectItemAt indexPath: IndexPath
+    ) {
+        guard let item = dataSource.itemIdentifier(for: indexPath) else { return }
+        eventPublisher.send(.didTapCell(recordId: item.recordId))
     }
 }
 

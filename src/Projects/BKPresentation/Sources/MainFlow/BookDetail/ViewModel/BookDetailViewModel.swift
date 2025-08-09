@@ -16,6 +16,8 @@ final class BookDetailViewModel: BaseViewModel {
         let userBookId: String
         var error: DomainError?
         var isRetrying: Bool = false
+        var isCellTapped = false
+        var selectedRecordId: String?
     }
     
     enum Action {
@@ -25,6 +27,8 @@ final class BookDetailViewModel: BaseViewModel {
         case addNoteHandled
         case statusButtonTapped
         case changeStatusHandled
+        case cellTapped(recordId: String)
+        case cellTapHandled
         case upsert(isbn: String, status: BookRegistrationStatus)
         case upsertSuccessed(Book)
         case fetchRecordsSuccessed([BookDetailItem])
@@ -128,6 +132,14 @@ final class BookDetailViewModel: BaseViewModel {
             
         case .errorHandled:
             newState.error = nil
+        
+        case .cellTapped(let recordId):
+            newState.isCellTapped = true
+            newState.selectedRecordId = recordId
+            
+        case .cellTapHandled:
+            newState.isCellTapped = false
+            newState.selectedRecordId = nil
         }
         
         return (newState, effects)
