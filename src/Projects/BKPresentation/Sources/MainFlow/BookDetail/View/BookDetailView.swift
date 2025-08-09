@@ -32,12 +32,15 @@ struct BookDetailItem: Hashable {
 
 enum SortOption: String, CaseIterable {
     case newest = "최신 등록순"
-    case pageDescending = "페이지순"
+    case pageAcending = "페이지순"
+    case pageDescending = "기본"
     
     var sortingFunction: (BookDetailItem, BookDetailItem) -> Bool {
         switch self {
         case .newest:
             return { $0.createdAt > $1.createdAt }
+        case .pageAcending:
+            return { $0.page < $1.page }
         case .pageDescending:
             return { $0.page > $1.page }
         }
@@ -66,7 +69,7 @@ final class BookDetailView: BaseView {
         button.rightIcon = BKImage.Icon.chevronDown
         button.title = "초기 값"
         
-        button.setContentHuggingPriority(.required, for: .horizontal)
+        button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         button.setContentCompressionResistancePriority(.required, for: .horizontal)
         return button
     }()
@@ -74,6 +77,8 @@ final class BookDetailView: BaseView {
     private let addNoteButton: BKButton = {
         let button = BKButton()
         button.title = "독서 기록 추가"
+        
+        button.setContentHuggingPriority(.defaultLow, for: .horizontal)
         return button
     }()
 
@@ -104,7 +109,7 @@ final class BookDetailView: BaseView {
         return label
     }()
     
-    private var currentSortOption: SortOption = .pageDescending
+    private var currentSortOption: SortOption = .pageAcending
 
     override func setupView() {
         addSubview(scrollView)
