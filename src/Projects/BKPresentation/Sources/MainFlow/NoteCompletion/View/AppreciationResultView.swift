@@ -26,9 +26,9 @@ enum EmotionIcon: String {
             return .warmth
         case .joy:
             return .joy
-        case .insight:
-            return .sadness
         case .sad:
+            return .sadness
+        case .insight:
             return .insight
         }
     }

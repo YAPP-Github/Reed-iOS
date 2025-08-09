@@ -24,7 +24,7 @@ enum EmotionSeed: String, CaseIterable {
         switch self {
         case .warmth: return .bkEmotionColor(.warmth)
         case .joy: return .bkEmotionColor(.joy)
-        case .insight: return .bkEmotionColor(.tension)
+        case .insight: return .bkEmotionColor(.insight)
         case .sad: return .bkEmotionColor(.sadness)
         }
     }
@@ -33,7 +33,7 @@ enum EmotionSeed: String, CaseIterable {
         switch self {
         case .warmth: return .bkEmotionBaseColor(.warmth)
         case .joy: return .bkEmotionBaseColor(.joy)
-        case .insight: return .bkEmotionBaseColor(.tension)
+        case .insight: return .bkEmotionBaseColor(.insight)
         case .sad: return .bkEmotionBaseColor(.sadness)
         }
     }
@@ -41,8 +41,8 @@ enum EmotionSeed: String, CaseIterable {
     static func from(emotion: Emotion) -> Self {
         switch emotion {
         case .joy: return .joy
-        case .sad: return .insight
-        case .insight: return .sad
+        case .sad: return .sad
+        case .insight: return .insight
         case .warmth: return .warmth
         }
     }
