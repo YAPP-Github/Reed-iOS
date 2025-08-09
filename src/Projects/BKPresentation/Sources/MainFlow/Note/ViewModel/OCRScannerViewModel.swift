@@ -97,6 +97,7 @@ final class OCRScannerViewModel: BaseViewModel {
         case .captureButtonTapped(let scanAreaFrame):
             debugPulse("\(newState.failureCount)")
             newState.isLoading = true
+            
             let capturedTexts = extractTextsInScanArea(
                 items: currentRecognizedItems,
                 scanAreaFrame: scanAreaFrame
@@ -171,15 +172,15 @@ final class OCRScannerViewModel: BaseViewModel {
             switch item {
             case .text(let textItem):
                 let textFrame = convertToViewCoordinates(textItem.bounds)
-                let textCenter = CGPoint(x: textFrame.midX, y: textFrame.midY)
+                let overlapPercentage = calculateOverlapPercentage(textFrame: textFrame, scanAreaFrame: scanAreaFrame)
                 
-                if scanAreaFrame.contains(textCenter) {
+                if overlapPercentage >= 0.5 {
+                    debugPulse("\(overlapPercentage)")
                     let lines = textItem.transcript.components(separatedBy: .newlines)
                     
                     for line in lines {
                         let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
                         debugPulse("\(trimmedLine)")
-                        
                         if !trimmedLine.isEmpty {
                             capturedTexts.append(trimmedLine)
                         }
@@ -205,5 +206,18 @@ final class OCRScannerViewModel: BaseViewModel {
             width: maxX - minX,
             height: maxY - minY
         )
+    }
+    
+    private func calculateOverlapPercentage(textFrame: CGRect, scanAreaFrame: CGRect) -> Double {
+        let intersection = textFrame.intersection(scanAreaFrame)
+        
+        guard !intersection.isNull && !intersection.isEmpty else {
+            return 0.0
+        }
+        
+        let textArea = textFrame.width * textFrame.height
+        let intersectionArea = intersection.width * intersection.height
+        
+        return textArea > 0 ? Double(intersectionArea / textArea) : 0.0
     }
 }
