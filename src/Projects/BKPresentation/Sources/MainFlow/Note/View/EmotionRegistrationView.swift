@@ -182,8 +182,9 @@ private extension EmotionRegistrationView {
     
     func updateSelectionUI() {
         emotionButtons.forEach { emotion, view in
+            view.layer.cornerRadius = BKRadius.medium
             view.layer.borderWidth = (emotion == selectedEmotion)
-                ? 2 : 0
+            ? 1.5 : 0
             view.layer.borderColor = (emotion == selectedEmotion)
                 ? UIColor.bkBorderColor(.brand).cgColor : nil
         }
