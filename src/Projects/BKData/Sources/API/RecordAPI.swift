@@ -22,7 +22,7 @@ extension RecordAPI: RequestTarget {
         case .fetch(let userBookId, _):
             return "/\(userBookId)"
         case .detail(let userRecordId):
-            return "/\(userRecordId)"
+            return "/detail/\(userRecordId)"
         case .seed(let userRecordId):
             return "/\(userRecordId)/seed/stats"
         }
@@ -62,7 +62,8 @@ extension RecordAPI: RequestTarget {
         case .fetch(_, let dto):
             return dto.toDictionary()
         case .detail(let isbn):
-            return BookDetailRequestDTO(isbn13: isbn).toDictionary()
+//            return BookDetailRequestDTO(isbn13: isbn).toDictionary()
+            return [:]
         }
     }
     

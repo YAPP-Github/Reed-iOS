@@ -48,10 +48,12 @@ extension BookDetailCoordinator {
     }
     
     func didTapCell(recordId: String) {
-        print("\(recordId)로 화면 이동")
-//        let noteCompletionViewModel = NoteCompletionViewModel(recordId: recordId)
-//        let noteCompletionViewController = NoteCompletionViewController(viewModel: noteCompletionViewModel)
-//        let navigationController = UINavigationController(rootViewController: noteCompletionViewController)
-//        self.navigationController.present(navigationController, animated: true)
+        let viewController = NoteCompletionViewController(
+            viewModel: NoteCompletionViewModel(recordId: recordId)
+        )
+        let noteNavigationController = UINavigationController(rootViewController: viewController)
+        
+        noteNavigationController.modalPresentationStyle = .fullScreen
+        navigationController.present(noteNavigationController, animated: true)
     }
 }
