@@ -8,6 +8,7 @@ public struct SearchBookResult: Decodable {
     public let author: String
     public let publisher: String
     public let coverImageUrl: URL
+    public let link: URL
     public let userBookStatus: BookStatus
 }
 
