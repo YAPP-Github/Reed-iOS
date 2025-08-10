@@ -28,16 +28,9 @@ public final class AppCoordinator: Coordinator {
     }
     
     public func start() {
-        showSplashScreen()
+        proceedWithAppFlow()
     }
     
-    private func showSplashScreen() {
-        let splashViewController = SplashViewController()
-        splashViewController.delegate = self
-        navigationController.setViewControllers([splashViewController], animated: false)
-    }
-    
-    /// 이전 코드
     private func proceedWithAppFlow() {
         onboardingCheckUseCase.execute()
             .receive(on: DispatchQueue.main)
@@ -51,12 +44,6 @@ public final class AppCoordinator: Coordinator {
             .store(in: &cancellable)
     }
 
-}
-
-extension AppCoordinator: SplashViewControllerDelegate {
-    public func splashDidComplete() {
-        proceedWithAppFlow()
-    }
 }
 
 private extension AppCoordinator {
