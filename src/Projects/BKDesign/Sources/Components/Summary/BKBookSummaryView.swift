@@ -140,7 +140,6 @@ public class BKBookSummaryView: UIView {
             descriptionStack.addArrangedSubview(separatorLabel)
             descriptionStack.addArrangedSubview(publisherLabel)
             
-            /// style setting
             self.backgroundColor = .bkBackgroundColor(.disable)
             thubmnailCoverView.backgroundColor = UIColor(hex: "000000").withAlphaComponent(0.4)
 
