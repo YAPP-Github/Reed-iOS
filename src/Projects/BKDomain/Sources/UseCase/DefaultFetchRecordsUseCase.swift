@@ -10,11 +10,13 @@ public struct DefaultFetchRecordsUseCase: FetchRecordsUseCase {
     }
     
     public func execute(
-        id: String
-    ) -> AnyPublisher<[RecordInfo], DomainError> {
+        id: String,
+        page: Int
+    ) -> AnyPublisher<(infos: [RecordInfo], hasMore: Bool, totalCount: Int), DomainError> {
         repository.fetch(
             bookId: id,
-            sortType: .pageNumberDesc
+            sortType: .pageNumberDesc,
+            page: page
         )
     }
 }

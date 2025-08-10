@@ -11,8 +11,9 @@ public protocol RecordRepository {
     
     func fetch(
         bookId: String,
-        sortType: LibrarySortType
-    ) -> AnyPublisher<[RecordInfo], DomainError>
+        sortType: LibrarySortType,
+        page: Int
+    ) -> AnyPublisher<(infos: [RecordInfo], hasMore: Bool, totalCount: Int), DomainError>
     
     func findBy(
         id recordId: String

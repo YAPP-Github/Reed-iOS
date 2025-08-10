@@ -4,6 +4,7 @@ import Combine
 
 public protocol FetchRecordsUseCase {
     func execute(
-        id: String
-    ) -> AnyPublisher<[RecordInfo], DomainError>
+        id: String,
+        page: Int
+    ) -> AnyPublisher<(infos: [RecordInfo], hasMore: Bool, totalCount: Int), DomainError>
 }

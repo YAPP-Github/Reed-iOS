@@ -10,6 +10,7 @@ enum BookDetailViewEvent: Equatable {
     case didTapAddNoteButton
     case didTapSortMenuButton(SortOption?)
     case didTapCell(recordId: String)
+    case didReachBottom
 }
 
 final class BookDetailViewController: BaseViewController<BookDetailView> {
@@ -77,15 +78,28 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
                 self?.viewModel.send(.cellTapped(recordId: recordId))
             }
             .store(in: &cancellable)
+        
+        contentView.eventPublisher
+            .filter { $0 == .didReachBottom }
+            .sink { [weak self] _ in
+                self?.viewModel.send(.loadNextPage)
+            }
+            .store(in: &cancellable)
     }
     
     override func bindState() {
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
-            .map { $0.items }
+            .map { state in
+                ItemsAndTotal(
+                    itemIDs: state.items.map(\.recordId),
+                    items: state.items,
+                    total: state.totalResults
+                )
+            }
             .removeDuplicates()
-            .sink { [weak self] in
-                self?.contentView.applySnapshot(with: $0)
+            .sink { [weak self] output in
+                self?.contentView.applySnapshot(with: output.items, totalCount: output.total)
             }
             .store(in: &cancellable)
         
@@ -164,10 +178,29 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
                 self?.viewModel.send(.cellTapHandled)
             }
             .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .map(\.seeds)
+            .removeDuplicates()
+            .sink { [weak self] in
+                self?.contentView.applySeedReport(with: $0)
+            }
+            .store(in: &cancellable)
     }
 }
 
 private extension BookDetailViewController {
+    struct ItemsAndTotal: Equatable {
+        let itemIDs: [String]
+        let items: [BookDetailItem]
+        let total: Int
+
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.itemIDs == rhs.itemIDs && lhs.total == rhs.total
+        }
+    }
+    
     func presentBookRegistration(_ book: Book? = nil) {
         guard let book = book else { return }
         

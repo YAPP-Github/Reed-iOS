@@ -31,12 +31,14 @@ public final class DefaultRecordRepository: RecordRepository {
     
     public func fetch(
         bookId: String,
-        sortType: LibrarySortType
-    ) -> AnyPublisher<[RecordInfo], DomainError> {
+        sortType: LibrarySortType,
+        page: Int
+    ) -> AnyPublisher<(infos: [RecordInfo], hasMore: Bool, totalCount: Int), DomainError> {
         networkProvider.request(
             target: RecordAPI.fetch(
                 userBookId: bookId,
                 dto: FetchRecordRequestDTO(
+                    page: page,
                     sort: sortType
                 )
             ),
@@ -44,7 +46,7 @@ public final class DefaultRecordRepository: RecordRepository {
         )
         .mapError { $0.toDomainError() }
         .debugError(logger: AppLogger.network)
-        .map { $0.readingRecords.map { $0.toRecordInfo() }}
+        .map { ($0.readingRecords.map { $0.toRecordInfo() }, !$0.lastPage, $0.totalResults) }
         .eraseToAnyPublisher()
     }
     

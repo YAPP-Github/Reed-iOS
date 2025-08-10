@@ -1,8 +1,8 @@
 // Copyright © 2025 Booket. All rights reserved
 
-import Combine
 import BKCore
 import BKDomain
+import Combine
 import Foundation
 
 final class BookDetailViewModel: BaseViewModel {
@@ -18,6 +18,9 @@ final class BookDetailViewModel: BaseViewModel {
         var isRetrying: Bool = false
         var isCellTapped = false
         var selectedRecordId: String?
+        var nextPage: Int = 0
+        var hasMore: Bool = true
+        var totalResults = 0
     }
     
     enum Action {
@@ -31,17 +34,19 @@ final class BookDetailViewModel: BaseViewModel {
         case cellTapHandled
         case upsert(isbn: String, status: BookRegistrationStatus)
         case upsertSuccessed(Book)
-        case fetchRecordsSuccessed([BookDetailItem])
+        case fetchRecordsSuccessed(items: [BookDetailItem], hasMore: Bool, totalResult: Int)
         case fetchSeedStatsSuccessed([Seed])
         case fetchBookDetailSuccessed(Book)
         case errorOccured(DomainError)
         case errorHandled
         case retryTapped
+        case loadNextPage
+        case appendRecordsSuccessed(items: [BookDetailItem], hasMore: Bool)
     }
     
     enum SideEffect {
         case upsertBook(isbn: String, status: BookRegistrationStatus)
-        case fetchRecords
+        case fetchRecords(page: Int)
         case fetchSeedStats
         case fetchBookDetail
     }
@@ -77,6 +82,7 @@ final class BookDetailViewModel: BaseViewModel {
         effects.forEach { sideEffectSubject.send($0) }
     }
     
+    // swiftlint:disable cyclomatic_complexity
     func reduce(action: Action, state: State) -> (State, [SideEffect]) {
         var newState = state
         var effects: [SideEffect] = []
@@ -84,7 +90,7 @@ final class BookDetailViewModel: BaseViewModel {
         switch action {
         case .onAppear:
             effects.append(.fetchBookDetail)
-            effects.append(.fetchRecords)
+            effects.append(.fetchRecords(page: 0))
             effects.append(.fetchSeedStats)
             
         case .changeSortOption(let option):
@@ -111,8 +117,11 @@ final class BookDetailViewModel: BaseViewModel {
         case .fetchBookDetailSuccessed(let book):
             newState.currentBook = book
             
-        case .fetchRecordsSuccessed(let items):
+        case .fetchRecordsSuccessed(let items, let hasMore, let totalResults):
             newState.items = items
+            newState.nextPage = 1
+            newState.hasMore = hasMore
+            newState.totalResults = totalResults
             
         case .fetchSeedStatsSuccessed(let seeds):
             newState.seeds = seeds
@@ -124,7 +133,7 @@ final class BookDetailViewModel: BaseViewModel {
                 newState.isRetrying = false
                 newState.error = error
             }
-
+            
         case .retryTapped:
             if let last = lastEffect {
                 effects.append(last)
@@ -132,7 +141,7 @@ final class BookDetailViewModel: BaseViewModel {
             
         case .errorHandled:
             newState.error = nil
-        
+            
         case .cellTapped(let recordId):
             newState.isCellTapped = true
             newState.selectedRecordId = recordId
@@ -140,6 +149,18 @@ final class BookDetailViewModel: BaseViewModel {
         case .cellTapHandled:
             newState.isCellTapped = false
             newState.selectedRecordId = nil
+            
+        case .loadNextPage:
+            if newState.hasMore {
+                effects.append(.fetchRecords(page: newState.nextPage))
+            }
+            
+        case .appendRecordsSuccessed(let items, let hasMore):
+            var existing = Set(newState.items.map(\.recordId))
+            let deduped = items.filter { existing.insert($0.recordId).inserted }
+            newState.items.append(contentsOf: deduped)
+            if hasMore { newState.nextPage += 1 }
+            newState.hasMore = hasMore
         }
         
         return (newState, effects)
@@ -168,12 +189,21 @@ final class BookDetailViewModel: BaseViewModel {
                 }
                 .eraseToAnyPublisher()
             
-        case .fetchRecords:
-            return fetchRecordsUseCase.execute(id: state.userBookId)
-                .map { $0.map { BookDetailItem.from(recordInfo: $0) } }
-                .map { Action.fetchRecordsSuccessed($0) }
+        case .fetchRecords(let page):
+            return fetchRecordsUseCase.execute(id: state.userBookId, page: page)
+                .map {
+                    let items = $0.infos.map { BookDetailItem.from(recordInfo: $0) }
+                    return page == 0 ? Action.fetchRecordsSuccessed(
+                        items: items,
+                        hasMore: $0.hasMore,
+                        totalResult: $0.totalCount
+                    ) : Action.appendRecordsSuccessed(
+                        items: items,
+                        hasMore: $0.hasMore
+                    )
+                }
                 .catch { [weak self] in
-                    self?.lastEffect = .fetchRecords
+                    self?.lastEffect = .fetchRecords(page: page)
                     return Just(Action.errorOccured($0))
                 }
                 .eraseToAnyPublisher()
