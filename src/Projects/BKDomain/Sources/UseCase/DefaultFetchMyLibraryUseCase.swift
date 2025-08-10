@@ -13,7 +13,7 @@ public struct DefaultFetchMyLibraryUseCase: FetchMyLibraryUseCase {
         query: String?,
         startIndex: Int?,
         status: BookStatus?
-    ) -> AnyPublisher<(books: [BookInfo], totalResults: BookCountSet), DomainError> {
+    ) -> AnyPublisher<(books: [BookInfo], bookCountSet: BookCountSet), DomainError> {
         repository.searchMyLibrary(
             MyLibraryParameters(
                 status: status,
@@ -21,7 +21,7 @@ public struct DefaultFetchMyLibraryUseCase: FetchMyLibraryUseCase {
                 title: query
             )
         )
-        .map { ($0.0, $0.totalResults) }
+        .map { ($0.0, $0.bookCountSet) }
         .eraseToAnyPublisher()
     }
 }

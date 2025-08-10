@@ -44,7 +44,7 @@ public final class DefaultRecordRepository: RecordRepository {
         )
         .mapError { $0.toDomainError() }
         .debugError(logger: AppLogger.network)
-        .map { $0.content.map { $0.toRecordInfo() }}
+        .map { $0.readingRecords.map { $0.toRecordInfo() }}
         .eraseToAnyPublisher()
     }
     

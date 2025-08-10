@@ -145,8 +145,8 @@ final class ArchiveViewModel: BaseViewModel {
                     let mapped = result.books.map(self.mapToArchiveBook(_:))
                     return .fetchBooksSuccessed(
                         books: mapped,
-                        totalCount: result.totalResults.totalCount,
-                        counts: result.totalResults
+                        totalCount: result.bookCountSet.totalCount,
+                        counts: result.bookCountSet
                     )
                 }
                 .catch { Just(.errorOccured($0)) }

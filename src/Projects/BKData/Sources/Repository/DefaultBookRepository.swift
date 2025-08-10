@@ -41,14 +41,14 @@ public struct DefaultBookRepository: BookRepository {
     
     public func searchMyLibrary(
         _ parameters: MyLibraryParameters
-    ) -> AnyPublisher<([BookInfo], totalResults: BookCountSet), DomainError> {
+    ) -> AnyPublisher<([BookInfo], bookCountSet: BookCountSet, totalElements: Int), DomainError> {
         networkProvider.request(
             target: BookAPI.myLibrary(
                 parameter: LibraryRequestDTO(parameters)
             ),
             type: UserLibraryResponseDTO.self
         )
-        .map { ($0.getBookInfos(), $0.toBookCountSet()) }
+        .map { ($0.getBookInfos(), $0.toBookCountSet(), $0.books.page.totalElements) }
         .mapError { $0.toDomainError() }
         .eraseToAnyPublisher()
     }

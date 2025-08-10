@@ -7,5 +7,5 @@ public protocol FetchMyLibraryUseCase {
         query: String?,
         startIndex: Int?,
         status: BookStatus?
-    ) -> AnyPublisher<(books: [BookInfo], totalResults: BookCountSet), DomainError>
+    ) -> AnyPublisher<(books: [BookInfo], bookCountSet: BookCountSet), DomainError>
 }
