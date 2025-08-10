@@ -61,6 +61,7 @@ final class HomeViewModel: BaseViewModel {
             newState.homeInfos = homeInfos
             
         case .errorOccured(let error):
+            newState.isLoading = false
             newState.error = error
             
         case .errorHandled:
