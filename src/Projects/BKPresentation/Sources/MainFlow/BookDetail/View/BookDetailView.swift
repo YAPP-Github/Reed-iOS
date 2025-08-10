@@ -222,8 +222,10 @@ final class BookDetailView: BaseView {
                 self.collectionView.collectionViewLayout.collectionViewContentSize.height
             )
         }
-        
-        seedReportView.applyReport(with: sortedItems.map(\.emotion))
+    }
+    
+    func applySeedReport(with seeds: [Seed]) {
+        seedReportView.applyReport(with: seeds)
     }
     
     func applySort(option: SortOption) {
