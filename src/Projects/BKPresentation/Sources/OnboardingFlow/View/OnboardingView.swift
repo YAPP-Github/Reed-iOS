@@ -54,10 +54,12 @@ final class OnboardingView: BaseView {
     }
     
     override func configure() {
-        scrollView.isScrollEnabled = false
         scrollView.isPagingEnabled = true
         scrollView.alwaysBounceVertical = false
         scrollView.showsVerticalScrollIndicator = false
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.delegate = self
+        
         pageControl.addTarget(self, action: #selector(pageControlChanged), for: .valueChanged)
         nextButton.primaryButton?.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
     }
@@ -177,6 +179,29 @@ private extension OnboardingView {
     func updatePage(to index: Int) {
         pageControl.currentPage = index
         pageControlChanged(pageControl)
+    }
+    
+    func syncPageWithScroll() {
+        guard scrollView.bounds.width > 0 else { return }
+        let page = Int(round(scrollView.contentOffset.x / scrollView.bounds.width))
+        guard page != pageControl.currentPage,
+              (0..<pageControl.numberOfPages).contains(page) else { return }
+        pageControl.currentPage = page
+        updateButtonTitle(for: page)
+    }
+}
+
+extension OnboardingView: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        syncPageWithScroll()
+    }
+
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        syncPageWithScroll()
+    }
+
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        syncPageWithScroll()
     }
 }
  
