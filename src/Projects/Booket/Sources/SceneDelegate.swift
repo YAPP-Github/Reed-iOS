@@ -26,7 +26,11 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         setupNavigationBar()
+        #if DEBUG
         window = PulseWindow(windowScene: windowScene)
+        #else
+        window = UIWindow(windowScene: windowScene)
+        #endif
         window?.rootViewController = navigationController
         window?.backgroundColor = .bkBaseColor(.primary)
         window?.makeKeyAndVisible()

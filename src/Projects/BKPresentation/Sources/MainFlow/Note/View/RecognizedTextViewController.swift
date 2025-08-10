@@ -225,7 +225,6 @@ final class RecognizedTextViewController: UIViewController {
     }
     
     // MARK: - Helpers
-    // TODO : BK다이얼로그로 교체하기 @dyk429
     private func showAlert(message: String) {
         let alert = UIAlertController(
             title: nil,

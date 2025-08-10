@@ -21,9 +21,6 @@ let appTarget = Target.target(
             .string("kakaolink"),
             .string("kakaoplus")
         ]),
-        "NSAppTransportSecurity": .dictionary([
-            "NSAllowsArbitraryLoads": .boolean(true)
-        ]),
         "NSCameraUsageDescription": .string("OCR을 통해 텍스트를 인식하여 더 편리한 문장 입력 방식을 제공하기 위해서 카메라를 사용합니다."),
         "UIAppFonts": .array([
             .string("Pretendard-SemiBold.otf"),

@@ -70,7 +70,6 @@ final class SettingViewModel: BaseViewModel {
         effects.forEach { sideEffectSubject.send($0) }
     }
     
-    // TODO : withdraw 케이스에도 로딩 추가 필요 @dyk429
     func reduce(action: Action, state: State) -> (State, [SideEffect]) {
         var newState = state
         var effects: [SideEffect] = []

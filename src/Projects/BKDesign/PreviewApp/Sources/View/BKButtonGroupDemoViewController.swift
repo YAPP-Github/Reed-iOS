@@ -52,8 +52,16 @@ public final class BKButtonGroupDemoViewController: UIViewController {
         addSection(title: "TwoButtonGroup")
         containerView.addArrangedSubview(BKButtonGroup.twoButtonGroup(
             leftTitle: "취소", rightTitle: "확인",
-            leftAction: { print("취소 tapped") },
-            rightAction: { print("확인 tapped") }
+            leftAction: {
+                #if DEBUG
+                print("취소 tapped")
+                #endif
+            },
+            rightAction: {
+                #if DEBUG
+                print("확인 tapped")
+                #endif
+            }
         ))
 
         addDivider()
@@ -61,9 +69,21 @@ public final class BKButtonGroupDemoViewController: UIViewController {
         addSection(title: "ThreeButtonGroup")
         containerView.addArrangedSubview(BKButtonGroup.threeButtonGroup(
             leftTitle: "이전", centerTitle: "중간", rightTitle: "다음",
-            leftAction: { print("이전 tapped") },
-            centerAction: { print("중간 tapped") },
-            rightAction: { print("다음 tapped") }
+            leftAction: {
+                #if DEBUG
+                print("이전 tapped")
+                #endif
+            },
+            centerAction: {
+                #if DEBUG
+                print("중간 tapped")
+                #endif
+            },
+            rightAction: {
+                #if DEBUG
+                print("다음 tapped")
+                #endif
+            }
         ))
 
         addDivider()
@@ -71,7 +91,11 @@ public final class BKButtonGroupDemoViewController: UIViewController {
         addSection(title: "SingleFullButton")
         containerView.addArrangedSubview(BKButtonGroup.singleFullButton(
             title: "계속하기",
-            action: { print("계속하기 tapped") }
+            action: {
+                #if DEBUG
+                print("계속하기 tapped")
+                #endif
+            }
         ))
 
         addDivider()
@@ -86,7 +110,9 @@ public final class BKButtonGroupDemoViewController: UIViewController {
     private func makeButton(title: String, size: BKButtonSize) -> BKButton {
         let button = BKButton.primary(title: title, size: size)
         button.addAction(UIAction { _ in
+            #if DEBUG
             print("Tapped: \(title)")
+            #endif
         }, for: .touchUpInside)
         return button
     }

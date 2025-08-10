@@ -266,12 +266,16 @@ extension ArchiveView: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
+        #if DEBUG
         print("shouldHighlight \(indexPath)")
+        #endif
         return true
     }
 
     func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
+        #if DEBUG
         print("didHighlight \(indexPath)")
+        #endif
     }
     
     func collectionView(
