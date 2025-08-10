@@ -18,6 +18,14 @@ extension Date {
         formatter.timeZone = TimeZone.current
         return formatter
     }()
+    
+    private static let koreanDotFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy.MM.dd"
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.timeZone = TimeZone.current
+        return formatter
+    }()
 
     func toKoreanDateString() -> String {
         return Self.koreanFormatter.string(from: self)
@@ -25,5 +33,9 @@ extension Date {
     
     func toKoreanYearString() -> String {
         return Self.koreanYearFormatter.string(from: self)
+    }
+    
+    func toKoreanDotDateString() -> String {
+        return Self.koreanDotFormatter.string(from: self)
     }
 }
