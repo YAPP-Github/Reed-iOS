@@ -18,6 +18,12 @@ public enum External: String {
     case PulseUI
     case PulseProxy
     
+    case FirebaseCore
+    case FirebaseAnalytics
+    case FirebaseCrashlytics
+    case FirebaseAnalyticsSwift
+    case FirebaseRemoteConfig
+    
     case Nimble
     case Quick
 }
