@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>BASE_API_URL</key>
-	<string>${BASE_API_URL}</string>
+	<string>$(BASE_API_URL)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -41,11 +41,6 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>OCR을 통해 텍스트를 인식하여 더 편리한 문장 입력 방식을 제공하기 위해서 카메라를 사용합니다.</string>
 	<key>UIAppFonts</key>
@@ -79,7 +74,7 @@
 		<integer>1</integer>
 	</array>
 	<key>UILaunchStoryboardName</key>
-	<string></string>
+	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
@@ -88,5 +83,7 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

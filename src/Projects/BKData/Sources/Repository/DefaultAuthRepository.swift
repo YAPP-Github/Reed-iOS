@@ -71,7 +71,6 @@ public struct DefaultAuthRepository: AuthRepository {
     }
     
     public func withdraw() -> AnyPublisher<Void, AuthError> {
-        // TODO: - 현재 탈퇴 API가 없으므로 logout으로 대체
         return oauthProvider.request(
             target: AuthAPI.withdraw,
             type: EmptyResponse.self

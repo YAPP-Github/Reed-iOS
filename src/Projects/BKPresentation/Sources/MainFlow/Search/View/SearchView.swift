@@ -74,6 +74,10 @@ final class SearchView: BaseView {
         }
     }
     
+    func setSearchBarPlaceholder(with placeholder: String) {
+        searchBar.placeholder = placeholder
+    }
+    
     func applySnapshot(
         with state: SearchViewModel.SearchState,
         count: Int = 0
@@ -93,7 +97,10 @@ final class SearchView: BaseView {
             
         case .result(let state):
             if state.books.isEmpty {
-                collectionView.backgroundView = makeEmptyLabel("검색어와 일치하는 도서가 없습니다.")
+                header.layoutIfNeeded()
+                let headerHeight = header.bounds.height
+                let offset = -(headerHeight / 2.0)
+                collectionView.backgroundView = makeEmptyLabel(state.placeholder, verticalOffset: offset)
             } else {
                 collectionView.backgroundView = nil
                 snapshot.appendSections([.result])
@@ -205,13 +212,25 @@ private extension SearchView {
         return layout
     }
 
-    func makeEmptyLabel(_ text: String) -> UILabel {
+    func makeEmptyLabel(
+        _ text: String,
+        verticalOffset: CGFloat = 0
+    ) -> UIView {
+        let container = UIView()
+        container.backgroundColor = .bkBaseColor(.primary)
+
         let label = UILabel()
         label.text = text
         label.textColor = .bkContentColor(.secondary)
-        label.backgroundColor = .bkBaseColor(.primary)
         label.textAlignment = .center
-        return label
+
+        container.addSubview(label)
+        label.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview().offset(verticalOffset)
+        }
+
+        return container
     }
     
     @objc func searchButtonTapped() {

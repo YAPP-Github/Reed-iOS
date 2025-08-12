@@ -6,7 +6,7 @@ import Foundation
 struct BookDetailResponseDTO: Decodable {
     let version: String
     let title: String
-    let link: String
+    let link: URL
     let author: String
     let pubDate: String
     let description: String

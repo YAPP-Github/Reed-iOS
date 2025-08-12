@@ -265,15 +265,6 @@ extension ArchiveView: UICollectionViewDelegateFlowLayout {
         eventPublisher.send(.bookTapped(book: book))
     }
     
-    func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        print("shouldHighlight \(indexPath)")
-        return true
-    }
-
-    func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
-        print("didHighlight \(indexPath)")
-    }
-    
     func collectionView(
         _ collectionView: UICollectionView,
         willDisplay cell: UICollectionViewCell,

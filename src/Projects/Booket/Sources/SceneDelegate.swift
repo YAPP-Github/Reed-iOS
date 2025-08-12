@@ -8,8 +8,10 @@ import BKNetwork
 import BKPresentation
 import BKStorage
 import KakaoSDKAuth
+#if DEBUG
 import Pulse
 import PulseUI
+#endif
 import SwiftUI
 import UIKit
 
@@ -26,7 +28,11 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         setupNavigationBar()
+        #if DEBUG
         window = PulseWindow(windowScene: windowScene)
+        #else
+        window = UIWindow(windowScene: windowScene)
+        #endif
         window?.rootViewController = navigationController
         window?.backgroundColor = .bkBaseColor(.primary)
         window?.makeKeyAndVisible()
@@ -80,6 +86,7 @@ private extension SceneDelegate {
     }
 }
 
+#if DEBUG
 class PulseWindow: UIWindow {
     override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         super.motionEnded(motion, with: event)
@@ -90,3 +97,4 @@ class PulseWindow: UIWindow {
         rootViewController?.present(navigation, animated: true)
     }
 }
+#endif

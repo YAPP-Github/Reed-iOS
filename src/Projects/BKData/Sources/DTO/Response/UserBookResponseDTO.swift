@@ -39,8 +39,8 @@ public struct UserBookResponseDTO: Decodable {
             status: status,
             imageUrl: coverURL,
             publisher: publisher,
-            createdAt: DateParser.parse(createdDate),
-            updatedAt: DateParser.parse(updatedDate),
+            createdAt: DateParser.parseISO8601(createdDate),
+            updatedAt: DateParser.parseISO8601(updatedDate),
             recordCount: recordCount
         )
     }

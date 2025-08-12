@@ -27,7 +27,7 @@ extension HomeDTO {
             author: author,
             publisher: publisher,
             coverImageUrl: coverImageUrl,
-            lastRecordedAt: DateParser.parse(lastRecordedAt),
+            lastRecordedAt: DateParser.parseISO8601(lastRecordedAt),
             recordCount: recordCount
         )
     }

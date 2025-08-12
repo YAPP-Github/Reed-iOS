@@ -3,5 +3,7 @@
 import BKDomain
 
 struct FetchRecordResponseDTO: Decodable {
-    let content: [DetailRecordResponseDTO]
+    let readingRecords: [DetailRecordResponseDTO]
+    let lastPage: Bool
+    let totalResults: Int
 }

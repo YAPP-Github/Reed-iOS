@@ -55,7 +55,7 @@ final class LoginViewController: BaseViewController<LoginView> {
     
     override func bindState() {
         viewModel.statePublisher
-            .map { $0.errorMessage }
+            .compactMap { $0.errorMessage }
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in

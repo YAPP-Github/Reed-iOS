@@ -198,6 +198,7 @@ final class BookDetailView: BaseView {
     
     func applySnapshot(
         with items: [BookDetailItem],
+        totalCount: Int,
         animating: Bool = true
     ) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, BookDetailItem>()
@@ -212,7 +213,7 @@ final class BookDetailView: BaseView {
             snapshot.appendItems(sortedItems, toSection: .main)
         }
         
-        header.applyHeaderTitle(count: sortedItems.count)
+        header.applyHeaderTitle(count: totalCount)
         dataSource.apply(snapshot, animatingDifferences: animating) { [weak self] in
             guard let self = self else { return }
             self.collectionView.reloadData()
@@ -221,8 +222,10 @@ final class BookDetailView: BaseView {
                 self.collectionView.collectionViewLayout.collectionViewContentSize.height
             )
         }
-        
-        seedReportView.applyReport(with: sortedItems.map(\.emotion))
+    }
+    
+    func applySeedReport(with seeds: [Seed]) {
+        seedReportView.applyReport(with: seeds)
     }
     
     func applySort(option: SortOption) {
@@ -335,6 +338,17 @@ extension BookDetailView: UICollectionViewDelegateFlowLayout {
     ) {
         guard let item = dataSource.itemIdentifier(for: indexPath) else { return }
         eventPublisher.send(.didTapCell(recordId: item.recordId))
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        willDisplay cell: UICollectionViewCell,
+        forItemAt indexPath: IndexPath
+    ) {
+        let count = dataSource.snapshot().numberOfItems
+        if indexPath.item == count - 1, !dataSource.snapshot().itemIdentifiers.isEmpty {
+            eventPublisher.send(.didReachBottom)
+        }
     }
 }
 

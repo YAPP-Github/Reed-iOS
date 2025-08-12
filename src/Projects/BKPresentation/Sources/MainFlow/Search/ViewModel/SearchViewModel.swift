@@ -25,7 +25,7 @@ enum SearchViewType: String {
     case myLibrarySearch = "MyLibrary"
     
     var recentPlaceholder: String {
-        return "최근 검색어가 없습니다."
+        return "최근 검색어 내역이 없습니다."
     }
 
     var resultPlaceholder: String {
@@ -34,6 +34,24 @@ enum SearchViewType: String {
             return "검색어와 일치하는 도서가 없습니다."
         case .myLibrarySearch:
             return "내 서재에 해당 도서가 없습니다."
+        }
+    }
+    
+    var searchBarPlaceholder: String {
+        switch self {
+        case .defaultSearch:
+            return "도서 검색 후 내 서재에 담아보세요."
+        case .myLibrarySearch:
+            return "등록한 책을 검색해보세요"
+        }
+    }
+    
+    var searchViewTitle: String {
+        switch self {
+        case .defaultSearch:
+            return "도서 검색"
+        case .myLibrarySearch:
+            return "내 서재 검색"
         }
     }
 }
@@ -69,6 +87,8 @@ final class SearchViewModel: BaseViewModel {
         var totalResults = 0
         var error: DomainError? = nil
         var isRetrying: Bool = false
+        var searchBarPlaceholder: String
+        var searchViewTitle: String
     }
     
     enum Action {
@@ -95,7 +115,7 @@ final class SearchViewModel: BaseViewModel {
         case upsert(isbn: String, status: BookRegistrationStatus)
     }
     
-    @Published private var state = State()
+    @Published private var state: State
     private var cancellables = Set<AnyCancellable>()
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
     private let pageSize = 10
@@ -143,6 +163,10 @@ final class SearchViewModel: BaseViewModel {
     
     init(searchViewType: SearchViewType) {
         self.searchViewType = searchViewType
+        self.state = State(
+            searchBarPlaceholder: searchViewType.searchBarPlaceholder,
+            searchViewTitle: searchViewType.searchViewTitle
+        )
         bindSideEffects()
     }
     

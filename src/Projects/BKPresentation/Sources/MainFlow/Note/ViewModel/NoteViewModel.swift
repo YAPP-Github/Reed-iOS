@@ -71,6 +71,7 @@ final class NoteViewModel: BaseViewModel {
             newState.recordInfo = recordInfo
             
         case .errorOccured(let error):
+            newState.isLoading = false
             if newState.isRetrying == false {
                 newState.isRetrying = true
             } else {

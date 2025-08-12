@@ -5,7 +5,6 @@ import BKDomain
 struct SearchBookResponseDTO: Decodable {
     let version: String
     let title: String
-    let link: String
     let pubDate: String
     let totalResults: Int
     let startIndex: Int

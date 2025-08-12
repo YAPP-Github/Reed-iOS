@@ -5,7 +5,45 @@ let appTarget = Target.target(
     name: "Reed",
     product: .app,
     bundleId: Project.bundleID,
-    infoPlist: .file(path: .relativeToRoot("SupportingFiles/Booket/Info.plist")),
+    infoPlist: .extendingDefault(with: [
+        "BASE_API_URL": .string("${BASE_API_URL}"),
+        "ITSAppUsesNonExemptEncryption" : false,
+        "KAKAO_NATIVE_APP_KEY": .string("${KAKAO_NATIVE_APP_KEY}"),
+        "UILaunchStoryboardName": .string("LaunchScreen"),
+        "CFBundleURLTypes": .array([
+            .dictionary([
+                "CFBundleTypeRole": .string("Editor"),
+                "CFBundleURLSchemes": .array([.string("kakao${KAKAO_NATIVE_APP_KEY}")])
+            ])
+        ]),
+        "LSApplicationQueriesSchemes": .array([
+            .string("kakaokompassauth"),
+            .string("kakaolink"),
+            .string("kakaoplus")
+        ]),
+        "NSCameraUsageDescription": .string("OCR을 통해 텍스트를 인식하여 더 편리한 문장 입력 방식을 제공하기 위해서 카메라를 사용합니다."),
+        "UIAppFonts": .array([
+            .string("Pretendard-SemiBold.otf"),
+            .string("Pretendard-Regular.otf"),
+            .string("Pretendard-Medium.otf"),
+            .string("Pretendard-Bold.otf")
+        ]),
+        "UIApplicationSceneManifest": .dictionary([
+            "UIApplicationSupportsMultipleScenes": .boolean(false),
+            "UISceneConfigurations": .dictionary([
+                "UIWindowSceneSessionRoleApplication": .array([
+                    .dictionary([
+                        "UISceneClassName": .string("UIWindowScene"),
+                        "UISceneConfigurationName": .string("Default Configuration"),
+                        "UISceneDelegateClassName": .string("Reed.SceneDelegate")
+                    ])
+                ])
+            ])
+        ]),
+        "UISupportedInterfaceOrientations": .array([
+            .string("UIInterfaceOrientationPortrait")
+        ])
+    ]),
     sources: .sources,
     resources: [
         .glob(pattern: .relativeToRoot("Projects/Booket/Resources/**")),

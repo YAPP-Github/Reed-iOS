@@ -46,15 +46,23 @@ enum EmotionSeed: String, CaseIterable {
         case .warmth: return .warmth
         }
     }
+    
+    static func from(seedName: String) -> Self? {
+        switch seedName {
+        case "warmth", "따뜻함": return .warmth
+        case "joy", "즐거움":   return .joy
+        case "sad", "슬픔":     return .sad
+        case "insight", "깨달음": return .insight
+        default: return nil
+        }
+    }
+    
+    static func from(seed: Seed) -> Self? {
+        return from(seedName: seed.name)
+    }
 }
 
 final class SeedReportView: BaseView {
-    private var emotionSeedMap: [EmotionSeed: Int] = {
-        return Dictionary(
-            uniqueKeysWithValues: EmotionSeed.allCases.map { ($0, 0) }
-        )
-    }()
-    
     private let titleLabel = BKLabel(
         text: "내가 모은 씨앗",
         fontStyle: .body2(weight: .medium),
@@ -121,31 +129,34 @@ final class SeedReportView: BaseView {
         }
     }
     
-    func applyReport(with data: [EmotionSeed?]) {
-        emotionReport.arrangedSubviews.forEach {
-            emotionReport.removeArrangedSubview($0)
-            $0.removeFromSuperview()
+    func applyReport(with seeds: [Seed]) {
+        var counts: [EmotionSeed: Int] = [:]
+        for s in seeds {
+            if let key = EmotionSeed.from(seed: s) {
+                counts[key, default: 0] += s.count
+            }
         }
-        
-        let data = data.compactMap(\.self)
-        let counts = data.reduce(into: [EmotionSeed: Int]()) { acc, seed in
-            acc[seed, default: 0] += 1
-        }
-
-        for seed in EmotionSeed.allCases {
-            let count = counts[seed] ?? 0
-            emotionReport.addArrangedSubview(
-                makeInnerView(with: seed, count: count)
-            )
-        }
-        
-        let (summary, highlightedWord) = generateEmotionSummary(from: counts)
-        reportLabel.setText(text: summary)
-        reportLabel.highlightedWord = highlightedWord
+        applyReportCore(counts: counts)
     }
 }
 
 private extension SeedReportView {
+    func applyReportCore(counts: [EmotionSeed: Int]) {
+        emotionReport.arrangedSubviews.forEach {
+            emotionReport.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+
+        for seed in EmotionSeed.allCases {
+            let count = counts[seed] ?? 0
+            emotionReport.addArrangedSubview(makeInnerView(with: seed, count: count))
+        }
+
+        let (summary, highlightedWord) = generateEmotionSummary(from: counts)
+        reportLabel.setText(text: summary)
+        reportLabel.highlightedWord = highlightedWord
+    }
+    
     func generateEmotionSummary(
         from counts: [EmotionSeed: Int]
     ) -> (String, String) {

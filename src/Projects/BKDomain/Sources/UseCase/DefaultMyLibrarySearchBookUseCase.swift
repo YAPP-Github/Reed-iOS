@@ -19,7 +19,7 @@ public struct DefaultMyLibrarySearchBookUseCase: MyLibrarySearchBookUseCase {
                 title: query
             )
         )
-        .map { ($0.0, $0.totalResults.totalCount) }
+        .map { ($0.0, $0.totalElements) }
         .eraseToAnyPublisher()
     }
 }

@@ -141,9 +141,22 @@ extension SentenceRegistrationView: UITextFieldDelegate {
         shouldChangeCharactersIn range: NSRange,
         replacementString string: String
     ) -> Bool {
-        let allowedCharacters = CharacterSet.decimalDigits
-        let characterSet = CharacterSet(charactersIn: string)
-        return allowedCharacters.isSuperset(of: characterSet)
+        if string.isEmpty { return true }
+        guard CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: string)) else {
+            return false
+        }
+
+        let current = textField.text ?? ""
+        guard let range = Range(range, in: current) else { return false }
+        let newText = current.replacingCharacters(in: range, with: string)
+
+        let trimmed = newText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty { return true }
+        if trimmed.hasPrefix("0") { return false }
+        if trimmed.count > 4 { return false }
+
+        if let value = Int(trimmed), value <= 9999 { return true }
+        return false
     }
 }
 

@@ -137,7 +137,9 @@ public class BKButtonGroup: UIView {
     /// - Warning: 이 함수는 내부에 버튼이 2개 있을 때만 정상 동작합니다. 기존에 설정된 모든 액션은 제거됩니다.
     public func bindTwoButtonsAction(leftAction: (() -> Void)?, rightAction: (() -> Void)?) {
         guard buttons.count == 2 else {
+            #if DEBUG
             print("Warning: bindTwoButtonsAction() called on a button group that does not have 2 buttons.")
+            #endif
             return
         }
         

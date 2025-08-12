@@ -93,6 +93,24 @@ final class SearchViewController: BaseViewController<SearchView> {
     override func bindState() {
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
+            .map { $0.searchBarPlaceholder }
+            .removeDuplicates()
+            .sink { [weak self] placeholder in
+                self?.contentView.setSearchBarPlaceholder(with: placeholder)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .map { $0.searchViewTitle }
+            .removeDuplicates()
+            .sink { [weak self] title in
+                self?.navigationItem.title = title
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
             .map { state in
                 Snapshot(
                     state: state.searchState,

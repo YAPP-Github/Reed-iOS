@@ -12,10 +12,10 @@ final class SearchResultCell: UICollectionViewCell {
     }
     
     static let identifier = "SearchResultCell"
-
+    
     private var resultView: BKBookSummaryView?
     private let dividerView = BKDivider(type: .small)
-
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubview(dividerView)
@@ -23,16 +23,23 @@ final class SearchResultCell: UICollectionViewCell {
             $0.leading.trailing.bottom.equalToSuperview()
         }
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     override func prepareForReuse() {
         super.prepareForReuse()
-        resultView?.clearView()
+        
+        resultView?.removeFromSuperview()
+        resultView = nil
+        
+        isUserInteractionEnabled = true
+        
+        backgroundColor = .clear
+        contentView.backgroundColor = .clear
     }
-
+    
     func configure(
         title: String,
         description: BookDescription,
@@ -40,24 +47,25 @@ final class SearchResultCell: UICollectionViewCell {
         canSelect: Bool = true,
         recordCount: Int? = nil
     ) {
-        if resultView == nil {
-            let view = BKBookSummaryView(
-                style: recordCount != nil ? .record : (
-                    canSelect ? .regular : .alreadyEnroll
-                )
-            )
-            
-            contentView.addSubview(view)
-            view.snp.makeConstraints {
-                $0.top.leading.trailing.equalToSuperview()
-                $0.bottom.equalTo(dividerView.snp.top)
+        let style: BKBookSummaryViewStyle = {
+            if recordCount != nil {
+                return .record
+            } else if canSelect {
+                return .regular
+            } else {
+                return .alreadyEnroll
             }
-            self.resultView = view
-        }
+        }()
         
-        if recordCount == nil && !canSelect {
-            isUserInteractionEnabled = false
+        let view = BKBookSummaryView(style: style)
+        contentView.addSubview(view)
+        view.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(dividerView.snp.top)
         }
+        self.resultView = view
+        
+        isUserInteractionEnabled = canSelect
         
         resultView?.configure(
             title: title,

@@ -57,10 +57,11 @@ final class HomeViewModel: BaseViewModel {
             newState.shouldPlayAnimation = false
 
         case .fetchHomeSuccessed(let homeInfos):
-            newState.isLoading = false // TODO : 추후에 failed 케이스 생기면 거기에도 추가 @dyk429
+            newState.isLoading = false
             newState.homeInfos = homeInfos
             
         case .errorOccured(let error):
+            newState.isLoading = false
             newState.error = error
             
         case .errorHandled:
