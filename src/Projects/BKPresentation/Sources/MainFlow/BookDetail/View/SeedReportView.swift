@@ -129,12 +129,11 @@ final class SeedReportView: BaseView {
         }
     }
     
-    public func applyReport(with seeds: [Seed]) {
-        let pairs = seeds.map { ($0.name, $0.count) }
+    func applyReport(with seeds: [Seed]) {
         var counts: [EmotionSeed: Int] = [:]
         for s in seeds {
             if let key = EmotionSeed.from(seed: s) {
-                counts[key] = s.count
+                counts[key, default: 0] += s.count
             }
         }
         applyReportCore(counts: counts)

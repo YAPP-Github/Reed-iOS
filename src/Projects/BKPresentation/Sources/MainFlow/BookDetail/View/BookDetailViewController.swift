@@ -81,6 +81,7 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
         
         contentView.eventPublisher
             .filter { $0 == .didReachBottom }
+            .throttle(for: .milliseconds(800), scheduler: RunLoop.main, latest: false)
             .sink { [weak self] _ in
                 self?.viewModel.send(.loadNextPage)
             }
