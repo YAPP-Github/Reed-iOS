@@ -102,6 +102,15 @@ final class SearchViewController: BaseViewController<SearchView> {
         
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
+            .map { $0.searchViewTitle }
+            .removeDuplicates()
+            .sink { [weak self] title in
+                self?.navigationItem.title = title
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
             .map { state in
                 Snapshot(
                     state: state.searchState,

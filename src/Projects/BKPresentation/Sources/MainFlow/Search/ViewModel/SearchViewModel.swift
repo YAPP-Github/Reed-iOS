@@ -45,6 +45,15 @@ enum SearchViewType: String {
             return "등록한 책을 검색해보세요"
         }
     }
+    
+    var searchViewTitle: String {
+        switch self {
+        case .defaultSearch:
+            return "도서 검색"
+        case .myLibrarySearch:
+            return "내 서재 검색"
+        }
+    }
 }
 
 struct MyLibrarySearchAdapter: SearchBookUseCase {
@@ -79,6 +88,7 @@ final class SearchViewModel: BaseViewModel {
         var error: DomainError? = nil
         var isRetrying: Bool = false
         var searchBarPlaceholder: String
+        var searchViewTitle: String
     }
     
     enum Action {
@@ -153,7 +163,10 @@ final class SearchViewModel: BaseViewModel {
     
     init(searchViewType: SearchViewType) {
         self.searchViewType = searchViewType
-        self.state = State(searchBarPlaceholder: searchViewType.searchBarPlaceholder)
+        self.state = State(
+            searchBarPlaceholder: searchViewType.searchBarPlaceholder,
+            searchViewTitle: searchViewType.searchViewTitle
+        )
         bindSideEffects()
     }
     
