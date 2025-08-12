@@ -45,10 +45,10 @@ final class LoginView: BaseView {
         imageView.contentMode = .scaleAspectFit
         logoImageView.backgroundColor = .clear
         
-        appleSignInButton.title = "Apple로 시작하기"
+        appleSignInButton.title = "Apple로 로그인"
         appleSignInButton.leftIcon = BKImage.Icon.apple
 
-        kakaoSignInButton.title = "카카오로 시작하기"
+        kakaoSignInButton.title = "카카오로 로그인"
         kakaoSignInButton.leftIcon = BKImage.Icon.kakao
         
         logoImageView.addSubviews(imageView, sloganLabel)
