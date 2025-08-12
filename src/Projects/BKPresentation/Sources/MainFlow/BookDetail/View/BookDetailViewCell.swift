@@ -74,7 +74,6 @@ final class BookDetailViewCell: UICollectionViewCell {
     ) {
         let emotion = item.emotion ?? .joy
         
-        print(item.createdAt)
         noteLabel.setText(text: item.note)
         emotionIcon.image = emotion.image
         emotionIcon.layer.cornerRadius = LayoutConstants.imageCornerRadius

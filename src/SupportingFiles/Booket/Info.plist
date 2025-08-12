@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>BASE_API_URL</key>
-	<string>${BASE_API_URL}</string>
+	<string>$(BASE_API_URL)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -83,5 +83,7 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

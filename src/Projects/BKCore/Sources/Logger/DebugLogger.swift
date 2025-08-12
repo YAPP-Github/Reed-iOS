@@ -3,7 +3,7 @@
 import Foundation
 
 #if DEBUG
-    import Pulse
+import Pulse
 #endif
 
 // nil값 검증도 가능하도록 optional로 message pass

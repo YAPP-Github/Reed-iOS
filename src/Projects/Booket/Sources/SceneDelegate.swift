@@ -8,8 +8,10 @@ import BKNetwork
 import BKPresentation
 import BKStorage
 import KakaoSDKAuth
+#if DEBUG
 import Pulse
 import PulseUI
+#endif
 import SwiftUI
 import UIKit
 
@@ -84,6 +86,7 @@ private extension SceneDelegate {
     }
 }
 
+#if DEBUG
 class PulseWindow: UIWindow {
     override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         super.motionEnded(motion, with: event)
@@ -94,3 +97,4 @@ class PulseWindow: UIWindow {
         rootViewController?.present(navigation, animated: true)
     }
 }
+#endif
