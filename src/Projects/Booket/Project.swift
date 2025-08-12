@@ -47,11 +47,13 @@ let appTarget = Target.target(
     sources: .sources,
     resources: [
         .glob(pattern: .relativeToRoot("Projects/Booket/Resources/**")),
-        .glob(pattern: .relativeToRoot("Projects/BKDesign/Resources/**"))
+        .glob(pattern: .relativeToRoot("SupportingFiles/Booket/GoogleService-Info.plist")),
+        .glob(pattern: .relativeToRoot("Projects/BKDesign/Resources/**")),
     ],
     entitlements: .file(path: .relativeToRoot("SupportingFiles/Booket/Booket.entitlements")),
     scripts: [
-        swiftLintScript
+        swiftLintScript,
+        crashScript
     ],
     dependencies: [
         .data(),
@@ -63,10 +65,14 @@ let appTarget = Target.target(
         .domain(),
         .external(dependency: .Pulse),
         .external(dependency: .PulseUI),
-        .external(dependency: .PulseProxy)
+        .external(dependency: .PulseProxy),
+        .external(dependency: .FirebaseCore),
+        .external(dependency: .FirebaseCrashlytics)
     ],
     settings: .settings(
         base: [
+            "OTHER_LDFLAGS": ["-ObjC"],
+            "DEBUG_INFORMATION_FORMAT": "dwarf-with-dsym",
             "DEVELOPMENT_LANGUAGE": "ko",
             "DEVELOPMENT_TEAM": "VZC79KP79S",
             "CODE_SIGN_STYLE": "Manual",
