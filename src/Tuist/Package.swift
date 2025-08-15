@@ -12,7 +12,12 @@
             "SnapKit": .staticLibrary,
             "Kingfisher": .framework,
             "Pulse": .framework,
-            "Lottie": .framework
+            "Lottie": .framework,
+            "FirebaseCore" : .staticLibrary,
+            "FirebaseAnalytics" : .staticLibrary,
+            "FirebaseCrashlytics" : .staticLibrary,
+            "FirebaseAnalyticsSwift" : .staticLibrary,
+            "FirebaseRemoteConfig" : .staticLibrary
         ]
     )
 #endif
@@ -26,6 +31,7 @@ let package = Package(
         .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.7.1"),
         .package(url: "https://github.com/onevcat/Kingfisher", from: "8.5.0"),
         .package(url: "https://github.com/kean/Pulse", from: "5.1.4"),
-        .package(url: "https://github.com/airbnb/lottie-ios", from: "4.5.2")
+        .package(url: "https://github.com/airbnb/lottie-ios", from: "4.5.2"),
+        .package(url: "https://github.com/firebase/firebase-ios-sdk", from: "12.1.0")
     ]
 )

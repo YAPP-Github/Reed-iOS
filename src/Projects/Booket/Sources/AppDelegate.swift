@@ -2,6 +2,7 @@
 
 import BKData
 import KakaoSDKCommon
+import Firebase
 #if DEBUG
 import Pulse
 import PulseProxy
@@ -21,6 +22,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         NetworkLogger.enableProxy()
 #endif
         KakaoSDK.initSDK(appKey: kakaoAPIkey)
+        FirebaseApp.configure()
         return true
     }
     
