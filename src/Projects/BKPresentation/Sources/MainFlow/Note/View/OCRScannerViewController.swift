@@ -106,7 +106,8 @@ final class OCRScannerViewController: UIViewController {
         
         captureButton.backgroundColor = .bkBackgroundColor(.primary)
         captureButton.layer.cornerRadius = LayoutGuide.buttonRadius
-        captureButton.setImage(BKImage.Icon.maximize, for: .normal)
+        let resizedImage = BKImage.Icon.maximize.resizedAsTemplate(to: CGSize(width: 32, height: 32))
+        captureButton.setImage(resizedImage, for: .normal)
         captureButton.tintColor = .bkBaseColor(.primary)
         captureButton.addTarget(
             self,
@@ -336,5 +337,14 @@ extension OCRScannerViewController: DataScannerViewControllerDelegate {
 //    }
 }
 
+extension UIImage {
+    func resizedAsTemplate(to size: CGSize) -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
+        defer { UIGraphicsEndImageContext() }
+        draw(in: CGRect(origin: .zero, size: size))
+        
+        guard let resizedImage = UIGraphicsGetImageFromCurrentImageContext() else { return nil }
+        
+        return resizedImage.withRenderingMode(.alwaysTemplate)
     }
 }
