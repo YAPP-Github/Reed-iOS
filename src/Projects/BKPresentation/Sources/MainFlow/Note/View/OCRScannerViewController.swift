@@ -36,9 +36,9 @@ final class OCRScannerViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     private var scannerViewController: DataScannerViewController?
-    private let scanAreaView = UIView()
-    private let overlayView = UIView()
-    private let scanOverlayView = UIImageView(image: UIImage(named: "dim"))
+//    private let scanAreaView = UIView()
+//    private let overlayView = UIView()
+//    private let scanOverlayView = UIImageView(image: UIImage(named: "dim"))
     
     private let guideLabel = BKLabel(
         text: LabelString.guideText,
@@ -92,6 +92,7 @@ final class OCRScannerViewController: UIViewController {
         view.backgroundColor = .black
         
         guideLabel.numberOfLines = 2
+        guideLabel.backgroundColor = .black
         errorLabel.numberOfLines = 2
         errorLabel.isHidden = true
         
@@ -112,37 +113,40 @@ final class OCRScannerViewController: UIViewController {
             action: #selector(captureButtonTapped),
             for: .touchUpInside
         )
+//        
+//        scanAreaView.backgroundColor = .clear
+//        scanAreaView.isUserInteractionEnabled = false
         
-        scanAreaView.backgroundColor = .clear
-        scanAreaView.isUserInteractionEnabled = false
+//        overlayView.backgroundColor = .clear
+//        overlayView.isUserInteractionEnabled = false
         
-        overlayView.backgroundColor = .clear
-        overlayView.isUserInteractionEnabled = false
-        
-        view.addSubviews(overlayView, scanAreaView, scanOverlayView, guideLabel, closeButton, captureButton, errorLabel)
+//        view.addSubviews(overlayView, scanAreaView, scanOverlayView, guideLabel, closeButton, captureButton, errorLabel)
+        view.addSubviews(guideLabel, closeButton, captureButton, errorLabel)
         
         setupConstraints()
     }
     
     private func setupConstraints() {
-        overlayView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+//        overlayView.snp.makeConstraints {
+//            $0.edges.equalToSuperview()
+//        }
         
-        scanAreaView.snp.makeConstraints {
-            $0.center.equalToSuperview()
-            $0.width.equalToSuperview()
-            $0.height.equalTo(LayoutGuide.scanAreaHeight)
-        }
-        
-        scanOverlayView.snp.makeConstraints {
-            $0.leading.trailing.equalTo(scanAreaView)
-            $0.top.bottom.equalTo(scanAreaView)
-        }
+//        scanAreaView.snp.makeConstraints {
+//            $0.center.equalToSuperview()
+//            $0.width.equalToSuperview()
+//            $0.height.equalTo(LayoutGuide.scanAreaHeight)
+//        }
+//        
+//        scanOverlayView.snp.makeConstraints {
+//            $0.leading.trailing.equalTo(scanAreaView)
+//            $0.top.bottom.equalTo(scanAreaView)
+//        }
         
         guideLabel.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(scanAreaView.snp.top).offset(LayoutGuide.guideLabelBottomOffset)
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(LayoutGuide.closeButtonTopOffset)
+            
+//            $0.bottom.equalTo(scanAreaView.snp.top).offset(LayoutGuide.guideLabelBottomOffset)
         }
         
         closeButton.snp.makeConstraints {
@@ -179,6 +183,8 @@ final class OCRScannerViewController: UIViewController {
             qualityLevel: .accurate,
             recognizesMultipleItems: true,
             isHighFrameRateTrackingEnabled: false,
+            isPinchToZoomEnabled: true,
+            isGuidanceEnabled: false,
             isHighlightingEnabled: false
         )
         
@@ -195,27 +201,27 @@ final class OCRScannerViewController: UIViewController {
         scannerViewController = scanner
         
         // 오버레이 마스크 설정
-        DispatchQueue.main.async { [weak self] in
-            self?.setupOverlayMask()
-        }
+//        DispatchQueue.main.async { [weak self] in
+//            self?.setupOverlayMask()
+//        }
     }
     
-    private func setupOverlayMask() {
-        let path = UIBezierPath(rect: overlayView.bounds)
-        
-        // 스캔 영역에 해당하는 부분을 뚫음
-        let scanAreaFrame = scanAreaView.frame
-        let scanPath = UIBezierPath(roundedRect: scanAreaFrame, cornerRadius: 0)
-        path.append(scanPath)
-        path.usesEvenOddFillRule = true
-        
-        let maskLayer = CAShapeLayer()
-        maskLayer.path = path.cgPath
-        maskLayer.fillRule = .evenOdd
-        maskLayer.fillColor = UIColor.black.cgColor
-        
-        overlayView.layer.addSublayer(maskLayer)
-    }
+//    private func setupOverlayMask() {
+//        let path = UIBezierPath(rect: overlayView.bounds)
+//        
+//        // 스캔 영역에 해당하는 부분을 뚫음
+//        let scanAreaFrame = scanAreaView.frame
+//        let scanPath = UIBezierPath(roundedRect: scanAreaFrame, cornerRadius: 0)
+//        path.append(scanPath)
+//        path.usesEvenOddFillRule = true
+//        
+//        let maskLayer = CAShapeLayer()
+//        maskLayer.path = path.cgPath
+//        maskLayer.fillRule = .evenOdd
+//        maskLayer.fillColor = UIColor.black.cgColor
+//        
+//        overlayView.layer.addSublayer(maskLayer)
+//    }
     
     private func bindViewModel() {
         viewModel.statePublisher
@@ -277,8 +283,7 @@ extension OCRScannerViewController {
     
     @objc
     private func captureButtonTapped() {
-        let scanAreaFrame = scanAreaView.frame
-        viewModel.send(.captureButtonTapped(scanAreaFrame: scanAreaFrame))
+        viewModel.send(.captureButtonTapped)
     }
     
     private func showFailureDialog() {
@@ -314,19 +319,22 @@ extension OCRScannerViewController: DataScannerViewControllerDelegate {
         viewModel.send(.itemsAdded(addedItems, allItems: allItems))
     }
     
-    func dataScanner(
-        _ dataScanner: DataScannerViewController,
-        didUpdate updatedItems: [RecognizedItem],
-        allItems: [RecognizedItem]
-    ) {
-        viewModel.send(.itemsUpdated(updatedItems, allItems: allItems))
-    }
+//    func dataScanner(
+//        _ dataScanner: DataScannerViewController,
+//        didUpdate updatedItems: [RecognizedItem],
+//        allItems: [RecognizedItem]
+//    ) {
+//        viewModel.send(.itemsUpdated(updatedItems, allItems: allItems))
+//    }
     
-    func dataScanner(
-        _ dataScanner: DataScannerViewController,
-        didRemove removedItems: [RecognizedItem],
-        allItems: [RecognizedItem]
-    ) {
-        viewModel.send(.itemsRemoved(removedItems, allItems: allItems))
+//    func dataScanner(
+//        _ dataScanner: DataScannerViewController,
+//        didRemove removedItems: [RecognizedItem],
+//        allItems: [RecognizedItem]
+//    ) {
+//        viewModel.send(.itemsRemoved(removedItems, allItems: allItems))
+//    }
+}
+
     }
 }

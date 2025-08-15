@@ -29,7 +29,7 @@ final class OCRScannerViewModel: BaseViewModel {
         case itemsAdded([RecognizedItem], allItems: [RecognizedItem])
         case itemsUpdated([RecognizedItem], allItems: [RecognizedItem])
         case itemsRemoved([RecognizedItem], allItems: [RecognizedItem])
-        case captureButtonTapped(scanAreaFrame: CGRect)
+        case captureButtonTapped
         case closeButtonTapped
         case textCaptured(String)
         case alertDismissed
@@ -94,14 +94,11 @@ final class OCRScannerViewModel: BaseViewModel {
         case .itemsRemoved(_, let allItems):
             currentRecognizedItems = allItems
             
-        case .captureButtonTapped(let scanAreaFrame):
+        case .captureButtonTapped:
             debugPulse("\(newState.failureCount)")
             newState.isLoading = true
             
-            let capturedTexts = extractTextsInScanArea(
-                items: currentRecognizedItems,
-                scanAreaFrame: scanAreaFrame
-            )
+            let capturedTexts = extractTextsInScanArea(items: currentRecognizedItems)
             
             if !capturedTexts.isEmpty {
                 newState.failureCount = 0
@@ -164,28 +161,30 @@ final class OCRScannerViewModel: BaseViewModel {
     // MARK: - Private Methods
     private func extractTextsInScanArea(
         items: [RecognizedItem],
-        scanAreaFrame: CGRect
+        scanAreaFrame: CGRect? = nil
     ) -> [String] {
         var capturedTexts: [String] = []
         
         for item in items {
             switch item {
             case .text(let textItem):
-                let textFrame = convertToViewCoordinates(textItem.bounds)
-                let overlapPercentage = calculateOverlapPercentage(textFrame: textFrame, scanAreaFrame: scanAreaFrame)
-                
-                if overlapPercentage >= 0.5 {
-                    debugPulse("\(overlapPercentage)")
-                    let lines = textItem.transcript.components(separatedBy: .newlines)
-                    
-                    for line in lines {
-                        let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
-                        debugPulse("\(trimmedLine)")
-                        if !trimmedLine.isEmpty {
-                            capturedTexts.append(trimmedLine)
-                        }
+//                let textFrame = convertToViewCoordinates(textItem.bounds)
+//                let overlapPercentage = calculateOverlapPercentage(textFrame: textFrame, scanAreaFrame: scanAreaFrame)
+                let lines = textItem.transcript.components(separatedBy: .newlines)
+                for line in lines {
+                    let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if !trimmedLine.isEmpty {
+                        let sentences = splitIntoSentences(trimmedLine)
+                        capturedTexts.append(contentsOf: sentences)
                     }
                 }
+                
+                
+                
+//                if overlapPercentage >= 0.5 {
+//                    debugPulse("\(overlapPercentage)")
+//
+//                }
             default:
                 break
             }
@@ -194,30 +193,66 @@ final class OCRScannerViewModel: BaseViewModel {
         return capturedTexts
     }
     
-    private func convertToViewCoordinates(_ bounds: RecognizedItem.Bounds) -> CGRect {
-        let minX = min(bounds.topLeft.x, bounds.bottomLeft.x)
-        let maxX = max(bounds.topRight.x, bounds.bottomRight.x)
-        let minY = min(bounds.topLeft.y, bounds.topRight.y)
-        let maxY = max(bounds.bottomLeft.y, bounds.bottomRight.y)
-        
-        return CGRect(
-            x: minX,
-            y: minY,
-            width: maxX - minX,
-            height: maxY - minY
-        )
-    }
+//    private func convertToViewCoordinates(_ bounds: RecognizedItem.Bounds) -> CGRect {
+//        let minX = min(bounds.topLeft.x, bounds.bottomLeft.x)
+//        let maxX = max(bounds.topRight.x, bounds.bottomRight.x)
+//        let minY = min(bounds.topLeft.y, bounds.topRight.y)
+//        let maxY = max(bounds.bottomLeft.y, bounds.bottomRight.y)
+//        
+//        return CGRect(
+//            x: minX,
+//            y: minY,
+//            width: maxX - minX,
+//            height: maxY - minY
+//        )
+//    }
+//    
+//    private func calculateOverlapPercentage(textFrame: CGRect, scanAreaFrame: CGRect) -> Double {
+//        let intersection = textFrame.intersection(scanAreaFrame)
+//        
+//        guard !intersection.isNull && !intersection.isEmpty else {
+//            return 0.0
+//        }
+//        
+//        let textArea = textFrame.width * textFrame.height
+//        let intersectionArea = intersection.width * intersection.height
+//        
+//        return textArea > 0 ? Double(intersectionArea / textArea) : 0.0
+//    }
     
-    private func calculateOverlapPercentage(textFrame: CGRect, scanAreaFrame: CGRect) -> Double {
-        let intersection = textFrame.intersection(scanAreaFrame)
+    func splitIntoSentences(_ text: String) -> [String] {
+        var sentences: [String] = []
+        var currentSentence = ""
+        var insideQuotes = false
+        var quoteChar: Character? = nil
         
-        guard !intersection.isNull && !intersection.isEmpty else {
-            return 0.0
+        for char in text {
+            currentSentence.append(char)
+            
+            if char == "\"" || char == "'" {
+                if !insideQuotes {
+                    insideQuotes = true
+                    quoteChar = char
+                } else if char == quoteChar {
+                    insideQuotes = false
+                    quoteChar = nil
+                }
+            }
+            
+            if !insideQuotes && (char == "." || char == "?" || char == "!") {
+                let trimmed = currentSentence.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !trimmed.isEmpty {
+                    sentences.append(trimmed)
+                }
+                currentSentence = ""
+            }
         }
         
-        let textArea = textFrame.width * textFrame.height
-        let intersectionArea = intersection.width * intersection.height
+        let trimmed = currentSentence.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty {
+            sentences.append(trimmed)
+        }
         
-        return textArea > 0 ? Double(intersectionArea / textArea) : 0.0
+        return sentences
     }
 }
