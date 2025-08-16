@@ -45,7 +45,7 @@ private extension BKBottomSheetTitleView {
             
             switch style {
             case .leadingCloseButton:
-                subtitleLabel.setFontStyle(style: .label2(weight: .regular))
+                subtitleLabel.setFontStyle(style: .label1(weight: .medium))
             case .centered:
                 subtitleLabel.setFontStyle(style: .body1(weight: .medium))
             }
@@ -79,12 +79,12 @@ private extension BKBottomSheetTitleView {
         ].compactMap { $0 })
         labelStack.axis = .vertical
         labelStack.alignment = .leading
-        labelStack.spacing = LayoutConstants.leadingContentSpacing
+        labelStack.spacing = LayoutConstants.contentSpacing
         
         let hStack = UIStackView(arrangedSubviews: [labelStack, closeButton])
         hStack.axis = .horizontal
         hStack.alignment = .top
-        hStack.spacing = LayoutConstants.leadingContentSpacing
+        hStack.spacing = LayoutConstants.contentSpacing
         
         addSubview(hStack)
         hStack.snp.makeConstraints {
@@ -105,7 +105,7 @@ private extension BKBottomSheetTitleView {
         ].compactMap { $0 })
         vStack.axis = .vertical
         vStack.alignment = .fill
-        vStack.spacing = LayoutConstants.centeredContentSpacing
+        vStack.spacing = LayoutConstants.contentSpacing
         
         addSubview(vStack)
         vStack.snp.makeConstraints {
@@ -120,8 +120,6 @@ private extension BKBottomSheetTitleView {
 
 private extension BKBottomSheetTitleView {
     enum LayoutConstants {
-        static let leadingContentSpacing: CGFloat = 2
-        static let centeredContentSpacing: CGFloat = 4
-        static let labelHeight: CGFloat = 24
+        static let contentSpacing: CGFloat = 4
     }
 }
