@@ -27,7 +27,7 @@ public final class BKLabel: UILabel {
         get { super.textColor }
         set { super.textColor = newValue }
     }
-
+    
     @available(*, unavailable, message: "Implement `setFont(_:)` instead.")
     override public var font: UIFont! {
         get { super.font }
@@ -36,19 +36,22 @@ public final class BKLabel: UILabel {
     
     public var highlightedWord: String? {
         didSet {
-            apply()
+//            apply()
+            applyRecommended()
         }
     }
     
     public var highlightColor: UIColor {
         didSet {
-            apply()
+//            apply()
+            applyRecommended()
         }
     }
     
     public var highlightFont: UIFont? {
         didSet {
-            apply()
+//            apply()
+            applyRecommended()
         }
     }
     
@@ -70,7 +73,8 @@ public final class BKLabel: UILabel {
         self.highlightColor = highlightColor
         self.highlightFont = highlightFont
         super.init(frame: frame)
-        apply()
+//        apply()
+        applyRecommended()
     }
     
     convenience public init(
@@ -98,17 +102,21 @@ public final class BKLabel: UILabel {
     
     public func setFontStyle(style: BKTextStyle) {
         self.fontStyle = style
-        apply()
+//        apply()
+        applyRecommended()
     }
     
     public func setText(text: String) {
         self.labelText = text
-        apply()
+//        apply()
+        applyRecommended()
     }
     
     public func setColor(color: UIColor) {
         self.labelColor = color
-        apply()
+//        apply()
+        
+        applyRecommended()
     }
 }
 
@@ -130,6 +138,35 @@ private extension BKLabel {
             range: range
         )
         
+        if let word = highlightedWord, !word.isEmpty {
+            let wordRange = (labelText as NSString).range(of: word)
+            if wordRange.location != NSNotFound {
+                attributedString.addAttribute(.foregroundColor, value: highlightColor, range: wordRange)
+                if let highlightFont = highlightFont {
+                    attributedString.addAttribute(.font, value: highlightFont, range: wordRange)
+                }
+            }
+        }
+        
+        attributedText = attributedString
+    }
+    
+    func applyRecommended() {
+        let customParagraphStyle = fontStyle.paragraphStyle
+        customParagraphStyle.alignment = alignment
+        customParagraphStyle.lineBreakMode = self.lineBreakMode
+        
+        let extraAttributes: [NSAttributedString.Key: Any] = [
+            .paragraphStyle: customParagraphStyle
+        ]
+        
+        let attributedString = fontStyle.mutableAttributedString(
+            from: labelText,
+            color: labelColor,
+            extraAttributes: extraAttributes
+        )
+        
+        // 하이라이트 단어 처리
         if let word = highlightedWord, !word.isEmpty {
             let wordRange = (labelText as NSString).range(of: word)
             if wordRange.location != NSNotFound {
