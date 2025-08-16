@@ -6,7 +6,7 @@ import UIKit
 
 final class RecordCountView: UIView {
     private let image = UIImageView(image: BKImage.Graphics.homeSeed)
-    private let title = BKLabel()
+    private let title = BKLabel2()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
