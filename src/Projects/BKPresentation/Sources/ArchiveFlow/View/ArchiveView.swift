@@ -129,7 +129,7 @@ final class ArchiveView: BaseView, UIGestureRecognizerDelegate {
     
     override func setupLayout() {
         chipScrollView.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(BKSpacing.spacing3)
+            $0.top.equalTo(safeAreaLayoutGuide).offset(BKSpacing.spacing5)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(ArchiveLayoutGuide.chipViewHeight)
         }
