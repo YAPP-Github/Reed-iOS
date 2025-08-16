@@ -19,12 +19,12 @@ final class BookDetailViewCell: UICollectionViewCell {
     }()
     
     private let emotionIcon = UIImageView()
-    private let emotionLabel = BKLabel(
-        fontStyle: .body2(weight: .medium),
+    private let emotionLabel = BKLabel2(
+        fontStyle: .label1(weight: .semiBold),
         color: .bkContentColor(.brand)
     )
     
-    private let creationLabel = BKLabel(
+    private let creationLabel = BKLabel2(
         fontStyle: .caption1(weight: .regular),
         color: .bkContentColor(.tertiary)
     )
@@ -36,7 +36,7 @@ final class BookDetailViewCell: UICollectionViewCell {
         return stackView
     }()
     
-    private let pageLabel = BKLabel(
+    private let pageLabel = BKLabel2(
         fontStyle: .body2(weight: .medium),
         color: .bkContentColor(.brand)
     )
@@ -76,11 +76,13 @@ final class BookDetailViewCell: UICollectionViewCell {
         
         noteLabel.setText(text: item.note)
         emotionIcon.image = emotion.image
+        emotionIcon.contentMode = .scaleAspectFill
         emotionIcon.layer.cornerRadius = LayoutConstants.imageCornerRadius
         emotionIcon.clipsToBounds = true
+        emotionIcon.backgroundColor = .bkBaseColor(.primary)
         emotionLabel.setText(text: "#\(emotion.rawValue)")
         creationLabel.setText(text: item.createdAt.toKoreanDotDateString())
-        pageLabel.setText(text: "\(item.page)p")
+        pageLabel.setText(text: "\(item.page)P")
     }
 }
 
