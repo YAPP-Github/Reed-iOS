@@ -1,7 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
-import BKDesign
 import BKCore
+import BKDesign
 import Combine
 import SnapKit
 import UIKit
@@ -11,14 +11,15 @@ final class OCRScannerViewController: UIViewController {
     
     enum LayoutGuide {
         static let buttonRadius: CGFloat = 36
-        static let scanAreaHeight: CGFloat = 200
-        static let guideLabelBottomOffset: CGFloat = -48
         static let closeButtonTopOffset: CGFloat = 18
         static let closeButtonTrailingInset: CGFloat = 20
         static let closeButtonSize: CGFloat = 24
         static let captureButtonBottomInset: CGFloat = 16
         static let captureButtonSize: CGFloat = 72
         static let errorLabelBottomOffset: CGFloat = -16
+        
+        static let topDimHeight: CGFloat = 176
+        static let bottomDimHeight: CGFloat = 138
     }
     
     enum LabelString {
@@ -36,9 +37,8 @@ final class OCRScannerViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     private var scannerViewController: DataScannerViewController?
-//    private let scanAreaView = UIView()
-//    private let overlayView = UIView()
-//    private let scanOverlayView = UIImageView(image: UIImage(named: "dim"))
+    private var topDimView = UIView()
+    private var bottomDimView = UIView()
     
     private let guideLabel = BKLabel(
         text: LabelString.guideText,
@@ -47,10 +47,11 @@ final class OCRScannerViewController: UIViewController {
         alignment: .center
     )
     
+    private var errorBackView = UIView()
     private let errorLabel = BKLabel(
         text: LabelString.errorText,
-        fontStyle: .label2(weight: .semiBold),
-        color: .bkContentColor(.error),
+        fontStyle: .label1(weight: .medium),
+        color: .bkContentColor(.inverse),
         alignment: .center
     )
     
@@ -92,9 +93,8 @@ final class OCRScannerViewController: UIViewController {
         view.backgroundColor = .black
         
         guideLabel.numberOfLines = 2
-        guideLabel.backgroundColor = .black
         errorLabel.numberOfLines = 2
-        errorLabel.isHidden = true
+        errorBackView.isHidden = true
         
         closeButton.setImage(BKImage.Icon.x, for: .normal)
         closeButton.tintColor = .bkContentColor(.inverse)
@@ -114,40 +114,36 @@ final class OCRScannerViewController: UIViewController {
             action: #selector(captureButtonTapped),
             for: .touchUpInside
         )
-//        
-//        scanAreaView.backgroundColor = .clear
-//        scanAreaView.isUserInteractionEnabled = false
         
-//        overlayView.backgroundColor = .clear
-//        overlayView.isUserInteractionEnabled = false
+        errorBackView.backgroundColor = UIColor(hex: "0A0A0A").withAlphaComponent(0.8)
+        errorBackView.clipsToBounds = true
+        errorBackView.layer.cornerRadius = BKRadius.small
         
-//        view.addSubviews(overlayView, scanAreaView, scanOverlayView, guideLabel, closeButton, captureButton, errorLabel)
-        view.addSubviews(guideLabel, closeButton, captureButton, errorLabel)
+        topDimView.backgroundColor = UIColor(hex: "0A0A0A").withAlphaComponent(0.5)
+        bottomDimView.backgroundColor = UIColor(hex: "0A0A0A").withAlphaComponent(0.5)
+        
+        errorBackView.addSubview(errorLabel)
+        view.addSubviews(topDimView, bottomDimView, guideLabel, closeButton, captureButton,  errorBackView)
         
         setupConstraints()
     }
     
     private func setupConstraints() {
-//        overlayView.snp.makeConstraints {
-//            $0.edges.equalToSuperview()
-//        }
+        topDimView.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview()
+            $0.top.equalToSuperview()
+            $0.height.equalTo(LayoutGuide.topDimHeight)
+        }
         
-//        scanAreaView.snp.makeConstraints {
-//            $0.center.equalToSuperview()
-//            $0.width.equalToSuperview()
-//            $0.height.equalTo(LayoutGuide.scanAreaHeight)
-//        }
-//        
-//        scanOverlayView.snp.makeConstraints {
-//            $0.leading.trailing.equalTo(scanAreaView)
-//            $0.top.bottom.equalTo(scanAreaView)
-//        }
+        bottomDimView.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview()
+            $0.bottom.equalToSuperview()
+            $0.height.equalTo(LayoutGuide.bottomDimHeight)
+        }
         
         guideLabel.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(LayoutGuide.closeButtonTopOffset)
-            
-//            $0.bottom.equalTo(scanAreaView.snp.top).offset(LayoutGuide.guideLabelBottomOffset)
+            $0.bottom.equalTo(topDimView.snp.bottom).offset(-24)
         }
         
         closeButton.snp.makeConstraints {
@@ -163,9 +159,15 @@ final class OCRScannerViewController: UIViewController {
         }
         
         errorLabel.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(captureButton.snp.top).offset(LayoutGuide.errorLabelBottomOffset)
+            $0.verticalEdges.equalToSuperview().inset(8)
+            $0.horizontalEdges.equalToSuperview().inset(24)
         }
+        
+        errorBackView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalTo(bottomDimView.snp.top).offset(-16)
+        }
+
     }
     
     private func setupScanner() {
@@ -190,8 +192,7 @@ final class OCRScannerViewController: UIViewController {
         )
         
         scanner.delegate = self
-        
-        // Scanner를 자식 뷰컨트롤러로 추가
+
         addChild(scanner)
         view.insertSubview(scanner.view, at: 0)
         scanner.view.snp.makeConstraints {
@@ -200,29 +201,7 @@ final class OCRScannerViewController: UIViewController {
         scanner.didMove(toParent: self)
         
         scannerViewController = scanner
-        
-        // 오버레이 마스크 설정
-//        DispatchQueue.main.async { [weak self] in
-//            self?.setupOverlayMask()
-//        }
     }
-    
-//    private func setupOverlayMask() {
-//        let path = UIBezierPath(rect: overlayView.bounds)
-//        
-//        // 스캔 영역에 해당하는 부분을 뚫음
-//        let scanAreaFrame = scanAreaView.frame
-//        let scanPath = UIBezierPath(roundedRect: scanAreaFrame, cornerRadius: 0)
-//        path.append(scanPath)
-//        path.usesEvenOddFillRule = true
-//        
-//        let maskLayer = CAShapeLayer()
-//        maskLayer.path = path.cgPath
-//        maskLayer.fillRule = .evenOdd
-//        maskLayer.fillColor = UIColor.black.cgColor
-//        
-//        overlayView.layer.addSublayer(maskLayer)
-//    }
     
     private func bindViewModel() {
         viewModel.statePublisher
@@ -251,11 +230,11 @@ final class OCRScannerViewController: UIViewController {
             showFailureDialog()
             viewModel.send(.dialogDismissed)
         } else if state.shouldShowAlert {
-            errorLabel.isHidden = false
+            errorBackView.isHidden = false
             viewModel.send(.alertDismissed)
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-                self?.errorLabel.isHidden = true
+                self?.errorBackView.isHidden = true
             }
         }
     }
@@ -320,21 +299,21 @@ extension OCRScannerViewController: DataScannerViewControllerDelegate {
         viewModel.send(.itemsAdded(addedItems, allItems: allItems))
     }
     
-//    func dataScanner(
-//        _ dataScanner: DataScannerViewController,
-//        didUpdate updatedItems: [RecognizedItem],
-//        allItems: [RecognizedItem]
-//    ) {
-//        viewModel.send(.itemsUpdated(updatedItems, allItems: allItems))
-//    }
+    func dataScanner(
+        _ dataScanner: DataScannerViewController,
+        didUpdate updatedItems: [RecognizedItem],
+        allItems: [RecognizedItem]
+    ) {
+        viewModel.send(.itemsUpdated(updatedItems, allItems: allItems))
+    }
     
-//    func dataScanner(
-//        _ dataScanner: DataScannerViewController,
-//        didRemove removedItems: [RecognizedItem],
-//        allItems: [RecognizedItem]
-//    ) {
-//        viewModel.send(.itemsRemoved(removedItems, allItems: allItems))
-//    }
+    func dataScanner(
+        _ dataScanner: DataScannerViewController,
+        didRemove removedItems: [RecognizedItem],
+        allItems: [RecognizedItem]
+    ) {
+        viewModel.send(.itemsRemoved(removedItems, allItems: allItems))
+    }
 }
 
 extension UIImage {
