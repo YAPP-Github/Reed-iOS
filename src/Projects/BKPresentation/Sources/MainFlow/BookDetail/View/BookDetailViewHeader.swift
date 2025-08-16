@@ -20,7 +20,7 @@ final class BookDetailViewHeader: BaseView {
         return stackView
     }()
     
-    private let sortStateLabel = BKLabel(
+    private let sortStateLabel = BKLabel2(
         text: "페이지 순",
         fontStyle: .label1(weight: .medium),
         color: .bkContentColor(.secondary)

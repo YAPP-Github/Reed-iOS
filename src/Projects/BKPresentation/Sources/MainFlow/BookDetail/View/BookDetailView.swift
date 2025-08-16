@@ -32,7 +32,7 @@ struct BookDetailItem: Hashable {
 
 enum SortOption: String, CaseIterable {
     case newest = "최신 등록순"
-    case pageDescending = "페이지순"
+    case pageDescending = "페이지 순"
     
     var sortingFunction: (BookDetailItem, BookDetailItem) -> Bool {
         switch self {
