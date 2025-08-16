@@ -5,8 +5,8 @@ import UIKit
 
 public final class BKBottomSheetTitleView: UIView {
     private let style: BKBottomSheetStyle
-    private let titleLabel = UILabel()
-    private let subtitleLabel = UILabel()
+    private let titleLabel = BKLabel()
+    private let subtitleLabel = BKLabel()
     private let closeButton = UIButton(type: .system)
     
     private let title: String
@@ -33,20 +33,23 @@ public final class BKBottomSheetTitleView: UIView {
 
 private extension BKBottomSheetTitleView {
     func configure() {
-        titleLabel.text = title
+        titleLabel.setText(text: title)
         titleLabel.numberOfLines = .zero
-        titleLabel.font = BKTextStyle
-            .heading2(weight: .semiBold).uiFont
-        titleLabel.textColor = .bkContentColor(.primary)
+        titleLabel.setFontStyle(style: .heading2(weight: .semiBold))
+        titleLabel.setColor(color: .bkContentColor(.primary))
         
-        subtitleLabel.text = subtitle
-        subtitleLabel.numberOfLines = .zero
-        subtitleLabel.font = (
-            style == .leadingCloseButton
-                ? BKTextStyle.label2(weight: .regular)
-                : BKTextStyle.body1(weight: .medium))
-            .uiFont
-        subtitleLabel.textColor = .bkContentColor(.secondary)
+        if let subtitle = subtitle {
+            subtitleLabel.setText(text: subtitle)
+            subtitleLabel.numberOfLines = .zero
+            subtitleLabel.setColor(color: .bkContentColor(.secondary))
+            
+            switch style {
+            case .leadingCloseButton:
+                subtitleLabel.setFontStyle(style: .label2(weight: .regular))
+            case .centered:
+                subtitleLabel.setFontStyle(style: .body1(weight: .medium))
+            }
+        }
         
         closeButton.setImage(
             style == .leadingCloseButton
