@@ -127,7 +127,6 @@ private extension SettingViewController {
     func presentLogoutDialog() {
         let dialog = BKDialog(
             title: "정말 로그아웃 하시겠습니까?",
-            subtitle: "",
             config: BKDialogConfiguration(
                 leftButtonTitle: "취소",
                 leftButtonAction: { [weak self] in
