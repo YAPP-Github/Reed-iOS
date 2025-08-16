@@ -267,6 +267,7 @@ private extension UINavigationController {
         
         let backImage = BKImage.Icon.chevronLeft
             .withRenderingMode(.alwaysTemplate)
+            .imageWithOffset(x: -4, y: 2)!
             .withAlignmentRectInsets(
                 UIEdgeInsets(top: 0, left: -16, bottom: 0, right: 0)
             )
@@ -334,5 +335,29 @@ private extension UINavigationController {
             $0.height.equalTo(24)
         }
         return wrapper
+    }
+}
+
+extension UIImage {
+    func imageWithCustomRect(_ rect: CGRect, canvasSize: CGSize? = nil) -> UIImage? {
+        let finalCanvasSize = canvasSize ?? size
+        
+        UIGraphicsBeginImageContextWithOptions(finalCanvasSize, false, scale)
+        defer { UIGraphicsEndImageContext() }
+        
+        draw(in: rect)
+        
+        return UIGraphicsGetImageFromCurrentImageContext()?.withRenderingMode(renderingMode)
+    }
+    
+    func imageWithOffset(x: CGFloat = 0, y: CGFloat = 0) -> UIImage? {
+        let newRect = CGRect(
+            x: x,
+            y: y,
+            width: size.width,
+            height: size.height
+        )
+        
+        return imageWithCustomRect(newRect, canvasSize: size)
     }
 }
