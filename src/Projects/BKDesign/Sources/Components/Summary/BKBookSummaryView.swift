@@ -132,7 +132,7 @@ public class BKBookSummaryView: UIView {
             descriptionStack.addArrangedSubview(authorLabel)
             descriptionStack.addArrangedSubview(separatorLabel)
             descriptionStack.addArrangedSubview(publisherLabel)
-            labelStack.setCustomSpacing(BKSpacing.spacing3, after: descriptionStack)
+            labelStack.setCustomSpacing(BKSpacing.spacing4, after: descriptionStack)
             
         case .alreadyEnroll:
             labelStack.removeArrangedSubview(titleLabel)
