@@ -35,7 +35,7 @@ final class HomeEmptyView: BaseView {
     )
     
     private let subtitleLabel = BKLabel(
-        text: "책을 등록해 보세요.",
+        text: "등록 후 나만의 독서 기록을 남겨 보세요.",
         fontStyle: .label1(weight: .medium),
         color: .bkContentColor(.tertiary)
     )
@@ -50,6 +50,8 @@ final class HomeEmptyView: BaseView {
         addSubview(shadowView)
         shadowView.addSubview(contentView)
         contentView.addSubview(rootStack)
+        
+        emptyImageView.frame.size = .init(width: 112, height: 112)
         
         [emptyImageView, labelStack, noteButton].forEach(rootStack.addArrangedSubview)
         [titleLabel, subtitleLabel].forEach(labelStack.addArrangedSubview)
