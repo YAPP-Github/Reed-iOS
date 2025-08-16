@@ -245,12 +245,12 @@ private extension SearchViewController {
         }
         let sheet = BKBottomSheetViewController(
             title: "도서가 등록되었어요!",
-            subtitle: "독서 기록을 시작할까요?",
+            subtitle: "독서 기록을 바로 시작할까요?",
             style: .centered,
             suppliedContentStyle: .upper(graphicView),
             buttonConfiguration: .twoButtonGroup(
-                leftTitle: "아니요, 나중에요",
-                rightTitle: "네, 시작할게요!",
+                leftTitle: "나중에 하기",
+                rightTitle: "기록 시작하기",
                 leftAction: { [weak self] in
                     self?.dismiss(animated: true)
                     self?.hideLoading()
