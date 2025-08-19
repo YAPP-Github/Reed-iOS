@@ -91,7 +91,6 @@ platform :ios do
         scheme: scheme,
         configuration: "Debug",
         sdk: "iphonesimulator",
-        destination: "generic/platform=iOS Simulator",
         xcargs: [
           "CODE_SIGNING_ALLOWED=NO",
           "CODE_SIGN_IDENTITY=''",
