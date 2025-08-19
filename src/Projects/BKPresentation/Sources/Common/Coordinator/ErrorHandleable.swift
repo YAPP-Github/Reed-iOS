@@ -59,8 +59,9 @@ private extension ErrorHandleable where Self: Coordinator & AuthenticationRequir
             config: .init(
                 leftButtonTitle: "확인",
                 leftButtonAction: { [weak self] in
-                    self?.presentedViewController?.dismiss(animated: true)
-                    self?.notifyAuthenticationRequired {}
+                    self?.presentedViewController?.dismiss(animated: true) { [weak self] in
+                        self?.notifyAuthenticationRequired {}
+                    }
                 })
             )
         
@@ -82,8 +83,9 @@ private extension ErrorHandleable where Self: Coordinator & AuthenticationRequir
                 },
                 rightButtonTitle: "로그인하기",
                 rightButtonAction: { [weak self] in
-                    self?.presentedViewController?.dismiss(animated: true)
-                    self?.notifyAuthenticationRequired(onFinish: nil)
+                    self?.presentedViewController?.dismiss(animated: true) { [weak self] in
+                        self?.notifyAuthenticationRequired(onFinish: nil)
+                    }
                 })
             )
         

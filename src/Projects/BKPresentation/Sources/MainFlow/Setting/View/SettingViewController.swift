@@ -109,10 +109,13 @@ final class SettingViewController: BaseViewController<SettingView> {
         
         viewModel.statePublisher
             .map(\.isLoginRequired)
+            .removeDuplicates()
             .filter { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.coordinator?.notifyAuthenticationRequired {}
+                self?.coordinator?.notifyAuthenticationRequired { [weak self] in
+                    self?.viewModel.send(.loginFlowFinished)
+                }
             }
             .store(in: &cancellable)
     }

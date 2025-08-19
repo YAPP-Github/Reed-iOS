@@ -44,6 +44,7 @@ final class SettingViewModel: BaseViewModel {
         case errorHandled
         case withdrawButtonTapped
         case withdrawSuccessed
+        case loginFlowFinished
     }
     
     enum SideEffect {
@@ -124,6 +125,9 @@ final class SettingViewModel: BaseViewModel {
         case .withdrawSuccessed:
             newState.isLoading = false
             newState.isLoggedOut = true
+            
+        case .loginFlowFinished:
+            newState.isLoginRequired = false
         }
         
         return (newState, effects)

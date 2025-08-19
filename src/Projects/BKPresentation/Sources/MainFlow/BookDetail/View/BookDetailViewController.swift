@@ -224,8 +224,8 @@ private extension BookDetailViewController {
         let initialButtonEnabled = currentRegistrationStatus != statusView.selectedStatus
         sheet.button?.primaryButton?.isEnabled = initialButtonEnabled
 
-        statusView.onSelected = { [weak sheet, currentRegistrationStatus] in
-            let isDifferentFromCurrent = statusView.selectedStatus != currentRegistrationStatus
+        statusView.onSelected = { [weak sheet, weak statusView, currentRegistrationStatus] in
+            let isDifferentFromCurrent = (statusView?.selectedStatus != .some(currentRegistrationStatus))
             sheet?.button?.primaryButton?.isEnabled = isDifferentFromCurrent
         }
         
