@@ -22,12 +22,20 @@ extension BKBottomSheetViewController {
             confirmAction: confirmAction
         )
         
-        let stackView = UIStackView(arrangedSubviews: [pageDescendingOption, divider, newestOption])
-        stackView.axis = .vertical
-        stackView.spacing = 0
-        containerView.addSubview(stackView)
-        stackView.snp.makeConstraints {
+        containerView.addSubviews(pageDescendingOption, divider, newestOption)
+        
+        pageDescendingOption.snp.makeConstraints {
             $0.top.equalToSuperview().inset(BKInset.inset3)
+            $0.leading.trailing.equalToSuperview()
+        }
+        
+        divider.snp.makeConstraints {
+            $0.top.equalTo(pageDescendingOption.snp.bottom)
+            $0.leading.trailing.equalToSuperview().inset(-BKSpacing.spacing5)
+        }
+        
+        newestOption.snp.makeConstraints {
+            $0.top.equalTo(divider.snp.bottom)
             $0.leading.trailing.bottom.equalToSuperview()
         }
         
@@ -100,7 +108,7 @@ extension BKBottomSheetViewController {
         containerView.addSubview(titleLabel)
         titleLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
-                .inset(BKInset.inset3)
+                .inset(BKInset.inset1)
             $0.top.bottom.equalToSuperview()
             $0.height.equalTo(56)
         }
