@@ -15,6 +15,7 @@ enum FirstMenuItem: String, CaseIterable {
 }
 
 enum SecondMenuItem: String, CaseIterable {
+    case login = "로그인"
     case logout = "로그아웃"
     case withdraw = "회원탈퇴"
     
@@ -22,18 +23,21 @@ enum SecondMenuItem: String, CaseIterable {
 }
 
 final class SettingViewModel: BaseViewModel {
-    struct State {
+    struct State: Equatable {
         var firstMenuItems = FirstMenuItem.allCases
-        var secondMenuItems = SecondMenuItem.allCases
+        var secondMenuItems: [SecondMenuItem] = []
         var appVersion: String = ""
         var isLoggedOut: Bool = false
         var isLoading: Bool = false
         var error: DomainError? = nil
+        var isLoginRequired: Bool = false
     }
     
     enum Action {
         case onAppear
+        case accessModeChanged(AppAccessMode)
         case fetchAppVersionSuccessed(String)
+        case loginButtonTapped
         case logoutButtonTapped
         case logoutSuccessed
         case errorOccured(DomainError)
@@ -62,6 +66,12 @@ final class SettingViewModel: BaseViewModel {
     
     init() {
         bindSideEffects()
+        
+        AccessModeCenter.shared.mode
+            .sink { [weak self] mode in
+                self?.send(.accessModeChanged(mode))
+            }
+            .store(in: &cancellables)
     }
     
     func send(_ action: Action) {
@@ -76,10 +86,22 @@ final class SettingViewModel: BaseViewModel {
         
         switch action {
         case .onAppear:
+            send(.accessModeChanged(AccessModeCenter.shared.mode.value))
             effects.append(.appVersion)
             
+        case .accessModeChanged(let mode):
+            newState.isLoginRequired = false
+            if mode == .member {
+                newState.secondMenuItems = [.logout, .withdraw]
+            } else {
+                newState.secondMenuItems = [.login]
+            }
+
         case .fetchAppVersionSuccessed(let version):
             newState.appVersion = version
+            
+        case .loginButtonTapped:
+            newState.isLoginRequired = true
             
         case .logoutButtonTapped:
             newState.isLoading = true
@@ -87,12 +109,10 @@ final class SettingViewModel: BaseViewModel {
             
         case .logoutSuccessed:
             newState.isLoading = false
-            newState.isLoggedOut = true
             
         case .errorOccured(let error):
             newState.isLoading = false
             newState.error = error
-            newState.isLoggedOut = false
             
         case .errorHandled:
             newState.error = nil
@@ -115,14 +135,21 @@ final class SettingViewModel: BaseViewModel {
             return appVersionUseCase.execute()
                 .map(Action.fetchAppVersionSuccessed)
                 .eraseToAnyPublisher()
+            
         case .logout:
             return logoutUseCase.execute()
+                .handleEvents(receiveOutput: { _ in
+                    AccessModeCenter.shared.mode.send(.guest)
+                })
                 .map { _ in Action.logoutSuccessed }
                 .catch { _ in Just(Action.errorOccured(.unauthorized)) }
                 .eraseToAnyPublisher()
             
         case .withdraw:
             return withdrawAccountUseCase.execute()
+                .handleEvents(receiveOutput: { _ in
+                    AccessModeCenter.shared.mode.send(.guest)
+                })
                 .map { _ in Action.withdrawSuccessed }
                 .catch { _ in Just(Action.errorOccured(.unauthorized)) }
                 .eraseToAnyPublisher()
