@@ -14,6 +14,20 @@ public enum AppLogger {
 }
 
 public enum Log {
+    public enum Level { case debug, error }
+
+    public typealias Mirror = (
+        _ level: Level,
+        _ message: String,
+        _ file: String,
+        _ function: String,
+        _ line: Int
+    ) -> Void
+
+    private static var mirror: Mirror?
+
+    public static func setMirror(_ newMirror: Mirror?) { mirror = newMirror }
+    
     public static func debug(
         _ message: String,
         logger: Logger,
@@ -22,6 +36,7 @@ public enum Log {
         line: Int = #line
     ) {
         logger.debug("\(message, privacy: .public) [\(file):\(line) \(function)]")
+        mirror?(.debug, message, file, function, line)
     }
 
     public static func error(
@@ -32,5 +47,6 @@ public enum Log {
         line: Int = #line
     ) {
         logger.error("\(message, privacy: .public) [\(file):\(line) \(function)]")
+        mirror?(.error, message, file, function, line)
     }
 }
