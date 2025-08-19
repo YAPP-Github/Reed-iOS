@@ -95,7 +95,7 @@ final class OCRScannerViewModel: BaseViewModel {
             currentRecognizedItems = allItems
             
         case .captureButtonTapped(let scanAreaFrame):
-            debugPulse("\(newState.failureCount)")
+            Log.debug("\(newState.failureCount)", logger: AppLogger.viewModel)
             newState.isLoading = true
             
             let capturedTexts = extractTextsInScanArea(
@@ -175,12 +175,12 @@ final class OCRScannerViewModel: BaseViewModel {
                 let overlapPercentage = calculateOverlapPercentage(textFrame: textFrame, scanAreaFrame: scanAreaFrame)
                 
                 if overlapPercentage >= 0.5 {
-                    debugPulse("\(overlapPercentage)")
+                    Log.debug("\(overlapPercentage)", logger: AppLogger.viewModel)
                     let lines = textItem.transcript.components(separatedBy: .newlines)
                     
                     for line in lines {
                         let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
-                        debugPulse("\(trimmedLine)")
+                        Log.debug("\(trimmedLine)", logger: AppLogger.viewModel)
                         if !trimmedLine.isEmpty {
                             capturedTexts.append(trimmedLine)
                         }
