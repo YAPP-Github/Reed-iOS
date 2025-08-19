@@ -206,7 +206,7 @@ private extension BookDetailViewController {
         guard let book = book else { return }
         
         let statusView = BookRegistrationStatusView()
-        statusView.setInitialSelection(.from(book.userBookStatus))
+        statusView.setInitialSelection(.from(book.userBookStatus ?? .beforeRegistration))
         
         let sheet = BKBottomSheetViewController(
             title: "도서 상태",
@@ -220,7 +220,7 @@ private extension BookDetailViewController {
                 self?.viewModel.send(.upsert(isbn: book.isbn, status: selected))
             }
         )
-        let currentRegistrationStatus: BookRegistrationStatus = .from(book.userBookStatus)
+        let currentRegistrationStatus: BookRegistrationStatus = .from(book.userBookStatus ?? .beforeRegistration)
         let initialButtonEnabled = currentRegistrationStatus != statusView.selectedStatus
         sheet.button?.primaryButton?.isEnabled = initialButtonEnabled
 

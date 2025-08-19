@@ -258,7 +258,7 @@ final class BookDetailView: BaseView {
             image: book.thumbnail
         )
 
-        readingStateButton.title = book.userBookStatus.displayName
+        readingStateButton.title = book.userBookStatus?.displayName
     }
 }
 

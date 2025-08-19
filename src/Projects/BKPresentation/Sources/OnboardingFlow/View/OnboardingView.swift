@@ -172,7 +172,7 @@ private extension OnboardingView {
 
     func updateButtonTitle(for page: Int) {
         let isLast = (page == pageControl.numberOfPages - 1)
-        let title = isLast ? "로그인" : "다음"
+        let title = isLast ? "시작하기" : "다음"
         nextButton.primaryButton?.title = title
     }
 
