@@ -259,7 +259,7 @@ final class OCRScannerViewController: UIViewController {
             do {
                 try scannerViewController?.startScanning()
             } catch {
-                debugPulse(error)
+                Log.debug("\(error)", logger: AppLogger.ui)
             }
         }
     }

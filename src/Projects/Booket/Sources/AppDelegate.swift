@@ -20,6 +20,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 #if DEBUG
         NetworkLogger.enableProxy()
+        LoggingBootstrap.install()
 #endif
         KakaoSDK.initSDK(appKey: kakaoAPIkey)
         FirebaseApp.configure()

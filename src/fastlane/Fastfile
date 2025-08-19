@@ -90,7 +90,9 @@ platform :ios do
         workspace: WORKSPACE_NAME,
         scheme: scheme,
         configuration: "Debug",
+        sdk: "iphonesimulator",
         xcargs: [
+          "CODE_SIGNING_ALLOWED=NO",
           "CODE_SIGN_IDENTITY=''",
           "CODE_SIGNING_REQUIRED=NO"
         ].join(" ")

@@ -172,7 +172,6 @@ final class HomeView: BaseView {
     }
     
     func playAnimation(_ isPlay: Bool) {
-//        debugPulse(isPlay)
         if isPlay {
             graphicImageView.loopMode = .loop
             graphicImageView.play()

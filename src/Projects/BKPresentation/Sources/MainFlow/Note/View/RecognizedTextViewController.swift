@@ -210,7 +210,7 @@ final class RecognizedTextViewController: UIViewController {
     private func handleSideEffect(_ sideEffect: RecognizedTextViewModel.SideEffect) {
         switch sideEffect {
         case .confirmWithSelectedText(let selectedText):
-            debugPulse(selectedText)
+            Log.debug(selectedText, logger: AppLogger.ui)
             onConfirm?(selectedText)
             
         case .dismissToRetake:
