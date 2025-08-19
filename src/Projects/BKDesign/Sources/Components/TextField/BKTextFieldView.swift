@@ -39,6 +39,7 @@ public final class BKTextFieldView: UIView {
         stackView.axis = .vertical
         stackView.spacing = BKSpacing.spacing2
         stackView.alignment = .fill
+        stackView.distribution = .fill
         return stackView
     }()
     
@@ -112,6 +113,15 @@ private extension BKTextFieldView {
         stackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+        
+        titleLabel.setContentHuggingPriority(.required, for: .vertical)
+        titleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        
+        textField.setContentHuggingPriority(.required, for: .vertical)
+        textField.setContentCompressionResistancePriority(.required, for: .vertical)
+        
+        helpMessageLabel.setContentHuggingPriority(.required, for: .vertical)
+        helpMessageLabel.setContentCompressionResistancePriority(.required, for: .vertical)
     }
     
     @objc private func textDidChange() {

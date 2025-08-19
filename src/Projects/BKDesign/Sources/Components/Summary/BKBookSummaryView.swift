@@ -134,6 +134,28 @@ public class BKBookSummaryView: UIView {
             descriptionStack.addArrangedSubview(publisherLabel)
             labelStack.setCustomSpacing(BKSpacing.spacing4, after: descriptionStack)
             
+        case .big:
+            titleLabel.setFontStyle(style: .headline1(weight: .semiBold))
+            authorLabel.setFontStyle(style: .label2(weight: .regular))
+            separatorLabel.setFontStyle(style: .label2(weight: .regular))
+            publisherLabel.setFontStyle(style: .label2(weight: .regular))
+            extraLabel.setFontStyle(style: .label2(weight: .regular))
+            
+            let descriptionBlock = UIStackView(arrangedSubviews: [descriptionStack])
+            descriptionBlock.axis = .vertical
+            descriptionBlock.alignment = .leading
+            descriptionBlock.spacing = 0
+
+            descriptionStack.addArrangedSubview(authorLabel)
+            descriptionStack.addArrangedSubview(separatorLabel)
+            descriptionStack.addArrangedSubview(publisherLabel)
+            labelStack.addArrangedSubview(descriptionBlock)
+
+            if style.showsExtraLabel {
+                descriptionBlock.addArrangedSubview(extraLabel)
+                descriptionBlock.setCustomSpacing(style.extraLabelTopOffset, after: descriptionStack)
+            }
+            
         case .alreadyEnroll:
             labelStack.removeArrangedSubview(titleLabel)
             descriptionStack.addArrangedSubview(authorLabel)
@@ -251,6 +273,7 @@ public class BKBookSummaryView: UIView {
             if style.showsExtraLabel, let text = extraText {
                 extraLabel.setText(text: text)
             }
+            
         default:
             if style.showsExtraLabel, let text = extraText {
                 extraLabel.setText(text: text)
