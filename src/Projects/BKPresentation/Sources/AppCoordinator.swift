@@ -50,7 +50,10 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying 
             .store(in: &cancellable)
     }
     
-    private func presentAuthFlow(animated: Bool, onFinishAuth: (() -> Void)?) {
+    private func presentAuthFlow(
+        animated: Bool,
+        onFinishAuth: (() -> Void)?
+    ) {
         let authNavigationController = UINavigationController()
         let loginCoordinator = LoginCoordinator(
             parentCoordinator: self,
@@ -83,6 +86,7 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying 
     }
     
     private func transitionToAuthenticatedMain() {
+        guard !(navigationController.viewControllers.first is UITabBarController) else { return }
         navigationController.viewControllers.removeAll()
         startMainFlow()
     }
