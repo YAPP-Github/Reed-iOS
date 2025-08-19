@@ -46,13 +46,6 @@ jobs:
       - name: 📱 Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_16.4.app
 
-      - name: Install iOS Simulator runtime
-        run: |
-          sudo xcodebuild -runFirstLaunch
-          sudo xcodebuild -downloadPlatform iOS
-          xcodebuild -showsdks
-          xcrun simctl list
-
       - name: 💫 Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -98,7 +91,7 @@ jobs:
       - name: Write GoogleService-Info.plist (repo root)
         working-directory: src/SupportingFiles/Booket
         run: |
-          echo "$GOOGLESERVICE_INFO_PLIST_B64" | base64 --decode > GoogleService-Info.plist
+          echo "$GOOGLESERVICE_INFO_PLIST_B64" | base64 -D > GoogleService-Info.plist
         env:
           GOOGLESERVICE_INFO_PLIST_B64: ${{ secrets.GOOGLESERVICE_INFO_PLIST_B64 }}
 
@@ -111,3 +104,4 @@ jobs:
         run: |
           security delete-keychain $MATCH_KEYCHAIN_NAME || true
           rm -f src/fastlane/AuthKey
+          rm -f src/SupportingFiles/Booket/GoogleService-Info.plist || true

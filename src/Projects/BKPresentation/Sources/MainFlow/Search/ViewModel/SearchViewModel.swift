@@ -173,7 +173,7 @@ final class SearchViewModel: BaseViewModel {
     func send(_ action: Action) {
         let (newState, effects) = reduce(action: action, state: state)
         state = newState
-        debugPulse(allBooks.count)
+        Log.debug("\(allBooks.count)", logger: AppLogger.viewModel)
         effects.forEach {
             lastEffect = $0
             sideEffectSubject.send($0)
