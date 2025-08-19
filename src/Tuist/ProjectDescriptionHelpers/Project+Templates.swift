@@ -10,11 +10,13 @@ extension Project {
     public static func project(
         name: String,
         targets: [Target] = [],
+        schemes: [Scheme] = [],
         additionalFiles: [FileElement] = []
     ) -> Project {
         Project(
             name: name,
             targets: targets,
+            schemes: schemes,
             additionalFiles: additionalFiles
         )
     }
