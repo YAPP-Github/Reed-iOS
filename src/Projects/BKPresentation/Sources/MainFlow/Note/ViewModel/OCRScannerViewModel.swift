@@ -4,6 +4,7 @@ import BKCore
 import BKDomain
 import Combine
 import Foundation
+import NaturalLanguage
 import VisionKit
 
 final class OCRScannerViewModel: BaseViewModel {
@@ -168,23 +169,14 @@ final class OCRScannerViewModel: BaseViewModel {
         for item in items {
             switch item {
             case .text(let textItem):
-//                let textFrame = convertToViewCoordinates(textItem.bounds)
-//                let overlapPercentage = calculateOverlapPercentage(textFrame: textFrame, scanAreaFrame: scanAreaFrame)
                 let lines = textItem.transcript.components(separatedBy: .newlines)
                 for line in lines {
                     let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
                     if !trimmedLine.isEmpty {
-                        let sentences = splitIntoSentences(trimmedLine)
+                        let sentences = splitByToken(trimmedLine)
                         capturedTexts.append(contentsOf: sentences)
                     }
                 }
-                
-                
-                
-//                if overlapPercentage >= 0.5 {
-//                    debugPulse("\(overlapPercentage)")
-//
-//                }
             default:
                 break
             }
@@ -193,66 +185,17 @@ final class OCRScannerViewModel: BaseViewModel {
         return capturedTexts
     }
     
-//    private func convertToViewCoordinates(_ bounds: RecognizedItem.Bounds) -> CGRect {
-//        let minX = min(bounds.topLeft.x, bounds.bottomLeft.x)
-//        let maxX = max(bounds.topRight.x, bounds.bottomRight.x)
-//        let minY = min(bounds.topLeft.y, bounds.topRight.y)
-//        let maxY = max(bounds.bottomLeft.y, bounds.bottomRight.y)
-//        
-//        return CGRect(
-//            x: minX,
-//            y: minY,
-//            width: maxX - minX,
-//            height: maxY - minY
-//        )
-//    }
-//    
-//    private func calculateOverlapPercentage(textFrame: CGRect, scanAreaFrame: CGRect) -> Double {
-//        let intersection = textFrame.intersection(scanAreaFrame)
-//        
-//        guard !intersection.isNull && !intersection.isEmpty else {
-//            return 0.0
-//        }
-//        
-//        let textArea = textFrame.width * textFrame.height
-//        let intersectionArea = intersection.width * intersection.height
-//        
-//        return textArea > 0 ? Double(intersectionArea / textArea) : 0.0
-//    }
-    
-    func splitIntoSentences(_ text: String) -> [String] {
-        var sentences: [String] = []
-        var currentSentence = ""
-        var insideQuotes = false
-        var quoteChar: Character? = nil
-        
-        for char in text {
-            currentSentence.append(char)
-            
-            if char == "\"" || char == "'" {
-                if !insideQuotes {
-                    insideQuotes = true
-                    quoteChar = char
-                } else if char == quoteChar {
-                    insideQuotes = false
-                    quoteChar = nil
-                }
+    func splitByToken(_ text: String) -> [String] {
+        let tokenizer = NLTokenizer(unit: .sentence)
+        tokenizer.string = text
+        var results: [String] = []
+        tokenizer.enumerateTokens(in: text.startIndex..<text.endIndex) { range, _ in
+            let sentence = String(text[range]).trimmingCharacters(in: .whitespacesAndNewlines)
+            if !sentence.isEmpty {
+                results.append(sentence)
             }
-            
-            if !insideQuotes && (char == "." || char == "?" || char == "!") {
-                let trimmed = currentSentence.trimmingCharacters(in: .whitespacesAndNewlines)
-                if !trimmed.isEmpty {
-                    sentences.append(trimmed)
-                }
-                currentSentence = ""
-            }
+            return true
         }
-        
-        let trimmed = currentSentence.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !trimmed.isEmpty {
-            sentences.append(trimmed)
-        }
-        
-        return sentences
+        return results
     }
 }
