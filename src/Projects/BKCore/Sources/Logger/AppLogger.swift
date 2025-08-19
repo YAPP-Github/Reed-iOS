@@ -35,8 +35,10 @@ public enum Log {
         function: String = #function,
         line: Int = #line
     ) {
+        #if DEBUG
         logger.debug("\(message, privacy: .public) [\(file):\(line) \(function)]")
         mirror?(.debug, message, file, function, line)
+        #endif
     }
 
     public static func error(
