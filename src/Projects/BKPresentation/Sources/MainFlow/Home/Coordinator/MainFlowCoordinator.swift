@@ -18,13 +18,18 @@ final class MainFlowCoordinator: Coordinator, FinishNotifying {
     }
     
     func start() {
-        let homeViewController = HomeViewController(viewModel: HomeViewModel())
+        let homeViewModel = HomeViewModel()
+        let homeViewController = HomeViewController(viewModel: homeViewModel)
         homeViewController.coordinator = self
         navigationController.pushViewController(homeViewController, animated: true)
     }
 }
 
-extension MainFlowCoordinator: SessionExpirationNotifying, ErrorHandleable {}
+extension MainFlowCoordinator: AuthenticationRequiredNotifying, ErrorHandleable {
+    func notifyAuthenticationRequired(onFinish: (() -> Void)?) {
+        (parentCoordinator as? AuthenticationRequiredNotifying)?.notifyAuthenticationRequired(onFinish: onFinish)
+    }
+}
 
 extension MainFlowCoordinator {
     func didTapSettingButton() {

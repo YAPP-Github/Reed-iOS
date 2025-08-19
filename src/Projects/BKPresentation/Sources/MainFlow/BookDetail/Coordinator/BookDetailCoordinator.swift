@@ -34,7 +34,11 @@ final class BookDetailCoordinator: Coordinator {
     }
 }
 
-extension BookDetailCoordinator: SessionExpirationNotifying, ErrorHandleable {}
+extension BookDetailCoordinator: AuthenticationRequiredNotifying, ErrorHandleable {
+    func notifyAuthenticationRequired(onFinish: (() -> Void)?) {
+        (parentCoordinator as? AuthenticationRequiredNotifying)?.notifyAuthenticationRequired(onFinish: onFinish)
+    }
+}
 
 extension BookDetailCoordinator {
     func didTapAddNoteButton(bookId: String) {

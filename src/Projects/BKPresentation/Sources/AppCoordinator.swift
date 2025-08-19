@@ -5,7 +5,7 @@ import Combine
 import Foundation
 import UIKit
 
-public final class AppCoordinator: Coordinator {
+public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying {
     public weak var parentCoordinator: Coordinator?
     public var childCoordinators = [Coordinator]()
     public var navigationController: UINavigationController
@@ -29,6 +29,10 @@ public final class AppCoordinator: Coordinator {
     
     public func start() {
         proceedWithAppFlow()
+    }
+    
+    func notifyAuthenticationRequired(onFinish: (() -> Void)?) {
+        presentAuthFlow(animated: true, onFinishAuth: onFinish)
     }
     
     private func proceedWithAppFlow() {
