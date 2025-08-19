@@ -54,39 +54,7 @@ final class ArchiveView: BaseView, UIGestureRecognizerDelegate {
         return collectionView
     }()
     
-    private let emptyStateView: UIView = {
-        let containerView = UIView()
-        containerView.isUserInteractionEnabled = false
-        
-        let titleLabel = BKLabel(
-            text: "아직 등록된 책이 없어요",
-            fontStyle: .headline1(weight: .semiBold),
-            color: .bkContentColor(.primary),
-            alignment: .center
-        )
-        
-        let descriptionLabel = BKLabel(
-            text: "도서 등록 후 나만의 아카이브를 만들어보세요",
-            fontStyle: .body1(weight: .medium),
-            color: .bkContentColor(.secondary),
-            alignment: .center
-        )
-        
-        let stackView = UIStackView(
-            arrangedSubviews: [titleLabel, descriptionLabel]
-        )
-        stackView.axis = .vertical
-        stackView.spacing = BKSpacing.spacing2
-        stackView.alignment = .center
-        
-        containerView.addSubview(stackView)
-        stackView.snp.makeConstraints {
-            $0.center.equalToSuperview()
-            $0.horizontalEdges.equalToSuperview().inset(BKSpacing.spacing5)
-        }
-        
-        return containerView
-    }()
+    private let emptyStateView = EmptyStateView()
     
     private var books: [ArchiveBook] = [] {
         didSet {
@@ -105,13 +73,15 @@ final class ArchiveView: BaseView, UIGestureRecognizerDelegate {
         setupLayout()
         updateEmptyState()
         
+        emptyStateView.onTapLogin = { [weak self] in
+            self?.eventPublisher.send(.loginButtonTapped)
+        }
+        
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleCollectionTap(_:)))
         tap.cancelsTouchesInView = false
         tap.delaysTouchesEnded = false
         tap.delegate = self
         bookCollectionView.addGestureRecognizer(tap)
-
-        // didSelect 중복 방지
         bookCollectionView.allowsSelection = false
     }
     
