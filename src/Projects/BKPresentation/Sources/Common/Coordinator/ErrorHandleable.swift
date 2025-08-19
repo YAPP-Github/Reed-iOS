@@ -6,11 +6,15 @@ import UIKit
 
 protocol ErrorHandleable: AnyObject {}
 
-extension ErrorHandleable where Self: Coordinator & SessionExpirationNotifying {
+extension ErrorHandleable where Self: Coordinator & AuthenticationRequiredNotifying {
     func handleError(_ error: DomainError) {
         switch error {
         case .unauthorized:
-            presentSessionExpiredAlert()
+            if AccessModeCenter.shared.mode.value == .member {
+                presentAuthErrorAlert()
+            } else {
+                presentGuestAuthErrorAlert()
+            }
         case .internalServerError, .clientError:
             presentServerErrorAlert()
         case .timeout:
@@ -44,8 +48,8 @@ extension ErrorHandleable where Self: Coordinator {
     }
 }
 
-private extension ErrorHandleable where Self: Coordinator & SessionExpirationNotifying {
-    private func presentSessionExpiredAlert() {
+private extension ErrorHandleable where Self: Coordinator & AuthenticationRequiredNotifying {
+    private func presentAuthErrorAlert() {
         let dialog = BKDialog(
             title: "",
             subtitle: """
@@ -55,8 +59,8 @@ private extension ErrorHandleable where Self: Coordinator & SessionExpirationNot
             config: .init(
                 leftButtonTitle: "확인",
                 leftButtonAction: { [weak self] in
-                    self?.presentedViewController?.dismiss(animated: true) {
-                        self?.notifyParentSessionExpired()
+                    self?.presentedViewController?.dismiss(animated: true) { [weak self] in
+                        self?.notifyAuthenticationRequired {}
                     }
                 })
             )
@@ -64,7 +68,31 @@ private extension ErrorHandleable where Self: Coordinator & SessionExpirationNot
         let dialogViewController = BKDialogViewController(dialog: dialog)
         topViewController?.present(dialogViewController, animated: true)
     }
-
+    
+    private func presentGuestAuthErrorAlert() {
+        let dialog = BKDialog(
+            title: "",
+            subtitle: """
+            로그인이 필요한 기능입니다.
+            로그인 해주세요
+            """,
+            config: .init(
+                leftButtonTitle: "닫기",
+                leftButtonAction: { [weak self] in
+                    self?.presentedViewController?.dismiss(animated: true)
+                },
+                rightButtonTitle: "로그인하기",
+                rightButtonAction: { [weak self] in
+                    self?.presentedViewController?.dismiss(animated: true) { [weak self] in
+                        self?.notifyAuthenticationRequired(onFinish: nil)
+                    }
+                })
+            )
+        
+        let dialogViewController = BKDialogViewController(dialog: dialog)
+        topViewController?.present(dialogViewController, animated: true)
+    }
+    
     private func presentServerErrorAlert() {
         let dialog = BKDialog(
             title: "",

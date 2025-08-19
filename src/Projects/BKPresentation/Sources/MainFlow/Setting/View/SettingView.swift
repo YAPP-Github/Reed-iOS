@@ -106,9 +106,13 @@ extension SettingView: UICollectionViewDelegate {
         }
         
         if indexPath.section == Section.bottom.rawValue {
-            if indexPath.item == Section.top.rawValue {
+            let selectedMenu = secondMenus[indexPath.item]
+            switch selectedMenu {
+            case .login:
+                eventPublisher.send(.loginButtonTapped)
+            case .logout:
                 eventPublisher.send(.logoutButtonTapped)
-            } else if indexPath.item == Section.bottom.rawValue {
+            case .withdraw:
                 eventPublisher.send(.withdrawalButtonTapped)
             }
         }

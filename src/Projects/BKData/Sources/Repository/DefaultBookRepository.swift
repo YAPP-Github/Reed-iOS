@@ -39,6 +39,33 @@ public struct DefaultBookRepository: BookRepository {
         .eraseToAnyPublisher()
     }
     
+    public func guestSearch(
+        _ parameters: SearchBookParameters
+    ) -> AnyPublisher<([Book], totalResults: Int), DomainError> {
+        networkProvider.request(
+            target: BookAPI.guestSearch(
+                dto: SearchBookRequestDTO(
+                    query: parameters.query,
+                    queryType: parameters.queryType,
+                    searchTarget: parameters.searchTarget,
+                    maxResults: parameters.maxResults,
+                    start: parameters.start,
+                    sort: parameters.sort,
+                    cover: parameters.cover,
+                    categoryId: parameters.categoryId
+                )
+            ),
+            type: SearchBookResponseDTO.self
+        )
+        .debugError(logger: AppLogger.network)
+        .mapError { $0.toDomainError() }
+        .map { dto in
+            let books = dto.books.map { $0.toBook() }
+            return (books, dto.totalResults)
+        }
+        .eraseToAnyPublisher()
+    }
+    
     public func searchMyLibrary(
         _ parameters: MyLibraryParameters
     ) -> AnyPublisher<([BookInfo], bookCountSet: BookCountSet, totalElements: Int), DomainError> {

@@ -176,7 +176,7 @@ private extension SearchView {
         }
         
         switch book.userBookStatus {
-        case .beforeRegistration:
+        case .beforeRegistration, nil:
             cell.configure(
                 title: book.title,
                 description: .init(

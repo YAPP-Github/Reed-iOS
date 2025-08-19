@@ -21,14 +21,20 @@ final class SearchCoordinator: Coordinator {
     
     func start() {
         let searchViewController = SearchViewController(
-            viewModel: SearchViewModel(searchViewType: searchViewType)
+            viewModel: SearchViewModel(
+                searchViewType: searchViewType
+            )
         )
         searchViewController.coordinator = self
         navigationController.pushViewController(searchViewController, animated: true)
     }
 }
 
-extension SearchCoordinator: SessionExpirationNotifying, ErrorHandleable {}
+extension SearchCoordinator: ErrorHandleable, AuthenticationRequiredNotifying {
+    func notifyAuthenticationRequired(onFinish: (() -> Void)?) {
+        (parentCoordinator as? AuthenticationRequiredNotifying)?.notifyAuthenticationRequired(onFinish: onFinish)
+    }
+}
 
 extension SearchCoordinator {
     func didBookRegistered(bookId: String) {

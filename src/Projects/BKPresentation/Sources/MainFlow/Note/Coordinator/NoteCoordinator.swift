@@ -37,7 +37,11 @@ final class NoteCoordinator: Coordinator {
     }
 }
 
-extension NoteCoordinator: SessionExpirationNotifying, ErrorHandleable {}
+extension NoteCoordinator: AuthenticationRequiredNotifying, ErrorHandleable {
+    func notifyAuthenticationRequired(onFinish: (() -> Void)?) {
+        (parentCoordinator as? AuthenticationRequiredNotifying)?.notifyAuthenticationRequired(onFinish: onFinish)
+    }
+}
 
 extension NoteCoordinator {
     func didCompleteNoteCreation(recordInfo: RecordInfo) {

@@ -22,7 +22,11 @@ final class ArchiveCoordinator: Coordinator {
     }
 }
 
-extension ArchiveCoordinator: SessionExpirationNotifying, ErrorHandleable {}
+extension ArchiveCoordinator: AuthenticationRequiredNotifying, ErrorHandleable {
+    func notifyAuthenticationRequired(onFinish: (() -> Void)?) {
+        (parentCoordinator as? AuthenticationRequiredNotifying)?.notifyAuthenticationRequired(onFinish: onFinish)
+    }
+}
 
 extension ArchiveCoordinator {
     func didTapSearchButton() {

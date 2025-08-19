@@ -73,10 +73,25 @@ final class ArchiveViewModel: BaseViewModel {
         
         switch action {
         case .onAppear:
-            newState.isLoading = true
-            currentPage = 0
-            allBooks = []
-            effects.append(.fetchBooks(page: 0, status: status))
+            if AccessModeCenter.shared.mode.value == .guest {
+                currentPage = 0
+                allBooks = []
+                let chips = buildChips(
+                    from: BookCountSet(
+                        totalCount: 0,
+                        beforeReadingCount: 0,
+                        readingCount: 0,
+                        completedCount: 0
+                    ),
+                    selectedIndex: 0
+                )
+                newState.archiveState = .empty(chips)
+            } else {
+                newState.isLoading = true
+                currentPage = 0
+                allBooks = []
+                effects.append(.fetchBooks(page: 0, status: status))
+            }
             
         case .chipTapped(let index):
             guard index != state.selectedChipIndex else { break }
@@ -86,7 +101,6 @@ final class ArchiveViewModel: BaseViewModel {
             allBooks = []
             newState.totalBooks = 0
             
-            // 칩 선택 즉시 반영 + 리스트 비우기
             let currentChips = getCurrentChips(from: state.archiveState)
             let updated = currentChips.enumerated().map { (i, chip) -> ChipData in
                 var c = chip
@@ -95,7 +109,6 @@ final class ArchiveViewModel: BaseViewModel {
             }
             newState.archiveState = .books(updated, [])
             
-            // 선택된 칩 기준 status로 0페이지 호출
             let nextStatus = statusForChip(index: index)
             effects.append(.fetchBooks(page: 0, status: nextStatus))
             

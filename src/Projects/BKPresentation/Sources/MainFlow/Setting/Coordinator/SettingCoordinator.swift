@@ -16,10 +16,15 @@ final class SettingCoordinator: Coordinator {
     }
     
     func start() {
-        let settingViewController = SettingViewController(viewModel: SettingViewModel())
+        let settingViewModel = SettingViewModel()
+        let settingViewController = SettingViewController(viewModel: settingViewModel)
         settingViewController.coordinator = self
         navigationController.pushViewController(settingViewController, animated: true)
     }
 }
 
-extension SettingCoordinator: SessionExpirationNotifying, ErrorHandleable, WebPresenting {}
+extension SettingCoordinator: ErrorHandleable, WebPresenting, AuthenticationRequiredNotifying {
+    func notifyAuthenticationRequired(onFinish: (() -> Void)?) {
+        (parentCoordinator as? AuthenticationRequiredNotifying)?.notifyAuthenticationRequired(onFinish: onFinish)
+    }
+}

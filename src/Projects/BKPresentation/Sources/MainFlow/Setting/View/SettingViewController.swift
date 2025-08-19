@@ -7,13 +7,14 @@ import Foundation
 import UIKit
 
 enum SettingViewEvent {
+    case loginButtonTapped
     case logoutButtonTapped
     case withdrawalButtonTapped
     case firstMenuTapped(FirstMenuItem)
 }
 
 final class SettingViewController: BaseViewController<SettingView> {
-    weak var coordinator: SettingCoordinator?
+    weak var coordinator: (SettingCoordinator & AuthenticationRequiredNotifying)?
     
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
         return .standard(
@@ -38,6 +39,8 @@ final class SettingViewController: BaseViewController<SettingView> {
         contentView.eventPublisher
             .sink { [weak self] event in
                 switch event {
+                case .loginButtonTapped:
+                    self?.viewModel.send(.loginButtonTapped)
                 case .logoutButtonTapped:
                     self?.presentLogoutDialog()
                 case .withdrawalButtonTapped:
@@ -80,16 +83,6 @@ final class SettingViewController: BaseViewController<SettingView> {
             .store(in: &cancellable)
         
         viewModel.statePublisher
-            .receive(on: DispatchQueue.main)
-            .map { $0.isLoggedOut }
-            .filter { $0 }
-            .removeDuplicates()
-            .sink { [weak self] _ in
-                self?.coordinator?.notifyParentSessionExpired()
-            }
-            .store(in: &cancellable)
-        
-        viewModel.statePublisher
             .map { $0.isLoading }
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
@@ -108,8 +101,21 @@ final class SettingViewController: BaseViewController<SettingView> {
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
+                print(error)
                 self?.coordinator?.handleError(error)
                 self?.viewModel.send(.errorHandled)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map(\.isLoginRequired)
+            .removeDuplicates()
+            .filter { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.coordinator?.notifyAuthenticationRequired { [weak self] in
+                    self?.viewModel.send(.loginFlowFinished)
+                }
             }
             .store(in: &cancellable)
     }

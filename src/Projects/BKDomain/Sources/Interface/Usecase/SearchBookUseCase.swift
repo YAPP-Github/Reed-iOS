@@ -5,6 +5,7 @@ import Combine
 public protocol SearchBookUseCase {
     func execute(
         query: String?,
-        startIndex: Int?
+        startIndex: Int?,
+        isGuestMode: Bool
     ) -> AnyPublisher<(books: [Book], totalResults: Int), DomainError>
 }

@@ -54,7 +54,7 @@ final class SearchViewController: BaseViewController<SearchView> {
                 if case let .search(query) = event { return query }
                 return nil
             }
-            .removeDuplicates()
+            .throttle(for: .milliseconds(250), scheduler: RunLoop.main, latest: false)
             .sink { [weak self] query in
                 self?.viewModel.send(.search(query))
             }
@@ -137,6 +137,16 @@ final class SearchViewController: BaseViewController<SearchView> {
             .store(in: &cancellable)
         
         viewModel.statePublisher
+            .compactMap { $0.isUpserted }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isbn in
+                self?.presentNoteSuggestion(with: isbn)
+                self?.viewModel.send(.noteSuggestionShown)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
             .map { $0.isLoading }
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
@@ -171,11 +181,28 @@ final class SearchViewController: BaseViewController<SearchView> {
                     일시적인 오류로 
                     데이터를 불러올 수 없어요
                     """,
+                    confirmTitle: "다시 시도하기",
                     onConfirm: { [weak self] in
                         self?.viewModel.send(.retryTapped)
                     }
                 )
-                self?.viewModel.send(.errorHandled)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map(\.isReRetrying)
+            .removeDuplicates()
+            .filter { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.coordinator?.presentCustomErrorAlert(
+                    subtitle: """
+                    일시적인 오류로 데이터를 불러올 수 없어요.
+                    잠시 후 다시 시도해주세요
+                    """,
+                    confirmTitle: "확인",
+                    onConfirm: {}
+                )
             }
             .store(in: &cancellable)
     }
@@ -208,7 +235,6 @@ private extension SearchViewController {
         isbn: String
     ) {
         viewModel.send(.upsertBook(isbn: isbn, status: status))
-        presentNoteSuggestion(with: isbn)
     }
     
     func presentNoteSuggestion(with isbn: String) {

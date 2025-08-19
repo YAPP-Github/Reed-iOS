@@ -9,11 +9,12 @@ enum ArchiveViewEvent: Equatable {
     case viewWillAppear
     case chipTapped(index: Int)
     case bookTapped(book: ArchiveBook)
+    case loginButtonTapped
     case loadNextPage
 }
 
 final class ArchiveViewController: BaseViewController<ArchiveView> {
-    weak var coordinator: ArchiveCoordinator?
+    weak var coordinator: (ArchiveCoordinator & AuthenticationRequiredNotifying)?
     
     override var bkNavigationTitle: String {
         return "내 서재"
@@ -55,6 +56,10 @@ final class ArchiveViewController: BaseViewController<ArchiveView> {
                     self?.handleBookTapped(book)
                 case .loadNextPage:
                     self?.viewModel.send(.loadNextPage)
+                case .loginButtonTapped:
+                    self?.coordinator?.notifyAuthenticationRequired(onFinish: { [weak self] in
+                        self?.viewModel.send(.onAppear)
+                    })
                 default:
                     break
                 }
@@ -84,7 +89,11 @@ final class ArchiveViewController: BaseViewController<ArchiveView> {
     // MARK: - Navigation Actions
     @objc
     private func searchButtonTapped() {
-        coordinator?.didTapSearchButton()
+        if AccessModeCenter.shared.mode.value == .guest {
+            coordinator?.handleError(.unauthorized)
+        } else {
+            coordinator?.didTapSearchButton()
+        }
     }
     
     @objc

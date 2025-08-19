@@ -62,7 +62,8 @@ struct MyLibrarySearchAdapter: SearchBookUseCase {
 
     func execute(
         query: String?,
-        startIndex: Int?
+        startIndex: Int?,
+        isGuestMode: Bool
     ) -> AnyPublisher<(books: [Book], totalResults: Int), DomainError> {
         wrapped.execute(query: query, startIndex: startIndex)
             .map { (books: $0.books.map(map), totalResults: $0.totalResults) }
@@ -87,8 +88,10 @@ final class SearchViewModel: BaseViewModel {
         var totalResults = 0
         var error: DomainError? = nil
         var isRetrying: Bool = false
+        var isReRetrying: Bool = false
         var searchBarPlaceholder: String
         var searchViewTitle: String
+        var isUpserted: String? = nil
     }
     
     enum Action {
@@ -101,10 +104,12 @@ final class SearchViewModel: BaseViewModel {
         case fetchRecentQueriesSuccessed([String])
         case fetchSearchResultSuccessed((books: [Book], totalResults: Int))
         case fetchNextPageSuccessed([Book])
-        case upsertBookSuccessed(String)
+        case upsertBookSuccessed(isbn: String, bookId: String)
+        case noteSuggestionShown
         case errorOccured(DomainError)
         case errorHandled
         case retryTapped
+        case lastRetryTapped
     }
     
     enum SideEffect {
@@ -180,6 +185,7 @@ final class SearchViewModel: BaseViewModel {
         }
     }
     
+    //swiftlint:disable cyclomatic_complexity
     func reduce(action: Action, state: State) -> (State, [SideEffect]) {
         var newState = state
         var effects: [SideEffect] = []
@@ -247,15 +253,28 @@ final class SearchViewModel: BaseViewModel {
             effects.append(.deleteRecentQuery(query))
             
         case .upsertBook(let isbn, let status):
-            newState.isLoading = true
-            effects.append(.upsert(isbn: isbn, status: status))
+            if AccessModeCenter.shared.mode.value == .guest {
+                newState.error = .unauthorized
+            } else {
+                newState.isLoading = true
+                effects.append(.upsert(isbn: isbn, status: status))
+            }
             
-        case .upsertBookSuccessed(let bookId):
+        case .upsertBookSuccessed(let isbn, let bookId):
             newState.isLoading = false
             newState.bookId = bookId
+            newState.isUpserted = isbn
+            
+        case .noteSuggestionShown:
+            newState.isUpserted = nil
             
         case .errorOccured(let error):
             newState.isLoading = false
+            if error == .unauthorized {
+                newState.error = error
+                break
+            }
+            
             if newState.isRetrying == false {
                 newState.isRetrying = true
             } else {
@@ -266,8 +285,15 @@ final class SearchViewModel: BaseViewModel {
         case .retryTapped:
             if let last = lastEffect {
                 newState.isLoading = true
+                newState.isRetrying = false
+                newState.isReRetrying = true
                 effects.append(last)
             }
+            
+        case .lastRetryTapped:
+            newState.isLoading = false
+            newState.isRetrying = false
+            newState.isReRetrying = false
             
         case .errorHandled:
             newState.error = nil
@@ -295,7 +321,8 @@ final class SearchViewModel: BaseViewModel {
             return Publishers.Zip(
                 searchBookUseCase.execute(
                     query: query,
-                    startIndex: currentPage
+                    startIndex: currentPage,
+                    isGuestMode: AccessModeCenter.shared.mode.value == .guest
                 ),
                 storeRecentSearchUseCase.execute(query: query)
                     .setFailureType(to: DomainError.self)
@@ -315,7 +342,8 @@ final class SearchViewModel: BaseViewModel {
             }
             return searchBookUseCase.execute(
                 query: query,
-                startIndex: currentPage
+                startIndex: currentPage,
+                isGuestMode: AccessModeCenter.shared.mode.value == .guest
             )
             .map { Action.fetchNextPageSuccessed($0.books) }
             .catch { [weak self] in
@@ -329,7 +357,7 @@ final class SearchViewModel: BaseViewModel {
                 isbn: isbn,
                 status: status.toBookStatus()
             )
-            .map { Action.upsertBookSuccessed($0.bookId) }
+            .map { Action.upsertBookSuccessed(isbn: isbn, bookId: $0.bookId) }
             .catch { [weak self] in
                 self?.lastEffect = .upsert(isbn: isbn, status: status)
                 return Just(Action.errorOccured($0))

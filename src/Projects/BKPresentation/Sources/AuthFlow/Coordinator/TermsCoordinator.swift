@@ -24,4 +24,8 @@ final class TermsCoordinator: Coordinator, FinishNotifying {
     }
 }
 
-extension TermsCoordinator: SessionExpirationNotifying, ErrorHandleable, WebPresenting {}
+extension TermsCoordinator: AuthenticationRequiredNotifying, ErrorHandleable, WebPresenting {
+    func notifyAuthenticationRequired(onFinish: (() -> Void)?) {
+        (parentCoordinator as? AuthenticationRequiredNotifying)?.notifyAuthenticationRequired(onFinish: onFinish)
+    }
+}

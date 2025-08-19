@@ -3,11 +3,10 @@
 import BKDesign
 import UIKit
 
-final class TabBarCoordinator: Coordinator, FinishNotifying {
+final class TabBarCoordinator: Coordinator, AuthenticationRequiredNotifying {
     weak var parentCoordinator: Coordinator?
     var childCoordinators = [Coordinator]()
     var navigationController: UINavigationController
-    var onFinish: (() -> Void)?
     
     private let tabBarController = BottomTabBarController()
     
@@ -23,13 +22,20 @@ final class TabBarCoordinator: Coordinator, FinishNotifying {
         setupTabBarCoordinators()
         navigationController.setViewControllers([tabBarController], animated: true)
     }
+    
+    func notifyAuthenticationRequired(onFinish: (() -> Void)?) {
+        (parentCoordinator as? AuthenticationRequiredNotifying)?.notifyAuthenticationRequired(onFinish: onFinish)
+    }
 }
 
 private extension TabBarCoordinator {
     func setupTabBarCoordinators() {
         let viewControllers: [UINavigationController] = TabItem.allCases.map { item in
             let navigationController = UINavigationController()
-            let coordinator = item.makeCoordinator(parent: self, navigationController: navigationController)
+            let coordinator = item.makeCoordinator(
+                parent: self, 
+                navigationController: navigationController
+            )
 
             addChildCoordinator(coordinator)
             coordinator.start()
@@ -44,11 +50,5 @@ private extension TabBarCoordinator {
         }
 
         tabBarController.viewControllers = viewControllers
-    }
-}
-
-extension TabBarCoordinator: SessionExpirationHandling {
-    func handleSessionExpired() {
-        didFinish()
     }
 }
