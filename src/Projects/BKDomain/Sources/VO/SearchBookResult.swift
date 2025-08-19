@@ -9,7 +9,7 @@ public struct SearchBookResult: Decodable {
     public let publisher: String
     public let coverImageUrl: URL
     public let link: URL
-    public let userBookStatus: BookStatus
+    public let userBookStatus: BookStatus?
 }
 
 public extension SearchBookResult {

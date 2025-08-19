@@ -9,7 +9,7 @@ public struct Book: Hashable {
     public let pubDate: Date?
     public let publisher: String
     public let thumbnail: URL?
-    public let userBookStatus: BookStatus
+    public let userBookStatus: BookStatus?
     public let recordCount: Int?
     
     public init(
@@ -19,7 +19,7 @@ public struct Book: Hashable {
         pubDate: Date? = nil,
         publisher: String,
         thumbnail: URL?,
-        userBookStatus: BookStatus,
+        userBookStatus: BookStatus?,
         recordCount: Int? = nil
     ) {
         self.isbn = isbn

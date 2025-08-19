@@ -8,6 +8,11 @@ public protocol BookRepository {
         _ parameters: SearchBookParameters
     ) -> AnyPublisher<([Book], totalResults: Int), DomainError>
     
+    /// 전체 도서 검색에 특화된 기능입니다.
+    func guestSearch(
+        _ parameters: SearchBookParameters
+    ) -> AnyPublisher<([Book], totalResults: Int), DomainError>
+    
     /// 내 서재 검색에 특화된 기능입니다.
     func searchMyLibrary(
         _ parameters: MyLibraryParameters

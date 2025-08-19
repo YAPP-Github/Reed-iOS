@@ -101,6 +101,9 @@ extension DefaultAuthRepository: RefreshHandler {
                 accessToken: tokens.accessToken,
                 refreshToken: tokens.refreshToken
             )
+            .handleEvents(receiveOutput: { _ in
+                tokenProvider.clearCache()
+            })
             .mapError { _ in AuthError.missingToken }
         }
         .debugError("[Refresh]", logger: AppLogger.storage)

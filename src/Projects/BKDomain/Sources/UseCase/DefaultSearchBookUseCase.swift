@@ -11,15 +11,27 @@ public struct DefaultSearchBookUseCase: SearchBookUseCase {
     
     public func execute(
         query: String?,
-        startIndex: Int?
+        startIndex: Int?,
+        isGuestMode: Bool
     ) -> AnyPublisher<(books: [Book], totalResults: Int), DomainError> {
-        repository.search(
-            SearchBookParameters(
-                query: query,
-                start: startIndex
+        if isGuestMode {
+            repository.guestSearch(
+                SearchBookParameters(
+                    query: query,
+                    start: startIndex
+                )
             )
-        )
-        .map { ($0.0, $0.totalResults) }
-        .eraseToAnyPublisher()
+            .map { ($0.0, $0.totalResults) }
+            .eraseToAnyPublisher()
+        } else {
+            repository.search(
+                SearchBookParameters(
+                    query: query,
+                    start: startIndex
+                )
+            )
+            .map { ($0.0, $0.totalResults) }
+            .eraseToAnyPublisher()
+        }
     }
 }
