@@ -81,6 +81,10 @@ final class BookDetailView: BaseView {
 
     private let seedReportView = SeedReportView()
     private let divider = BKDivider(type: .medium)
+    private var seedReportViewHeightConstraint: Constraint?
+    private var dividerTopToSeed: Constraint?
+    private var dividerTopToButtons: Constraint?
+    private var seedReportZeroHeight: Constraint?
     private let header = BookDetailViewHeader()
 
     private lazy var collectionView: UICollectionView = {
@@ -161,11 +165,18 @@ final class BookDetailView: BaseView {
                 .offset(LayoutConstants.seedReportViewTopInset)
             $0.horizontalEdges.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
+            seedReportZeroHeight = $0.height.equalTo(0).priority(.low).constraint
+            seedReportViewHeightConstraint = $0.height.greaterThanOrEqualTo(0).constraint
         }
 
         divider.snp.makeConstraints {
-            $0.top.equalTo(seedReportView.snp.bottom)
+            dividerTopToSeed = $0.top.equalTo(seedReportView.snp.bottom)
                 .offset(LayoutConstants.dividerVerticalOffset)
+                .priority(.high).constraint
+            dividerTopToButtons = $0.top.equalTo(buttonGroup.snp.bottom)
+                .offset(LayoutConstants.dividerVerticalOffset)
+                .priority(.low).constraint
+
             $0.horizontalEdges.equalToSuperview()
         }
         
@@ -208,6 +219,12 @@ final class BookDetailView: BaseView {
         let isEmpty = sortedItems.isEmpty
         collectionView.isHidden = isEmpty
         emptyContainerView.isHidden = !isEmpty
+        seedReportView.isHidden = isEmpty
+        
+        seedReportZeroHeight?.update(priority: isEmpty ? .required : .low)
+
+        dividerTopToSeed?.update(priority: isEmpty ? .low : .high)
+        dividerTopToButtons?.update(priority: isEmpty ? .high : .low)
         
         if !isEmpty {
             snapshot.appendItems(sortedItems, toSection: .main)
