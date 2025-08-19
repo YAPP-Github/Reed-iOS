@@ -96,7 +96,7 @@ final class OCRScannerViewModel: BaseViewModel {
             currentRecognizedItems = allItems
             
         case .captureButtonTapped:
-            debugPulse("\(newState.failureCount)")
+            Log.debug("\(newState.failureCount)", logger: AppLogger.viewModel)
             newState.isLoading = true
             
             let capturedTexts = extractTextsInScanArea(items: currentRecognizedItems)

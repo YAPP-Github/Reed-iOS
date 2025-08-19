@@ -44,7 +44,7 @@ jobs:
           } > .env.ci
 
       - name: 📱 Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.0.app
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app
 
       - name: 💫 Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -88,6 +88,13 @@ jobs:
           chmod +x tuist_module_init.sh
           ./tuist_module_init.sh
 
+      - name: Write GoogleService-Info.plist (repo root)
+        working-directory: src/SupportingFiles/Booket
+        run: |
+          echo "$GOOGLESERVICE_INFO_PLIST_B64" | base64 -D > GoogleService-Info.plist
+        env:
+          GOOGLESERVICE_INFO_PLIST_B64: ${{ secrets.GOOGLESERVICE_INFO_PLIST_B64 }}
+
       - name: 🧪 Run PR Checks (build + test)
         working-directory: src/fastlane
         run: bundle exec fastlane ci_pr --env ci
@@ -97,3 +104,4 @@ jobs:
         run: |
           security delete-keychain $MATCH_KEYCHAIN_NAME || true
           rm -f src/fastlane/AuthKey
+          rm -f src/SupportingFiles/Booket/GoogleService-Info.plist || true
