@@ -81,7 +81,7 @@ let releaseAppTarget = Target.target(
             "DEVELOPMENT_LANGUAGE": "ko",
             "DEVELOPMENT_TEAM": "VZC79KP79S",
             "CODE_SIGN_STYLE": "Manual",
-            "PROVISIONING_PROFILE_SPECIFIER": "match AppStore Booket.26th.yapp"
+            "PROVISIONING_PROFILE_SPECIFIER": "match Development Booket.26th.yapp"
         ],
         configurations: [
             .release(name: "Release", xcconfig: .relativeToRoot("SupportingFiles/Booket/Release.xcconfig"))
