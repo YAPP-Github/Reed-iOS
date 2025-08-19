@@ -36,6 +36,14 @@ final class HomeViewModel: BaseViewModel {
     
     init() {
         bindSideEffects()
+        
+        AccessModeCenter.shared.mode
+            .sink { [weak self] mode in
+                if mode == .member {
+                    self?.send(.onAppear)
+                }
+            }
+            .store(in: &cancellables)
     }
     
     func send(_ action: Action) {
@@ -50,6 +58,11 @@ final class HomeViewModel: BaseViewModel {
         
         switch action {
         case .onAppear:
+            guard AccessModeCenter.shared.mode.value == .member else {
+                newState.shouldPlayAnimation = true
+                newState.homeInfos = []
+                break
+            }
             newState.isLoading = true
             effects.append(.fetch)
             newState.shouldPlayAnimation = true
