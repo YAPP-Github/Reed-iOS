@@ -39,110 +39,103 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying 
         onboardingCheckUseCase.execute()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] didSeeOnboarding in
+                guard let self else { return }
                 if didSeeOnboarding {
-                    self?.checkAuthAndRoute()
+                    self.startMainFlow()
+                    self.checkAuthAndRoute()
                 } else {
-                    self?.startOnboardingFlow()
+                    self.startOnboardingFlow()
                 }
             }
             .store(in: &cancellable)
     }
-
-}
-
-private extension AppCoordinator {
-    func startAuthFlow() {
+    
+    private func presentAuthFlow(animated: Bool, onFinishAuth: (() -> Void)?) {
+        let authNavigationController = UINavigationController()
         let loginCoordinator = LoginCoordinator(
             parentCoordinator: self,
-            navigationController: navigationController
+            navigationController: authNavigationController
         )
-        
+
         loginCoordinator.onFinish = { [weak self] in
             guard let self else { return }
-            authStateUseCase.execute()
-                .receive(on: DispatchQueue.main)
-                .map(\.termsAgreed)
-                .sink(
-                    receiveCompletion: { completion in
-                        if case .failure = completion {
-                            self.startAuthFlow()
-                        }
-                    },
-                    receiveValue: { termsAgreed in
-                        if termsAgreed {
-                            self.startMainFlow()
-                        } else {
-                            self.startTermsFlow()
-                        }
-                    }
-                )
-                .store(in: &cancellable)
+            
+            self.navigationController.dismiss(animated: animated)
+            AccessModeCenter.shared.mode.send(.member)
+            self.checkAuthAndRoute()
+            onFinishAuth?()
         }
-        
+
         addChildCoordinator(loginCoordinator)
         loginCoordinator.start()
+        
+        navigationController.present(authNavigationController, animated: animated)
     }
     
-    func startMainFlow() {
+    private func startMainFlow() {
         let tabBarCoordinator = TabBarCoordinator(
             parentCoordinator: self,
             navigationController: navigationController
         )
-        
-        tabBarCoordinator.onFinish = { [weak self] in
-            self?.startAuthFlow()
-        }
-        
+
         addChildCoordinator(tabBarCoordinator)
         tabBarCoordinator.start()
     }
     
-    func startTermsFlow() {
+    private func transitionToAuthenticatedMain() {
+        navigationController.viewControllers.removeAll()
+        startMainFlow()
+    }
+    
+    private func startTermsFlow() {
         let termsCoordinator = TermsCoordinator(
             parentCoordinator: self,
             navigationController: navigationController
         )
-        
         termsCoordinator.onFinish = { [weak self] in
-            self?.startMainFlow()
+            AccessModeCenter.shared.mode.send(.member)
+            self?.navigationController.dismiss(animated: true)
         }
-        
         addChildCoordinator(termsCoordinator)
         termsCoordinator.start()
     }
     
-    func startOnboardingFlow() {
+    private func startOnboardingFlow() {
         let onboardingCoordinator = OnboardingCoordinator(
             parentCoordinator: self,
             navigationController: navigationController
         )
         onboardingCoordinator.onFinish = { [weak self] in
-            self?.markOnboardingSeenUseCase.execute()
-            self?.checkAuthAndRoute()
+            guard let self else { return }
+            self.markOnboardingSeenUseCase.execute()
+            self.startMainFlow()
+            self.checkAuthAndRoute()
         }
         addChildCoordinator(onboardingCoordinator)
         onboardingCoordinator.start()
     }
     
-    func checkAuthAndRoute() {
+    private func checkAuthAndRoute() {
         authStateUseCase.execute()
             .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                guard let self else { return }
-                switch completion {
-                case .finished:
-                    break
-                case .failure:
-                    self.startAuthFlow()
+            .sink(
+                receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        AccessModeCenter.shared.mode.send(.member)
+                    case .failure:
+                        AccessModeCenter.shared.mode.send(.guest)
+                    }
+                },
+                receiveValue: { [weak self] userProfile in
+                    guard let self else { return }
+                    if userProfile.termsAgreed {
+                        self.transitionToAuthenticatedMain()
+                    } else {
+                        self.startTermsFlow()
+                    }
                 }
-            }, receiveValue: { [weak self] userProfile in
-                guard let self else { return }
-                if userProfile.termsAgreed {
-                    self.startMainFlow()
-                } else {
-                    self.startTermsFlow()
-                }
-            })
+            )
             .store(in: &cancellable)
     }
 }
