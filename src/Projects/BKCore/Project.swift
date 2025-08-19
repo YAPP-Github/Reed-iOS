@@ -12,9 +12,7 @@ let project = Project.project(
             scripts: [
                 swiftLintScript
             ],
-            dependencies: [
-                .external(dependency: .Pulse)
-            ]
+            dependencies: []
         ),
         
         Target.target(
