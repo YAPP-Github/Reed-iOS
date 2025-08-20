@@ -55,6 +55,8 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying 
         onFinishAuth: (() -> Void)?
     ) {
         let authNavigationController = UINavigationController()
+        authNavigationController.modalPresentationStyle = .fullScreen
+        authNavigationController.isModalInPresentation = true
         let loginCoordinator = LoginCoordinator(
             parentCoordinator: self,
             navigationController: authNavigationController

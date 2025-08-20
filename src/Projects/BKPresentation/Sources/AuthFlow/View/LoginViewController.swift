@@ -15,7 +15,11 @@ final class LoginViewController: BaseViewController<LoginView> {
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
         .standard(
             viewController: self,
-            rightButton: .none
+            rightButton: .init(
+                image: BKImage.Icon.x,
+                target: self,
+                action: #selector(handleCloseButtonTapped)
+            )
         )
     }
     
@@ -26,16 +30,6 @@ final class LoginViewController: BaseViewController<LoginView> {
     init(viewModel: LoginViewModel) {
         self.viewModel = AnyViewBindableViewModel(viewModel)
         super.init()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.navigationBar.isHidden = true
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.navigationController?.navigationBar.isHidden = false
     }
     
     override func bindAction() {
@@ -91,5 +85,9 @@ final class LoginViewController: BaseViewController<LoginView> {
                 }
             }
             .store(in: &cancellable)
+    }
+    
+    @objc private func handleCloseButtonTapped() {
+        self.dismiss(animated: true)
     }
 }
