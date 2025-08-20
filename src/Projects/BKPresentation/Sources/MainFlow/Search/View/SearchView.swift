@@ -21,7 +21,7 @@ final class SearchView: BaseView {
     
     private let searchBar = BKSearchTextField(
         placeholder: "도서 검색 후 내 서재에 담아보세요.",
-        type: .brand
+        type: .normal
     )
     
     private let divider = BKDivider(type: .medium)
@@ -78,6 +78,10 @@ final class SearchView: BaseView {
         searchBar.placeholder = placeholder
     }
     
+    func setSearchBarText(with text: String) {
+        searchBar.text = text
+    }
+    
     func applySnapshot(
         with state: SearchViewModel.SearchState,
         count: Int = 0
@@ -101,10 +105,12 @@ final class SearchView: BaseView {
                 let headerHeight = header.bounds.height
                 let offset = -(headerHeight / 2.0)
                 collectionView.backgroundView = makeEmptyLabel(state.placeholder, verticalOffset: offset)
+                searchBar.setClearButtonMode(.whileEditing)
             } else {
                 collectionView.backgroundView = nil
                 snapshot.appendSections([.result])
                 snapshot.appendItems(state.books.map { .result($0) }, toSection: .result)
+                searchBar.setClearButtonMode(.always)
             }
             header.setTitle(.result(count: count))
             layoutMode = .afterSearch
@@ -158,6 +164,7 @@ private extension SearchView {
         }
         cell.onQueryLabelTapped = { [weak self] in
             self?.eventPublisher.send(.search(keyword))
+            self?.setSearchBarText(with: keyword)
         }
         
         return cell

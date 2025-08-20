@@ -168,8 +168,8 @@ extension BKButtonGroup {
         leftAction: (() -> Void)? = nil,
         rightAction: (() -> Void)? = nil
     ) -> BKButtonGroup {
-        let leftButton = BKButton.secondary(title: leftTitle)
-        let rightButton = BKButton.primary(title: rightTitle)
+        let leftButton = BKButton.secondary(title: leftTitle, size: .large)
+        let rightButton = BKButton.primary(title: rightTitle, size: .large)
         
         if let action = leftAction {
             leftButton.addAction(UIAction { _ in action() }, for: .touchUpInside)

@@ -313,6 +313,7 @@ public enum BKTextStyle {
         let actualLineHeight = fontAttributes.lineHeight.calculateAbsoluteLineHeight(
             for: fontAttributes.fontSize.rawValue
         )
+        
         paragraphStyle.minimumLineHeight = actualLineHeight
         paragraphStyle.maximumLineHeight = actualLineHeight
         
@@ -339,6 +340,28 @@ public enum BKTextStyle {
         
         attributes.merge(extraAttributes) { $1 }
         return NSAttributedString(string: text, attributes: attributes)
+    }
+    
+    public func mutableAttributedString(
+        from text: String,
+        color: UIColor = .label,
+        extraAttributes: [NSAttributedString.Key: Any] = [:]
+    ) -> NSMutableAttributedString {
+        var attributes: [NSAttributedString.Key: Any] = [
+            .font: uiFont ?? UIFont.systemFont(ofSize: fontAttributes.fontSize.rawValue),
+            .foregroundColor: color,
+            .paragraphStyle: paragraphStyle
+        ]
+        
+        if let letterSpacing = fontAttributes.letterSpacing {
+            let actualLetterSpacing = letterSpacing.calculateAbsoluteLetterSpacing(
+                for: fontAttributes.fontSize.rawValue
+            )
+            attributes[.kern] = actualLetterSpacing
+        }
+        
+        attributes.merge(extraAttributes) { $1 }
+        return NSMutableAttributedString(string: text, attributes: attributes)
     }
 }
 

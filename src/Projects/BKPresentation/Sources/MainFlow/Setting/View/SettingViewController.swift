@@ -113,21 +113,17 @@ final class SettingViewController: BaseViewController<SettingView> {
             .filter { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.coordinator?.notifyAuthenticationRequired { [weak self] in
-                    self?.viewModel.send(.loginFlowFinished)
-                }
+                self?.viewModel.send(.loginFlowFinished)
+                self?.coordinator?.notifyAuthenticationRequired { }
             }
             .store(in: &cancellable)
     }
-    
-    @objc func dummyFunc() {}
 }
 
 private extension SettingViewController {
     func presentLogoutDialog() {
         let dialog = BKDialog(
             title: "정말 로그아웃 하시겠습니까?",
-            subtitle: "",
             config: BKDialogConfiguration(
                 leftButtonTitle: "취소",
                 leftButtonAction: { [weak self] in

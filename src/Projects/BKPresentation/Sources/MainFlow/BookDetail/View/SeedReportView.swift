@@ -8,8 +8,8 @@ import UIKit
 enum EmotionSeed: String, CaseIterable {
     case warmth = "따뜻함"
     case joy = "즐거움"
-    case insight = "깨달음"
     case sad = "슬픔"
+    case insight = "깨달음"
     
     var image: UIImage {
         switch self {
@@ -77,7 +77,7 @@ final class SeedReportView: BaseView {
         return stackView
     }()
     
-    private let reportLabel = BKLabel(
+    private let reportLabel = BKLabel2(
         fontStyle: .label2(weight: .regular),
         color: .bkContentColor(.secondary),
         highlightColor: .bkContentColor(.brand),
@@ -95,6 +95,7 @@ final class SeedReportView: BaseView {
         layer.cornerRadius = LayoutConstants.cornerRadius
         clipsToBounds = true
         backgroundColor = .bkBaseColor(.secondary)
+        reportContainer.backgroundColor = .bkBaseColor(.primary)
         reportContainer.layer.borderWidth = LayoutConstants.reportContainerBorderWidth
         reportContainer.layer.cornerRadius = LayoutConstants.reportContainerCornerRadius
         reportContainer.layer.borderColor = UIColor.bkBorderColor(.primary).cgColor
@@ -120,12 +121,11 @@ final class SeedReportView: BaseView {
                 .offset(LayoutConstants.contentSpacing)
             $0.leading.trailing.bottom.equalToSuperview()
                 .inset(LayoutConstants.contentInset)
+            $0.height.equalTo(42)
         }
         
         reportLabel.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.verticalEdges.equalToSuperview()
-                .inset(LayoutConstants.reportLabelVerticalInset)
+            $0.center.equalToSuperview()
         }
     }
     

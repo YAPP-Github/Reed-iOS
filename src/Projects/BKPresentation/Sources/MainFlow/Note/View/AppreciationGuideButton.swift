@@ -28,7 +28,7 @@ final class AppreciationGuideButton: UIButton {
     private let contentLabel = BKLabel(
         fontStyle: .label1(weight: .semiBold),
         highlightedWord: "______",
-        highlightColor: .bkContentColor(.disable)
+        highlightColor: UIColor(hex: "D6D6D6")
     )
     
     var onSelected: ((AppreciationGuide) -> Void)?

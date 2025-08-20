@@ -12,9 +12,9 @@ public final class BKTextView: UIView {
     private let textView: UITextView = {
         let textView = UITextView()
         textView.layer.cornerRadius = BKRadius.small
-        textView.layer.borderWidth = LayoutConstants.borderWidth
-        textView.layer.borderColor = UIColor.bkBorderColor(.primary).cgColor
-        textView.backgroundColor = .bkBackgroundColor(.secondary)
+        textView.layer.borderWidth = 0
+        textView.layer.borderColor = UIColor.clear.cgColor
+        textView.backgroundColor = .bkBaseColor(.secondary)
         textView.isScrollEnabled = true
         textView.font = BKTextStyle.body2(weight: .regular).uiFont
         textView.textColor = .bkContentColor(.primary)
@@ -180,9 +180,9 @@ private extension BKTextView {
             errorMessageLabel.setText(text: "")
         }
         
+        textView.layer.borderWidth = LayoutConstants.borderWidth
         textView.layer.borderColor = (message != nil)
-            ? UIColor.bkBorderColor(.error).cgColor
-            : UIColor.bkBorderColor(.primary).cgColor
+            ? UIColor.bkBorderColor(.error).cgColor : UIColor.clear.cgColor
 
         UIView.animate(withDuration: 0.25) {
             self.superview?.layoutIfNeeded()

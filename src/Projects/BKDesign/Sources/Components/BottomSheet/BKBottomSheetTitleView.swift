@@ -5,8 +5,8 @@ import UIKit
 
 public final class BKBottomSheetTitleView: UIView {
     private let style: BKBottomSheetStyle
-    private let titleLabel = UILabel()
-    private let subtitleLabel = UILabel()
+    private let titleLabel = BKLabel()
+    private let subtitleLabel = BKLabel()
     private let closeButton = UIButton(type: .system)
     
     private let title: String
@@ -33,20 +33,23 @@ public final class BKBottomSheetTitleView: UIView {
 
 private extension BKBottomSheetTitleView {
     func configure() {
-        titleLabel.text = title
+        titleLabel.setText(text: title)
         titleLabel.numberOfLines = .zero
-        titleLabel.font = BKTextStyle
-            .heading2(weight: .semiBold).uiFont
-        titleLabel.textColor = .bkContentColor(.primary)
+        titleLabel.setFontStyle(style: .heading2(weight: .semiBold))
+        titleLabel.setColor(color: .bkContentColor(.primary))
         
-        subtitleLabel.text = subtitle
-        subtitleLabel.numberOfLines = .zero
-        subtitleLabel.font = (
-            style == .leadingCloseButton
-                ? BKTextStyle.label2(weight: .regular)
-                : BKTextStyle.body1(weight: .medium))
-            .uiFont
-        subtitleLabel.textColor = .bkContentColor(.secondary)
+        if let subtitle = subtitle {
+            subtitleLabel.setText(text: subtitle)
+            subtitleLabel.numberOfLines = .zero
+            subtitleLabel.setColor(color: .bkContentColor(.secondary))
+            
+            switch style {
+            case .leadingCloseButton:
+                subtitleLabel.setFontStyle(style: .label1(weight: .medium))
+            case .centered:
+                subtitleLabel.setFontStyle(style: .body1(weight: .medium))
+            }
+        }
         
         closeButton.setImage(
             style == .leadingCloseButton
@@ -76,12 +79,12 @@ private extension BKBottomSheetTitleView {
         ].compactMap { $0 })
         labelStack.axis = .vertical
         labelStack.alignment = .leading
-        labelStack.spacing = LayoutConstants.leadingContentSpacing
+        labelStack.spacing = LayoutConstants.contentSpacing
         
         let hStack = UIStackView(arrangedSubviews: [labelStack, closeButton])
         hStack.axis = .horizontal
         hStack.alignment = .top
-        hStack.spacing = LayoutConstants.leadingContentSpacing
+        hStack.spacing = LayoutConstants.contentSpacing
         
         addSubview(hStack)
         hStack.snp.makeConstraints {
@@ -102,7 +105,7 @@ private extension BKBottomSheetTitleView {
         ].compactMap { $0 })
         vStack.axis = .vertical
         vStack.alignment = .fill
-        vStack.spacing = LayoutConstants.centeredContentSpacing
+        vStack.spacing = LayoutConstants.contentSpacing
         
         addSubview(vStack)
         vStack.snp.makeConstraints {
@@ -117,8 +120,6 @@ private extension BKBottomSheetTitleView {
 
 private extension BKBottomSheetTitleView {
     enum LayoutConstants {
-        static let leadingContentSpacing: CGFloat = 2
-        static let centeredContentSpacing: CGFloat = 4
-        static let labelHeight: CGFloat = 24
+        static let contentSpacing: CGFloat = 4
     }
 }

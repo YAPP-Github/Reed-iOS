@@ -49,7 +49,7 @@ private extension BookRegistrationStatusView {
         }
         
         statuses.forEach { status in
-            let button = BKButton.secondary(title: status.rawValue)
+            let button = BKButton.secondary(title: status.rawValue, size: .large)
             button.addAction(UIAction { [weak self] _ in
                 self?.select(status: status)
             }, for: .touchUpInside)

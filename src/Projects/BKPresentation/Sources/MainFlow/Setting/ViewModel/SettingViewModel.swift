@@ -91,7 +91,6 @@ final class SettingViewModel: BaseViewModel {
             effects.append(.appVersion)
             
         case .accessModeChanged(let mode):
-            newState.isLoginRequired = false
             if mode == .member {
                 newState.secondMenuItems = [.logout, .withdraw]
             } else {

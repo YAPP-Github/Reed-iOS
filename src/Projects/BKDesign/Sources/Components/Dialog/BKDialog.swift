@@ -57,11 +57,11 @@ public final class BKDialog: UIView {
     
     private let buttonGroup: BKButtonGroup
     private let titleText: String
-    private let subtitleText: String
+    private let subtitleText: String?
     
     public init(
         title: String,
-        subtitle: String,
+        subtitle: String? = nil,
         config: BKDialogConfiguration,
         suppliedContentStyle: SuppliedContentStyle? = nil
     ) {
@@ -108,14 +108,27 @@ private extension BKDialog {
 private extension BKDialog {
     func setup() {
         addSubviews(rootStack, buttonGroup)
-        [titleLabel, subtitleLabel].forEach(titleStack.addArrangedSubview(_:))
+        
+        // 타이틀은 항상 추가
+        titleStack.addArrangedSubview(titleLabel)
+        
+        // subtitle이 있을 때만 추가
+        if subtitleText != nil {
+            titleStack.addArrangedSubview(subtitleLabel)
+        }
     }
     
     func configure() {
         layer.cornerRadius = BKRadius.large
         backgroundColor = .bkBaseColor(.primary)
         titleLabel.setText(text: titleText)
-        subtitleLabel.setText(text: subtitleText)
+        
+        if let subtitle = subtitleText, !subtitle.isEmpty {
+            subtitleLabel.setText(text: subtitle)
+            subtitleLabel.isHidden = false
+        } else {
+            subtitleLabel.isHidden = true
+        }
         
         titleLabel.numberOfLines = 0
         subtitleLabel.numberOfLines = 0
@@ -134,7 +147,7 @@ private extension BKDialog {
                 .offset(LayoutConstants.buttonTopInset)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(84)
-            $0.bottom.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(4)
         }
     }
     
@@ -182,7 +195,7 @@ private extension BKDialog {
 private extension BKDialog {
     enum LayoutConstants {
         static let titleTopInset = BKInset.inset8
-        static let buttonTopInset = BKInset.inset6
+        static let buttonTopInset = BKInset.inset2
         static let horizontalInset = BKInset.inset5
         static let buttonBottomInset = BKInset.inset5
         static let titleStackSpacing = BKSpacing.spacing2

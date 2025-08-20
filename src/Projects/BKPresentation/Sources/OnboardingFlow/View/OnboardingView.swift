@@ -76,8 +76,8 @@ final class OnboardingView: BaseView {
         
         pageControl.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(nextButton.snp.top)
-                .offset(-LayoutConstants.pageControlBottomOffset)
+            $0.top.equalTo(nextButton.snp.top)
+                .offset(-36)
         }
         
         innerContentView.snp.makeConstraints {
@@ -113,9 +113,9 @@ private extension OnboardingView {
         imageView.contentMode = .scaleAspectFit
         imageView.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.leading.trailing.equalToSuperview()
-                .inset(LayoutConstants.innerImageViewInset)
+            $0.horizontalEdges.equalToSuperview()
         }
+        
         labelStack.snp.makeConstraints {
             $0.top.equalTo(imageView.snp.bottom)
                 .offset(LayoutConstants.labelStackTopOffset)
@@ -208,10 +208,8 @@ extension OnboardingView: UIScrollViewDelegate {
 private extension OnboardingView {
     enum LayoutConstants {
         static let labelStackSpacing = BKSpacing.spacing3
-        static let labelStackTopOffset = BKSpacing.spacing8
+        static let labelStackTopOffset = BKSpacing.spacing7
         static let labelStackHorizontalInset = BKInset.inset5
-        static let pageControlBottomOffset = BKInset.inset6
-        static let innerImageViewInset: CGFloat = 27.5
     }
     
     enum Constants {

@@ -101,6 +101,10 @@ public class BKBaseTextField: UITextField {
         self.textFieldType = type
     }
     
+    public func setClearButtonMode(_ mode: UITextField.ViewMode) {
+        rightViewMode = mode
+    }
+    
     func typeDidChanged() {
         layer.borderColor = textFieldType.borderColor.cgColor
     }
@@ -122,11 +126,16 @@ extension BKBaseTextField: UITextFieldDelegate {
 private extension BKBaseTextField {
     func configure() {
         delegate = self
+        switch textFieldType {
+        case .normal:
+            layer.borderWidth = 0
+        default:
+            layer.borderWidth = LayoutConstants.borderWidth
+            layer.borderColor = textFieldType.borderColor.cgColor
+        }
         returnKeyType = .done
         layer.cornerRadius = BKRadius.small
-        layer.borderWidth = LayoutConstants.borderWidth
-        layer.borderColor = textFieldType.borderColor.cgColor
-        backgroundColor = .bkBackgroundColor(.secondary)
+        backgroundColor = .bkBaseColor(.secondary)
         font = BKTextStyle.body2(weight: .medium).uiFont
         textColor = .bkContentColor(.primary)
         textAlignment = .natural

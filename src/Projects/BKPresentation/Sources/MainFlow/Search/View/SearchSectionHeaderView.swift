@@ -64,7 +64,7 @@ private extension SearchSectionHeaderView {
         let fullText = "총 \(count)개"
         let countString = "\(count)"
 
-        let baseFont = BKTextStyle.body1(weight: .semiBold).uiFont ?? UIFont.systemFont(ofSize: 14)
+        let baseFont = BKTextStyle.label1(weight: .medium).uiFont ?? UIFont.systemFont(ofSize: 14)
         let attributed = NSMutableAttributedString(
             string: fullText,
             attributes: [

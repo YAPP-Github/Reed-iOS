@@ -146,7 +146,9 @@ final class HomeView: BaseView {
         }
         
         bookCollectionView.snp.makeConstraints {
-            $0.top.equalTo(bookSectionTitleLabel.snp.bottom)
+            $0.top
+                .equalTo(bookSectionTitleLabel.snp.bottom)
+                .offset(2)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(LayoutConstants.collectionHeight)
         }

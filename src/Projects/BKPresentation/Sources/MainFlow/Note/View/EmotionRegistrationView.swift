@@ -196,6 +196,6 @@ private extension EmotionRegistrationView {
         static let titleStackSpacing = BKSpacing.spacing1
         static let emotionStackSpacing = BKSpacing.spacing3
         static let horizontalInset = BKInset.inset5
-        static let emotionVStackOffset: CGFloat = 40
+        static let emotionVStackOffset: CGFloat = 24
     }
 }

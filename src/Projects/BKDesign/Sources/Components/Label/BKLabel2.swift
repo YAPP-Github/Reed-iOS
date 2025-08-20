@@ -2,7 +2,7 @@
 
 import UIKit
 
-public final class BKLabel: UILabel {
+public final class BKLabel2: UILabel {
     public enum LabelType {
         case medium
         case small
@@ -36,22 +36,19 @@ public final class BKLabel: UILabel {
     
     public var highlightedWord: String? {
         didSet {
-//            apply()
-            applyRecommended()
+            apply()
         }
     }
     
     public var highlightColor: UIColor {
         didSet {
-//            apply()
-            applyRecommended()
+            apply()
         }
     }
     
     public var highlightFont: UIFont? {
         didSet {
-//            apply()
-            applyRecommended()
+            apply()
         }
     }
     
@@ -73,8 +70,7 @@ public final class BKLabel: UILabel {
         self.highlightColor = highlightColor
         self.highlightFont = highlightFont
         super.init(frame: frame)
-//        apply()
-        applyRecommended()
+        apply()
     }
     
     convenience public init(
@@ -102,25 +98,21 @@ public final class BKLabel: UILabel {
     
     public func setFontStyle(style: BKTextStyle) {
         self.fontStyle = style
-//        apply()
-        applyRecommended()
+        apply()
     }
     
     public func setText(text: String) {
         self.labelText = text
-//        apply()
-        applyRecommended()
+        apply()
     }
     
     public func setColor(color: UIColor) {
         self.labelColor = color
-//        apply()
-        
-        applyRecommended()
+        apply()
     }
 }
 
-private extension BKLabel {
+private extension BKLabel2 {
     func apply() {
         let baseText = fontStyle.attributedString(
             from: labelText,
@@ -150,38 +142,9 @@ private extension BKLabel {
         
         attributedText = attributedString
     }
-    
-    func applyRecommended() {
-        let customParagraphStyle = fontStyle.paragraphStyle
-        customParagraphStyle.alignment = alignment
-        customParagraphStyle.lineBreakMode = self.lineBreakMode
-        
-        let extraAttributes: [NSAttributedString.Key: Any] = [
-            .paragraphStyle: customParagraphStyle
-        ]
-        
-        let attributedString = fontStyle.mutableAttributedString(
-            from: labelText,
-            color: labelColor,
-            extraAttributes: extraAttributes
-        )
-        
-        // 하이라이트 단어 처리
-        if let word = highlightedWord, !word.isEmpty {
-            let wordRange = (labelText as NSString).range(of: word)
-            if wordRange.location != NSNotFound {
-                attributedString.addAttribute(.foregroundColor, value: highlightColor, range: wordRange)
-                if let highlightFont = highlightFont {
-                    attributedString.addAttribute(.font, value: highlightFont, range: wordRange)
-                }
-            }
-        }
-        
-        attributedText = attributedString
-    }
 }
 
-extension BKLabel.LabelType {
+extension BKLabel2.LabelType {
     var fontStyle: BKTextStyle {
         switch self {
         case .medium:
