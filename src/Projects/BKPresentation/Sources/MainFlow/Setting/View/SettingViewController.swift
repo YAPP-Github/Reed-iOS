@@ -113,14 +113,11 @@ final class SettingViewController: BaseViewController<SettingView> {
             .filter { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.coordinator?.notifyAuthenticationRequired { [weak self] in
-                    self?.viewModel.send(.loginFlowFinished)
-                }
+                self?.viewModel.send(.loginFlowFinished)
+                self?.coordinator?.notifyAuthenticationRequired { }
             }
             .store(in: &cancellable)
     }
-    
-    @objc func dummyFunc() {}
 }
 
 private extension SettingViewController {
