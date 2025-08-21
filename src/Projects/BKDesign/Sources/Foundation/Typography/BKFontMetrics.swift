@@ -34,6 +34,7 @@ public enum BKLineHeight: CGFloat {
     case p162_5 = 1.625
     case p140 = 1.400
     case p150 = 1.500
+    case p155 = 1.550
     case p160 = 1.600
     
     public func calculateAbsoluteLineHeight(for fontSize: CGFloat) -> CGFloat {
@@ -45,7 +46,9 @@ public enum BKLineHeight: CGFloat {
 public enum BKLetterSpacing: CGFloat {
     case pNegative2_36 = -0.0236
     case pNegative2_3 = -0.023
+    case pNegative2 = -0.02
     case pNegative1_2 = -0.012
+    case pNegative1_5 = -0.015
     case pNegative1 = -0.01
     
     public func calculateAbsoluteLetterSpacing(for fontSize: CGFloat) -> CGFloat {

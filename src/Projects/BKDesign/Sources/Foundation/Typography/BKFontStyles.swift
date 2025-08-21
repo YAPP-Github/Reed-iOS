@@ -8,6 +8,7 @@ public enum BKFontName: String {
     case pretendardMedium = "Pretendard-Medium"
     case pretendardSemiBold = "Pretendard-SemiBold"
     case pretendardBold = "Pretendard-Bold"
+    case santteutM = "HakgyoansimSantteutbatangM"
     
     // 나중에 추가되면 여기에 네이밍 추가
 }
@@ -18,6 +19,7 @@ public enum BKFontWeight: String {
     case medium = "Medium"
     case semiBold = "SemiBold"
     case bold = "Bold"
+    case stMedium = "STMedium"
     
     public func toFontName() -> BKFontName {
         switch self {
@@ -25,6 +27,7 @@ public enum BKFontWeight: String {
         case .medium: return .pretendardMedium
         case .semiBold: return .pretendardSemiBold
         case .bold: return .pretendardBold
+        case .stMedium : return .santteutM
         }
     }
 }

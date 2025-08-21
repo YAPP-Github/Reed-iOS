@@ -15,12 +15,16 @@ public enum BKTextStyle {
     
     case body1(weight: BKFontWeight)
     case body2(weight: BKFontWeight)
+    /// 문장 공유 카드 전용
+    case body3(weight: BKFontWeight)
     
     case label1(weight: BKFontWeight)
     case label2(weight: BKFontWeight)
     
     case caption1(weight: BKFontWeight)
     case caption2(weight: BKFontWeight)
+    /// 문장 공유 카드 전용
+    case caption3(weight: BKFontWeight)
     
     // MARK: - fontAttributes: 폰트 속성 구조체 반환
     public var fontAttributes: BKFontAttributes {
@@ -181,7 +185,7 @@ public enum BKTextStyle {
                     lineHeight: .p150,
                     letterSpacing: .pNegative1
                 )
-            case .regular:
+            default:
                 return BKFontAttributes(
                     fontName: .pretendardRegular,
                     fontSize: .pt16,
@@ -297,6 +301,20 @@ public enum BKTextStyle {
                     letterSpacing: .pNegative1
                 )
             }
+        case .body3(let weight):
+            return BKFontAttributes(
+                fontName: .santteutM,
+                fontSize: .pt18,
+                lineHeight: .p155,
+                letterSpacing: .pNegative1_5
+            )
+        case .caption3(let weight):
+            return BKFontAttributes(
+                fontName: .santteutM,
+                fontSize: .pt16,
+                lineHeight: .p150,
+                letterSpacing: .pNegative2
+            )
         }
     }
     
