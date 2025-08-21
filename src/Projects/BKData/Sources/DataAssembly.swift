@@ -118,5 +118,12 @@ public struct DataAssembly: Assembly {
             @Autowired var repository: DefaultAuthRepository
             return repository
         }
+        
+        container.register(
+            type: AppStoreRepository.self
+        ) { _ in
+            @Autowired var networkProvider: NetworkProvider
+            return DefaultAppStoreRepository(networkProvider: networkProvider)
+        }
     }
 }
