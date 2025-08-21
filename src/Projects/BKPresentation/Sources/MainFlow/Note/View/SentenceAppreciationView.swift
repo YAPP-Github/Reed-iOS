@@ -54,8 +54,9 @@ final class SentenceAppreciationView: BaseView {
     
     init(guideButtonAction: @escaping () -> Void) {
         super.init(frame: .zero)
-        guideButton.addAction(UIAction { _ in
+        guideButton.addAction(UIAction { [weak self] _ in
             guideButtonAction()
+            self?.tooltipView.isHidden = true
         }, for: .touchUpInside)
         setupTextViewFocusHandling()
     }
