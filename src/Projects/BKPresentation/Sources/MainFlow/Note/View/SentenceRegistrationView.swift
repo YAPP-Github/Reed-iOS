@@ -38,11 +38,31 @@ final class SentenceRegistrationView: BaseView {
         size: .rounded
     )
     
+    private let tooltipView = TooltipView(text: "스캔으로 빠르게 입력해요")
+    
     var onTextScanTapped: (() -> Void)?
+    var onPageFieldFocused: (() -> Void)?
+    var onSentenceTextViewFocused: (() -> Void)?
+    
+    var scanButtonFrame: CGRect {
+        return textScanButton.frame
+    }
+    
+    var pageFieldFrame: CGRect {
+        return pageField.frame
+    }
+    
+    var sentenceTextViewFrame: CGRect {
+        return sentenceTextView.frame
+    }
     
     override init(frame: CGRect = .zero) {
         super.init(frame: frame)
         bindInputs()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func setupView() {
@@ -50,7 +70,8 @@ final class SentenceRegistrationView: BaseView {
             titleLabel,
             pageField,
             sentenceTextView,
-            textScanButton
+            textScanButton,
+            tooltipView
         )
     }
     
@@ -61,6 +82,8 @@ final class SentenceRegistrationView: BaseView {
         pageField.setTextFieldDelegate(self)
         pageField.setTextFieldKeyboardType(.numberPad)
         textScanButton.addTarget(self, action: #selector(textScanButtonTapped), for: .touchUpInside)
+        
+        setupTextFieldFocusHandling()
     }
     
     override func setupLayout() {
@@ -90,6 +113,12 @@ final class SentenceRegistrationView: BaseView {
             $0.trailing.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
             $0.bottom.equalToSuperview()
+        }
+        
+        tooltipView.snp.makeConstraints {
+            $0.centerY.equalTo(textScanButton)
+            $0.trailing.equalTo(textScanButton.snp.leading).offset(-8)
+            $0.height.equalTo(34)
         }
     }
 }
@@ -126,12 +155,35 @@ extension SentenceRegistrationView: RegistrationFormProvidable, FormInputNotifia
     }
     
     @objc func textScanButtonTapped() {
+        tooltipView.isHidden = true
         onTextScanTapped?()
     }
     
     func setScannedText(_ text: String) {
         sentenceTextView.setText(text)
         inputChangedSubject.send(())
+    }
+    
+    private func setupTextFieldFocusHandling() {
+        // BKTextView의 메서드를 통한 포커스 감지
+        sentenceTextView.addTextViewFocusObserver(
+            target: self,
+            selector: #selector(textViewDidBeginEditing)
+        )
+        
+        // BKTextFieldView의 메서드를 통한 포커스 감지  
+        pageField.addTextFieldFocusObserver(
+            target: self,
+            selector: #selector(pageFieldDidBeginEditing)
+        )
+    }
+    
+    @objc private func textViewDidBeginEditing(_ notification: Notification) {
+        onSentenceTextViewFocused?()
+    }
+    
+    @objc private func pageFieldDidBeginEditing(_ notification: Notification) {
+        onPageFieldFocused?()
     }
 }
 

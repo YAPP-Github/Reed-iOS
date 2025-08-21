@@ -84,6 +84,15 @@ public final class BKTextFieldView: UIView {
     public func setTextFieldKeyboardType(_ type: UIKeyboardType) {
         textField.keyboardType = type
     }
+    
+    public func addTextFieldFocusObserver(target: Any, selector: Selector) {
+        NotificationCenter.default.addObserver(
+            target,
+            selector: selector,
+            name: UITextField.textDidBeginEditingNotification,
+            object: textField
+        )
+    }
 }
 
 private extension BKTextFieldView {

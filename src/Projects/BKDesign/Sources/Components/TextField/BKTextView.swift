@@ -109,6 +109,15 @@ public final class BKTextView: UIView {
             }
         }
     }
+    
+    public func addTextViewFocusObserver(target: Any, selector: Selector) {
+        NotificationCenter.default.addObserver(
+            target,
+            selector: selector,
+            name: UITextView.textDidBeginEditingNotification,
+            object: textView
+        )
+    }
 }
 
 private extension BKTextView {

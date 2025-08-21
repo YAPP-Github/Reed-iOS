@@ -22,6 +22,17 @@ protocol FormInputNotifiable: AnyObject {
 final class NoteView: BaseView {
     let eventPublisher = PassthroughSubject<NoteViewEvent, Never>()
     private var cancellables = Set<AnyCancellable>()
+    private var keyboardCancellables = Set<AnyCancellable>()
+    
+    private var currentFocusedInput: FocusedInput = .none
+    
+    private enum FocusedInput {
+        case none
+        case pageField
+        case sentenceTextView
+        case scanButton
+        case appreciationTextView
+    }
     
     private lazy var sentenceView = SentenceRegistrationView()
     private lazy var emotionView = EmotionRegistrationView()
@@ -61,8 +72,19 @@ final class NoteView: BaseView {
         pageControl.addTarget(self, action: #selector(pageControlChanged), for: .valueChanged)
         nextButton.primaryButton?.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
         sentenceView.onTextScanTapped = { [weak self] in self?.eventPublisher.send(.didTapOCRButton) }
+        sentenceView.onPageFieldFocused = { [weak self] in 
+            self?.currentFocusedInput = .pageField
+        }
+        sentenceView.onSentenceTextViewFocused = { [weak self] in 
+            self?.currentFocusedInput = .sentenceTextView
+        }
+        appreciationView.onAppreciationTextViewFocused = { [weak self] in
+            self?.currentFocusedInput = .appreciationTextView
+        }
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         addGestureRecognizer(tapGesture)
+        
+        setupKeyboardHandling()
         
         if let notifiable = currentView as? FormInputNotifiable {
             notifiable.inputChangedPublisher
@@ -164,6 +186,7 @@ private extension NoteView {
         let xpos = CGFloat(sender.currentPage) * contentScrollView.bounds.width
         contentScrollView.setContentOffset(.init(x: xpos, y: 0), animated: true)
         
+        // input change 관련 cancellable만 제거하고 재설정
         cancellables.removeAll()
 
         if let notifiable = currentView as? FormInputNotifiable {
@@ -190,7 +213,114 @@ private extension NoteView {
     }
     
     @objc private func dismissKeyboard() {
+        currentFocusedInput = .none
         endEditing(true)
+    }
+    
+    private func setupKeyboardHandling() {
+        let keyboardWillShow = NotificationCenter.default
+            .publisher(for: UIResponder.keyboardWillShowNotification)
+            .compactMap { notification -> CGFloat? in
+                guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return nil }
+                return keyboardFrame.height
+            }
+        
+        let keyboardWillHide = NotificationCenter.default
+            .publisher(for: UIResponder.keyboardWillHideNotification)
+            .map { _ in CGFloat.zero }
+        
+        Publishers.Merge(keyboardWillShow, keyboardWillHide)
+            .sink { [weak self] height in
+                self?.adjustForKeyboard(height: height)
+            }
+            .store(in: &keyboardCancellables)
+    }
+    
+    private func adjustForKeyboard(height: CGFloat) {
+        // 각 페이지 뷰의 스크롤뷰 contentInset 조정
+        contentStackView.arrangedSubviews.enumerated().forEach { index, view in
+            guard let scrollView = view as? UIScrollView else { return }
+            scrollView.contentInset.bottom = height
+            scrollView.verticalScrollIndicatorInsets.bottom = height
+            
+            // 현재 페이지에서 키보드가 나타날 때만 스크롤
+            if index == pageControl.currentPage, height > 0 {
+                // 포커스된 입력에 따라 적절한 스크롤 수행
+                switch currentFocusedInput {
+                case .pageField:
+                    if index == 0 { scrollToPageField(in: scrollView) }
+                case .sentenceTextView:
+                    if index == 0 { scrollToSentenceTextView(in: scrollView) }
+                case .scanButton:
+                    if index == 0 { scrollToScanButton(in: scrollView) }
+                case .appreciationTextView:
+                    if index == 2 { scrollToAppreciationTextView(in: scrollView) }
+                case .none:
+                    break
+                }
+            }
+        }
+    }
+    
+    private func scrollToScanButton(in scrollView: UIScrollView) {
+        guard let sentenceView = pageViews.first as? SentenceRegistrationView else { return }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            // SentenceRegistrationView의 스캔 버튼이 보이도록 스크롤
+            let scanButtonFrame = sentenceView.scanButtonFrame
+            let scanButtonGlobalFrame = sentenceView.convert(scanButtonFrame, to: scrollView)
+            
+            // 스캔 버튼이 키보드 위에 20pt 여백을 두고 보이도록 계산
+            let visibleHeight = scrollView.frame.height - scrollView.contentInset.bottom
+            let targetY = max(0, scanButtonGlobalFrame.maxY - visibleHeight + 20)
+            
+            scrollView.setContentOffset(CGPoint(x: 0, y: targetY), animated: true)
+        }
+    }
+    
+    private func scrollToPageField(in scrollView: UIScrollView) {
+        guard let sentenceView = pageViews.first as? SentenceRegistrationView else { return }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            // 페이지 필드 라벨이 보이도록 스크롤 (상단 여백 포함)
+            let pageFieldFrame = sentenceView.pageFieldFrame
+            let pageFieldGlobalFrame = sentenceView.convert(pageFieldFrame, to: scrollView)
+            
+            // 페이지 필드 라벨이 상단에 20pt 여백을 두고 보이도록
+            let targetY = max(0, pageFieldGlobalFrame.minY - 20)
+            
+            scrollView.setContentOffset(CGPoint(x: 0, y: targetY), animated: true)
+        }
+    }
+    
+    private func scrollToSentenceTextView(in scrollView: UIScrollView) {
+        guard let sentenceView = pageViews.first as? SentenceRegistrationView else { return }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            // 문장 기록 라벨이 보이도록 스크롤
+            let sentenceTextViewFrame = sentenceView.sentenceTextViewFrame
+            let sentenceTextViewGlobalFrame = sentenceView.convert(sentenceTextViewFrame, to: scrollView)
+            
+            // 문장 기록 라벨이 상단에 20pt 여백을 두고 보이도록
+            let targetY = max(0, sentenceTextViewGlobalFrame.minY - 20)
+            
+            scrollView.setContentOffset(CGPoint(x: 0, y: targetY), animated: true)
+        }
+    }
+    
+    private func scrollToAppreciationTextView(in scrollView: UIScrollView) {
+        guard let appreciationView = pageViews[2] as? SentenceAppreciationView else { return }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            // 감상 텍스트뷰 라벨이 보이도록 스크롤
+            let appreciationTextViewFrame = appreciationView.appreciationTextViewFrame
+            let appreciationTextViewGlobalFrame = appreciationView.convert(appreciationTextViewFrame, to: scrollView)
+            
+            // 감상 텍스트뷰 라벨이 상단에 20pt 여백을 두고 보이도록
+            let targetY = max(0, appreciationTextViewGlobalFrame.minY - 20)
+            
+            scrollView.setContentOffset(CGPoint(x: 0, y: targetY), animated: true)
+        }
     }
 }
 

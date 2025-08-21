@@ -40,15 +40,33 @@ final class SentenceAppreciationView: BaseView {
         size: .rounded
     )
     
+    private let tooltipView = TooltipView(text: "예시 문장을 알려드려요")
+    
+    var onAppreciationTextViewFocused: (() -> Void)?
+    
+    var appreciationTextViewFrame: CGRect {
+        return appreciationTextView.frame
+    }
+    
+    var guideButtonFrame: CGRect {
+        return guideButton.frame
+    }
+    
     init(guideButtonAction: @escaping () -> Void) {
         super.init(frame: .zero)
-        guideButton.addAction(UIAction { _ in
+        guideButton.addAction(UIAction { [weak self] _ in
             guideButtonAction()
+            self?.tooltipView.isHidden = true
         }, for: .touchUpInside)
+        setupTextViewFocusHandling()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func setupView() {
-        addSubviews(titleStack, appreciationTextView, guideButton)
+        addSubviews(titleStack, appreciationTextView, guideButton, tooltipView)
         [titleLabel, subtitleLabel].forEach(titleStack.addArrangedSubview(_:))
     }
     
@@ -79,6 +97,13 @@ final class SentenceAppreciationView: BaseView {
                 .inset(LayoutConstants.horizontalInset)
             $0.bottom.equalToSuperview()
         }
+        
+        tooltipView.snp.makeConstraints {
+            $0.trailing.equalTo(guideButton.snp.leading)
+                .offset(-8)
+            $0.centerY.equalTo(guideButton)
+            $0.height.equalTo(34)
+        }
     }
     
     func setText(_ content: String) {
@@ -87,6 +112,18 @@ final class SentenceAppreciationView: BaseView {
     
     func startEditingIfNeeded() {
         appreciationTextView.startEditing()
+    }
+    
+    private func setupTextViewFocusHandling() {
+        // BKTextView의 메서드를 통한 포커스 감지
+        appreciationTextView.addTextViewFocusObserver(
+            target: self,
+            selector: #selector(textViewDidBeginEditing)
+        )
+    }
+    
+    @objc private func textViewDidBeginEditing(_ notification: Notification) {
+        onAppreciationTextViewFocused?()
     }
 }
 
