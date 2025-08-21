@@ -4,8 +4,18 @@ import Combine
 import Foundation
 
 public struct DefaultAppVersionUseCase: AppVersionUseCase {
+    private let repository: AppStoreRepository
+    
+    public init(repository: AppStoreRepository) {
+        self.repository = repository
+    }
+    
     public func execute() -> AnyPublisher<String, Never> {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "-"
         return Just(version).eraseToAnyPublisher()
+    }
+    
+    public func executeRecentVersion() -> AnyPublisher<String, Error> {
+        repository.fetchAppStoreVersion().eraseToAnyPublisher()
     }
 }
