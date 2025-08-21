@@ -41,10 +41,28 @@ final class SentenceRegistrationView: BaseView {
     private let tooltipView = TooltipView()
     
     var onTextScanTapped: (() -> Void)?
+    var onPageFieldFocused: (() -> Void)?
+    var onSentenceTextViewFocused: (() -> Void)?
+    
+    var scanButtonFrame: CGRect {
+        return textScanButton.frame
+    }
+    
+    var pageFieldFrame: CGRect {
+        return pageField.frame
+    }
+    
+    var sentenceTextViewFrame: CGRect {
+        return sentenceTextView.frame
+    }
     
     override init(frame: CGRect = .zero) {
         super.init(frame: frame)
         bindInputs()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func setupView() {
@@ -64,6 +82,8 @@ final class SentenceRegistrationView: BaseView {
         pageField.setTextFieldDelegate(self)
         pageField.setTextFieldKeyboardType(.numberPad)
         textScanButton.addTarget(self, action: #selector(textScanButtonTapped), for: .touchUpInside)
+        
+        setupTextFieldFocusHandling()
     }
     
     override func setupLayout() {
@@ -143,9 +163,29 @@ extension SentenceRegistrationView: RegistrationFormProvidable, FormInputNotifia
         sentenceTextView.setText(text)
         inputChangedSubject.send(())
     }
+    
+    private func setupTextFieldFocusHandling() {
+        // NotificationCenter를 통한 포커스 감지
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(textViewDidBeginEditing),
+            name: UITextView.textDidBeginEditingNotification,
+            object: sentenceTextView.textView
+        )
+    }
+    
+    @objc private func textViewDidBeginEditing(_ notification: Notification) {
+        if notification.object as? UITextView == sentenceTextView.textView {
+            onSentenceTextViewFocused?()
+        }
+    }
 }
 
 extension SentenceRegistrationView: UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        onPageFieldFocused?()
+    }
+    
     func textField(
         _ textField: UITextField,
         shouldChangeCharactersIn range: NSRange,

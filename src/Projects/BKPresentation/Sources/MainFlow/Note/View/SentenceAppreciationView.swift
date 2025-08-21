@@ -40,11 +40,26 @@ final class SentenceAppreciationView: BaseView {
         size: .rounded
     )
     
+    var onAppreciationTextViewFocused: (() -> Void)?
+    
+    var appreciationTextViewFrame: CGRect {
+        return appreciationTextView.frame
+    }
+    
+    var guideButtonFrame: CGRect {
+        return guideButton.frame
+    }
+    
     init(guideButtonAction: @escaping () -> Void) {
         super.init(frame: .zero)
         guideButton.addAction(UIAction { _ in
             guideButtonAction()
         }, for: .touchUpInside)
+        setupTextViewFocusHandling()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func setupView() {
@@ -87,6 +102,22 @@ final class SentenceAppreciationView: BaseView {
     
     func startEditingIfNeeded() {
         appreciationTextView.startEditing()
+    }
+    
+    private func setupTextViewFocusHandling() {
+        // NotificationCenter를 통한 포커스 감지
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(textViewDidBeginEditing),
+            name: UITextView.textDidBeginEditingNotification,
+            object: appreciationTextView.textView
+        )
+    }
+    
+    @objc private func textViewDidBeginEditing(_ notification: Notification) {
+        if notification.object as? UITextView == appreciationTextView.textView {
+            onAppreciationTextViewFocused?()
+        }
     }
 }
 
