@@ -12,9 +12,11 @@ final class TooltipView: BaseView {
         alignment: .center
     )
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupView()
+    private let labelText: String
+    
+    init(text: String) {
+        self.labelText = text
+        super.init(frame: .zero)
     }
 
     required init?(coder: NSCoder) {
@@ -28,6 +30,7 @@ final class TooltipView: BaseView {
     override func configure() {
         backgroundColor = .clear
         textLabel.numberOfLines = 1
+        textLabel.setText(text: labelText)
         
         layer.shadowColor = UIColor(hex: "#28323C").cgColor
         layer.shadowOpacity = 0.18

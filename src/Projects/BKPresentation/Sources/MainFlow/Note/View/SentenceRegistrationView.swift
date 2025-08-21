@@ -38,7 +38,7 @@ final class SentenceRegistrationView: BaseView {
         size: .rounded
     )
     
-    private let tooltipView = TooltipView()
+    private let tooltipView = TooltipView(text: "스캔으로 빠르게 입력해요")
     
     var onTextScanTapped: (() -> Void)?
     var onPageFieldFocused: (() -> Void)?

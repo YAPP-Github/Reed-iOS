@@ -40,6 +40,8 @@ final class SentenceAppreciationView: BaseView {
         size: .rounded
     )
     
+    private let tooltipView = TooltipView(text: "예시 문장을 알려드려요")
+    
     var onAppreciationTextViewFocused: (() -> Void)?
     
     var appreciationTextViewFrame: CGRect {
@@ -63,7 +65,7 @@ final class SentenceAppreciationView: BaseView {
     }
     
     override func setupView() {
-        addSubviews(titleStack, appreciationTextView, guideButton)
+        addSubviews(titleStack, appreciationTextView, guideButton, tooltipView)
         [titleLabel, subtitleLabel].forEach(titleStack.addArrangedSubview(_:))
     }
     
@@ -93,6 +95,13 @@ final class SentenceAppreciationView: BaseView {
             $0.trailing.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
             $0.bottom.equalToSuperview()
+        }
+        
+        tooltipView.snp.makeConstraints {
+            $0.trailing.equalTo(guideButton.snp.leading)
+                .offset(-8)
+            $0.centerY.equalTo(guideButton)
+            $0.height.equalTo(34)
         }
     }
     
