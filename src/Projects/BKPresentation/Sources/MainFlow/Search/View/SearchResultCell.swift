@@ -45,10 +45,15 @@ final class SearchResultCell: UICollectionViewCell {
         description: BookDescription,
         image: URL?,
         canSelect: Bool = true,
-        recordCount: Int? = nil
+        recordCount: Int? = nil,
+        isLibraryBook: Bool = false
     ) {
         let style: BKBookSummaryViewStyle = {
-            if recordCount != nil {
+            if isLibraryBook && recordCount != nil {
+                return .record
+            } else if isLibraryBook {
+                return .alreadyEnroll
+            } else if recordCount != nil {
                 return .record
             } else if canSelect {
                 return .regular

@@ -101,7 +101,6 @@ final class SettingViewController: BaseViewController<SettingView> {
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
-                print(error)
                 self?.coordinator?.handleError(error)
                 self?.viewModel.send(.errorHandled)
             }

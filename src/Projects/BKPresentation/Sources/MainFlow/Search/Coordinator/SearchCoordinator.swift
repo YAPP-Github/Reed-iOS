@@ -46,4 +46,15 @@ extension SearchCoordinator {
         addChildCoordinator(noteCoordinator)
         noteCoordinator.start()
     }
+    
+    func didTapBookDetail(isbn: String, userBookId: String) {
+        let bookDetailCoordinator = BookDetailCoordinator(
+            parentCoordinator: self,
+            navigationController: navigationController,
+            isbn: isbn,
+            userBookId: userBookId
+        )
+        addChildCoordinator(bookDetailCoordinator)
+        bookDetailCoordinator.start()
+    }
 }

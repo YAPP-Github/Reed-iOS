@@ -192,12 +192,12 @@ public class BKBookSummaryView: UIView {
             }
         }
 
-        authorLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        authorLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        authorLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        authorLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         separatorLabel.setContentHuggingPriority(.required, for: .horizontal)
         separatorLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
         publisherLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        publisherLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        publisherLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     }
 
     private func setupLayouts() {
@@ -245,8 +245,9 @@ public class BKBookSummaryView: UIView {
         recordCount: Int? = nil,
         image: URL? = nil
     ) {
+        let wrappedAuthor = author.isEmpty ? "저자 정보 없음" : author
         titleLabel.setText(text: title)
-        authorLabel.setText(text: author)
+        authorLabel.setText(text: wrappedAuthor)
         publisherLabel.setText(text: publisher)
         thumbnail.clipsToBounds = true
         thumbnail.layer.cornerRadius = LayoutConstants.imageRadius

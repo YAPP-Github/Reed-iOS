@@ -8,6 +8,7 @@ import Foundation
 enum SearchItem: Hashable {
     case query(String)
     case result(Book)
+    case libraryResult(BookInfo)
 }
 
 struct RecentState: Equatable {
@@ -17,7 +18,20 @@ struct RecentState: Equatable {
 
 struct ResultState: Equatable {
     let books: [Book]
+    let bookInfos: [BookInfo]
     let placeholder: String
+    
+    init(books: [Book], placeholder: String) {
+        self.books = books
+        self.bookInfos = []
+        self.placeholder = placeholder
+    }
+    
+    init(bookInfos: [BookInfo], placeholder: String) {
+        self.books = []
+        self.bookInfos = bookInfos
+        self.placeholder = placeholder
+    }
 }
 
 enum SearchViewType: String {
@@ -56,20 +70,6 @@ enum SearchViewType: String {
     }
 }
 
-struct MyLibrarySearchAdapter: SearchBookUseCase {
-    let wrapped: MyLibrarySearchBookUseCase
-    let map: (BookInfo) -> Book
-
-    func execute(
-        query: String?,
-        startIndex: Int?,
-        isGuestMode: Bool
-    ) -> AnyPublisher<(books: [Book], totalResults: Int), DomainError> {
-        wrapped.execute(query: query, startIndex: startIndex)
-            .map { (books: $0.books.map(map), totalResults: $0.totalResults) }
-            .eraseToAnyPublisher()
-    }
-}
 
 final class SearchViewModel: BaseViewModel {
     enum SearchState: Equatable {
@@ -96,6 +96,7 @@ final class SearchViewModel: BaseViewModel {
     
     enum Action {
         case onAppear
+        case onAppearWithoutReset  // 검색 결과 유지한 채로 appear
         case search(String)
         case loadNextPage
         case loadNoteFlow
@@ -103,6 +104,7 @@ final class SearchViewModel: BaseViewModel {
         case upsertBook(isbn: String, status: BookRegistrationStatus)
         case fetchRecentQueriesSuccessed([String])
         case fetchSearchResultSuccessed((books: [Book], totalResults: Int))
+        case fetchLibrarySearchResultSuccessed((bookInfos: [BookInfo], totalResults: Int))
         case fetchNextPageSuccessed([Book])
         case upsertBookSuccessed(isbn: String, bookId: String)
         case noteSuggestionShown
@@ -125,6 +127,7 @@ final class SearchViewModel: BaseViewModel {
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
     private let pageSize = 10
     private var allBooks: [Book] = []
+    private var allBookInfos: [BookInfo] = []
     private var currentQuery: String?
     private var currentPage = 1
     private let searchViewType: SearchViewType
@@ -148,17 +151,8 @@ final class SearchViewModel: BaseViewModel {
     @Autowired var defaultSearchUseCase: SearchBookUseCase
     @Autowired var myLibrarySearchUseCase: MyLibrarySearchBookUseCase
     
-    private lazy var searchBookUseCase: SearchBookUseCase = {
-        switch searchViewType {
-        case .defaultSearch:
-            return defaultSearchUseCase
-        case .myLibrarySearch:
-            return MyLibrarySearchAdapter(
-                wrapped: myLibrarySearchUseCase,
-                map: mapBookInfoToBook
-            )
-        }
-    }()
+    // SearchBookUseCase는 defaultSearch에서만 사용
+    // myLibrarySearch에서는 myLibrarySearchUseCase를 직접 사용
     
     @Autowired private var upsertUseCase: BookUpsertUseCase
     
@@ -195,6 +189,13 @@ final class SearchViewModel: BaseViewModel {
             newState.isLoading = true
             effects.append(.recentQueries)
             
+        case .onAppearWithoutReset:
+            // 검색 결과가 있으면 유지, 없으면 최근 검색어 로드
+            if case .recent = state.searchState {
+                newState.isLoading = true
+                effects.append(.recentQueries)
+            }
+            
         case .search(let query):
             currentQuery = query
             currentPage = searchViewType == .defaultSearch ? 1 : 0
@@ -213,6 +214,7 @@ final class SearchViewModel: BaseViewModel {
             
         case .fetchSearchResultSuccessed(let result):
             allBooks = result.books
+            allBookInfos = []
             newState.totalResults = result.totalResults
             newState.isLoading = false
             newState.searchState = .result(
@@ -222,6 +224,19 @@ final class SearchViewModel: BaseViewModel {
                 )
             )
             newState.hasMoreData = allBooks.count < result.totalResults
+            
+        case .fetchLibrarySearchResultSuccessed(let result):
+            allBookInfos = result.bookInfos
+            allBooks = []
+            newState.totalResults = result.totalResults
+            newState.isLoading = false
+            newState.searchState = .result(
+                ResultState(
+                    bookInfos: result.bookInfos,
+                    placeholder: searchViewType.resultPlaceholder
+                )
+            )
+            newState.hasMoreData = allBookInfos.count < result.totalResults
             
         case .loadNextPage:
             guard !state.isLoading, state.hasMoreData else { break }
@@ -318,39 +333,74 @@ final class SearchViewModel: BaseViewModel {
                 .eraseToAnyPublisher()
             
         case .searchResult(let query):
-            return Publishers.Zip(
-                searchBookUseCase.execute(
-                    query: query,
-                    startIndex: currentPage,
-                    isGuestMode: AccessModeCenter.shared.mode.value == .guest
-                ),
-                storeRecentSearchUseCase.execute(query: query)
-                    .setFailureType(to: DomainError.self)
-            )
-            .map { (result, _) in
-                Action.fetchSearchResultSuccessed(result)
+            if searchViewType == .myLibrarySearch {
+                return Publishers.Zip(
+                    myLibrarySearchUseCase.execute(
+                        query: query,
+                        startIndex: currentPage
+                    ),
+                    storeRecentSearchUseCase.execute(query: query)
+                        .setFailureType(to: DomainError.self)
+                )
+                .map { (result, _) in
+                    Action.fetchLibrarySearchResultSuccessed(result)
+                }
+                .catch { [weak self] in
+                    self?.lastEffect = .searchResult(query)
+                    return Just(Action.errorOccured($0))
+                }
+                .eraseToAnyPublisher()
+            } else {
+                return Publishers.Zip(
+                    defaultSearchUseCase.execute(
+                        query: query,
+                        startIndex: currentPage,
+                        isGuestMode: AccessModeCenter.shared.mode.value == .guest
+                    ),
+                    storeRecentSearchUseCase.execute(query: query)
+                        .setFailureType(to: DomainError.self)
+                )
+                .map { (result, _) in
+                    Action.fetchSearchResultSuccessed(result)
+                }
+                .catch { [weak self] in
+                    self?.lastEffect = .searchResult(query)
+                    return Just(Action.errorOccured($0))
+                }
+                .eraseToAnyPublisher()
             }
-            .catch { [weak self] in
-                self?.lastEffect = .searchResult(query)
-                return Just(Action.errorOccured($0))
-            }
-            .eraseToAnyPublisher()
             
         case .loadNextPage:
             guard let query = currentQuery else {
                 return Empty().eraseToAnyPublisher()
             }
-            return searchBookUseCase.execute(
-                query: query,
-                startIndex: currentPage,
-                isGuestMode: AccessModeCenter.shared.mode.value == .guest
-            )
-            .map { Action.fetchNextPageSuccessed($0.books) }
-            .catch { [weak self] in
-                self?.lastEffect = .loadNextPage
-                return Just(Action.errorOccured($0))
+            if searchViewType == .myLibrarySearch {
+                return myLibrarySearchUseCase.execute(
+                    query: query,
+                    startIndex: currentPage
+                )
+                .map { result in
+                    let books = result.books.map(self.mapBookInfoToBook)
+                    return Action.fetchNextPageSuccessed(books)
+                }
+                .catch { [weak self] in
+                    self?.lastEffect = .loadNextPage
+                    return Just(Action.errorOccured($0))
+                }
+                .eraseToAnyPublisher()
+            } else {
+                return defaultSearchUseCase.execute(
+                    query: query,
+                    startIndex: currentPage,
+                    isGuestMode: AccessModeCenter.shared.mode.value == .guest
+                )
+                .map { Action.fetchNextPageSuccessed($0.books) }
+                .catch { [weak self] in
+                    self?.lastEffect = .loadNextPage
+                    return Just(Action.errorOccured($0))
+                }
+                .eraseToAnyPublisher()
             }
-            .eraseToAnyPublisher()
             
         case .upsert(let isbn, let status):
             return upsertUseCase.execute(

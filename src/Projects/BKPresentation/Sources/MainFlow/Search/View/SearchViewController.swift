@@ -10,6 +10,7 @@ enum SearchViewEvent: Equatable {
     case loadNextPage
     case deleteRecentQuery(String)
     case upsertBook(String)
+    case goToBookDetail(isbn: String, userBookId: String)
 }
 
 final class SearchViewController: BaseViewController<SearchView> {
@@ -40,7 +41,7 @@ final class SearchViewController: BaseViewController<SearchView> {
         super.viewWillAppear(animated)
         self.tabBarController?.tabBar.isHidden = true
         
-        viewModel.send(.onAppear)
+        viewModel.send(.onAppearWithoutReset)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -86,6 +87,17 @@ final class SearchViewController: BaseViewController<SearchView> {
             .throttle(for: .milliseconds(800), scheduler: RunLoop.main, latest: false)
             .sink { [weak self] query in
                 self?.presentBookRegistration(with: query)
+            }
+            .store(in: &cancellable)
+            
+        contentView.eventPublisher
+            .compactMap { event -> (String, String)? in
+                if case let .goToBookDetail(isbn, userBookId) = event { return (isbn, userBookId) }
+                return nil
+            }
+            .throttle(for: .milliseconds(800), scheduler: RunLoop.main, latest: false)
+            .sink { [weak self] (isbn, userBookId) in
+                self?.coordinator?.didTapBookDetail(isbn: isbn, userBookId: userBookId)
             }
             .store(in: &cancellable)
     }
