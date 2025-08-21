@@ -96,6 +96,7 @@ final class SearchViewModel: BaseViewModel {
     
     enum Action {
         case onAppear
+        case onAppearWithoutReset  // 검색 결과 유지한 채로 appear
         case search(String)
         case loadNextPage
         case loadNoteFlow
@@ -187,6 +188,13 @@ final class SearchViewModel: BaseViewModel {
         case .onAppear:
             newState.isLoading = true
             effects.append(.recentQueries)
+            
+        case .onAppearWithoutReset:
+            // 검색 결과가 있으면 유지, 없으면 최근 검색어 로드
+            if case .recent = state.searchState {
+                newState.isLoading = true
+                effects.append(.recentQueries)
+            }
             
         case .search(let query):
             currentQuery = query

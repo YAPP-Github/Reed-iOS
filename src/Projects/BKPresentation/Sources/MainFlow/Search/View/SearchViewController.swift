@@ -41,7 +41,7 @@ final class SearchViewController: BaseViewController<SearchView> {
         super.viewWillAppear(animated)
         self.tabBarController?.tabBar.isHidden = true
         
-        viewModel.send(.onAppear)
+        viewModel.send(.onAppearWithoutReset)
     }
     
     override func viewWillDisappear(_ animated: Bool) {

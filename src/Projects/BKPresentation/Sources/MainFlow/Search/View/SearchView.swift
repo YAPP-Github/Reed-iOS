@@ -100,7 +100,8 @@ final class SearchView: BaseView {
             }
             
         case .result(let state):
-            if state.books.isEmpty {
+            let isEmpty = state.books.isEmpty && state.bookInfos.isEmpty
+            if isEmpty {
                 header.layoutIfNeeded()
                 let headerHeight = header.bounds.height
                 let offset = -(headerHeight / 2.0)
@@ -109,7 +110,9 @@ final class SearchView: BaseView {
             } else {
                 collectionView.backgroundView = nil
                 snapshot.appendSections([.result])
+                // Book과 BookInfo 모두 처리
                 snapshot.appendItems(state.books.map { .result($0) }, toSection: .result)
+                snapshot.appendItems(state.bookInfos.map { .libraryResult($0) }, toSection: .result)
                 searchBar.setClearButtonMode(.always)
             }
             header.setTitle(.result(count: count))
@@ -140,6 +143,8 @@ private extension SearchView {
                 return self.makeRecentKeywordCell(in: collectionView, at: indexPath, keyword: keyword)
             case .result(let result):
                 return self.makeSearchResultCell(in: collectionView, at: indexPath, book: result)
+            case .libraryResult(let bookInfo):
+                return self.makeLibraryResultCell(in: collectionView, at: indexPath, bookInfo: bookInfo)
             }
         }
         
@@ -207,6 +212,34 @@ private extension SearchView {
                 recordCount: book.recordCount
             )
         }
+
+        return cell
+    }
+    
+    func makeLibraryResultCell(
+        in collectionView: UICollectionView,
+        at indexPath: IndexPath,
+        bookInfo: BookInfo
+    ) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: SearchResultCell.identifier,
+            for: indexPath
+        ) as? SearchResultCell else {
+            return UICollectionViewCell()
+        }
+        
+        // BookInfo는 내 서재 도서 - 터치 가능하고 recordCount가 있으면 .record 스타일
+        cell.configure(
+            title: bookInfo.title,
+            description: .init(
+                author: bookInfo.author,
+                publisher: bookInfo.publisher
+            ),
+            image: bookInfo.imageUrl,
+            canSelect: true,
+            recordCount: bookInfo.recordCount,
+            isLibraryBook: true
+        )
 
         return cell
     }
@@ -286,8 +319,20 @@ extension SearchView: UICollectionViewDelegate {
         didSelectItemAt indexPath: IndexPath
     ) {
         guard let item = dataSource.itemIdentifier(for: indexPath) else { return }
-        if case let .result(book) = item {
-            eventPublisher.send(.upsertBook(book.isbn))
+        
+        switch item {
+        case .result(let book):
+            switch book.userBookStatus {
+            case .beforeRegistration, nil:
+                eventPublisher.send(.upsertBook(book.isbn))
+            default:
+                break
+            }
+            
+        case .libraryResult(let bookInfo):
+            eventPublisher.send(.goToBookDetail(isbn: bookInfo.isbn, userBookId: bookInfo.bookId))
+            
+        case .query: break
         }
     }
 }
