@@ -58,6 +58,8 @@ public class BKButtonGroup: UIView {
     // MARK: - Setup
     private func setupView() {
         addSubview(stackView)
+        self.translatesAutoresizingMaskIntoConstraints = false
+        
         stackView.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(BKSpacing.spacing5)
             $0.verticalEdges.equalToSuperview().inset(BKSpacing.spacing4)
