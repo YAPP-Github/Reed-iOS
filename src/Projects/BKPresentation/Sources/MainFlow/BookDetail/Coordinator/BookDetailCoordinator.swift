@@ -56,8 +56,19 @@ extension BookDetailCoordinator {
             viewModel: NoteCompletionViewModel(recordId: recordId)
         )
         let noteNavigationController = UINavigationController(rootViewController: viewController)
-        
+
         noteNavigationController.modalPresentationStyle = .fullScreen
         navigationController.present(noteNavigationController, animated: true)
     }
+    
+    /// 문장 카드 확인 및 공유하기 화면으로 이동합니다.
+    func goToShareView(item: BookDetailItem) {
+        let viewController = SentenceCardViewController(
+            viewModel: SentenceCardViewModel(item)
+        )
+        viewController.coordinator = self
+        
+        navigationController.pushViewController(viewController, animated: true)
+    }
 }
+
