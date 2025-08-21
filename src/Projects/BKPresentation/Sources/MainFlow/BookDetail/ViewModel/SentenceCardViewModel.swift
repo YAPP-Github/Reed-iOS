@@ -75,22 +75,21 @@ final class SentenceCardViewModel: BaseViewModel {
     func handle(_ effect: SideEffect) -> AnyPublisher<Action, Never> {
         switch effect {
         case .saveImage(let image):
-            return Future<Result<Void, Error>, Never> { promise in
-                PHPhotoLibrary.requestAuthorization { status in
-                    return
-                }
-                
-                PHPhotoLibrary.shared().performChanges({
-                    PHAssetChangeRequest.creationRequestForAsset(from: image)
-                }, completionHandler: { success, error in
-                    if success {
-                        promise(.success(.success(())))
-                    } else if let error = error {
-                        promise(.success(.failure(error)))
+            return Future<Action, Never> { promise in
+                Task { [weak self] in
+                    do {
+                        try await self?.checkAndRequestPhotoAccess()
+                        
+                        try await PHPhotoLibrary.shared().performChanges {
+                            PHAssetChangeRequest.creationRequestForAsset(from: image)
+                        }
+                        
+                        promise(.success(.saveImageResult(.success(()))))
+                    } catch {
+                        promise(.success(.saveImageResult(.failure(error))))
                     }
-                })
+                }
             }
-            .map { Action.saveImageResult($0) }
             .eraseToAnyPublisher()
         }
     }
@@ -102,5 +101,19 @@ final class SentenceCardViewModel: BaseViewModel {
             }
             .sink(receiveValue: send(_:))
             .store(in: &cancellables)
+    }
+    
+    private func checkAndRequestPhotoAccess() async throws {
+        var status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        if status == .notDetermined {
+            status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
+        }
+        guard status == .authorized || status == .limited else {
+            throw NSError(
+                domain: "PhotoLibrary",
+                code: 2,
+                userInfo: [NSLocalizedDescriptionKey: "포토 라이브러리 접근 권한이 필요합니다."]
+            )
+        }
     }
 }

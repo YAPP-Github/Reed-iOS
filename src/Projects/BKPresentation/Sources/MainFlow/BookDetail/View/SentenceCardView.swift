@@ -63,7 +63,7 @@ final class SentenceCardView: BaseView {
         addSubviews(emotionBackgroundImageView, guideLabel, bottomButtons)
     }
     
-    override func layoutSubviews() {
+    override func setupLayout() {
         sentenceLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(64)
             $0.directionalHorizontalEdges.equalToSuperview().inset(32)
