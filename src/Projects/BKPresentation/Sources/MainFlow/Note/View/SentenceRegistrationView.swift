@@ -38,6 +38,8 @@ final class SentenceRegistrationView: BaseView {
         size: .rounded
     )
     
+    private let tooltipView = TooltipView()
+    
     var onTextScanTapped: (() -> Void)?
     
     override init(frame: CGRect = .zero) {
@@ -50,7 +52,8 @@ final class SentenceRegistrationView: BaseView {
             titleLabel,
             pageField,
             sentenceTextView,
-            textScanButton
+            textScanButton,
+            tooltipView
         )
     }
     
@@ -91,6 +94,12 @@ final class SentenceRegistrationView: BaseView {
                 .inset(LayoutConstants.horizontalInset)
             $0.bottom.equalToSuperview()
         }
+        
+        tooltipView.snp.makeConstraints {
+            $0.centerY.equalTo(textScanButton)
+            $0.trailing.equalTo(textScanButton.snp.leading).offset(-8)
+            $0.height.equalTo(34)
+        }
     }
 }
 
@@ -126,6 +135,7 @@ extension SentenceRegistrationView: RegistrationFormProvidable, FormInputNotifia
     }
     
     @objc func textScanButtonTapped() {
+        tooltipView.isHidden = true
         onTextScanTapped?()
     }
     
