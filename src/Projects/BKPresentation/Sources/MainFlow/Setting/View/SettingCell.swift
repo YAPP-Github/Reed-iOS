@@ -44,7 +44,7 @@ final class SettingCell: UICollectionViewListCell {
         super.init(frame: frame)
         backgroundColor = .bkBaseColor(.primary)
         contentView.backgroundColor = .bkBaseColor(.primary)
-        addSubviews(titleLabel, recentVersionLabel, iconView, versionLabel)
+        contentView.addSubviews(titleLabel, recentVersionLabel, iconView, versionLabel)
         
         titleLabel.snp.makeConstraints {
             $0.leading.equalToSuperview()
