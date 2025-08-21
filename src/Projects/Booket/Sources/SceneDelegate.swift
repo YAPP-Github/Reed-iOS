@@ -58,12 +58,14 @@ private extension SceneDelegate {
         @Autowired var authStateUseCase: AuthStateUseCase
         @Autowired var onboardingCheckUseCase: OnboardingCheckUseCase
         @Autowired var markOnboardingSeenUseCase: MarkOnboardingSeenUseCase
+        @Autowired var appVersionUseCase: AppVersionUseCase
         
         self.coordinator = AppCoordinator(
             navigationController: navigationController,
             authStateUseCase: authStateUseCase,
             onboardingCheckUseCase: onboardingCheckUseCase,
-            markOnboardingSeenUseCase: markOnboardingSeenUseCase
+            markOnboardingSeenUseCase: markOnboardingSeenUseCase,
+            appVersionUseCase: appVersionUseCase
         )
         coordinator?.start()
     }
