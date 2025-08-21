@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>문장 카드를 이미지로 저장하기 위해 사진첩 접근 권한이 필요합니다.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>문장 카드를 이미지로 저장하기 위해 사진첩 접근 권한이 필요합니다.</string>
 	<key>BASE_API_URL</key>
 	<string>$(BASE_API_URL)</string>
 	<key>CFBundleDevelopmentRegion</key>
@@ -49,7 +53,7 @@
 		<string>Pretendard-Regular.otf</string>
 		<string>Pretendard-Medium.otf</string>
 		<string>Pretendard-Bold.otf</string>
-		<string>HakgyoansimSantteutbatangM.ttf</string>
+		<string>HakgyoansimSantteutbatangM.otf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

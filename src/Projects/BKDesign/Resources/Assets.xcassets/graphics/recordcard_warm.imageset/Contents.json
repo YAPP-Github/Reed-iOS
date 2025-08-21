@@ -1,8 +1,22 @@
 {
   "images" : [
     {
-      "filename" : "recordcard_warm.png",
+      "filename" : "recordcard_warm.pdf",
       "idiom" : "universal"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "recordcard_warm@2x.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "recordcard_warm@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
     }
   ],
   "info" : {
