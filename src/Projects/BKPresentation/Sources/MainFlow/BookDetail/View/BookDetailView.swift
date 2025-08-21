@@ -10,26 +10,6 @@ enum Section {
     case main
 }
 
-struct BookDetailItem: Hashable {
-    let id: String // book id임
-    let recordId: String
-    let note: String
-    let emotion: EmotionSeed?
-    let createdAt: Date
-    let page: Int
-    
-    static func from(recordInfo: RecordInfo) -> Self {
-        return Self(
-            id: recordInfo.bookId,
-            recordId: recordInfo.recordId,
-            note: recordInfo.quote,
-            emotion: EmotionSeed.from(emotion: recordInfo.emotionTags.first ?? .joy),
-            createdAt: recordInfo.createdAt,
-            page: recordInfo.pageNumber
-        )
-    }
-}
-
 enum SortOption: String, CaseIterable {
     case newest = "최신 등록순"
     case pageDescending = "페이지 순"

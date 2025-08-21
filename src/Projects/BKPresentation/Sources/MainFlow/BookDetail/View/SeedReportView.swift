@@ -5,63 +5,6 @@ import BKDomain
 import SnapKit
 import UIKit
 
-enum EmotionSeed: String, CaseIterable {
-    case warmth = "따뜻함"
-    case joy = "즐거움"
-    case sad = "슬픔"
-    case insight = "깨달음"
-    
-    var image: UIImage {
-        switch self {
-        case .warmth: return BKImage.Graphics.warm
-        case .joy: return BKImage.Graphics.joy
-        case .insight: return BKImage.Graphics.insight
-        case .sad: return BKImage.Graphics.sad
-        }
-    }
-    
-    var color: UIColor {
-        switch self {
-        case .warmth: return .bkEmotionColor(.warmth)
-        case .joy: return .bkEmotionColor(.joy)
-        case .insight: return .bkEmotionColor(.insight)
-        case .sad: return .bkEmotionColor(.sadness)
-        }
-    }
-    
-    var baseColor: UIColor {
-        switch self {
-        case .warmth: return .bkEmotionBaseColor(.warmth)
-        case .joy: return .bkEmotionBaseColor(.joy)
-        case .insight: return .bkEmotionBaseColor(.insight)
-        case .sad: return .bkEmotionBaseColor(.sadness)
-        }
-    }
-    
-    static func from(emotion: Emotion) -> Self {
-        switch emotion {
-        case .joy: return .joy
-        case .sad: return .sad
-        case .insight: return .insight
-        case .warmth: return .warmth
-        }
-    }
-    
-    static func from(seedName: String) -> Self? {
-        switch seedName {
-        case "warmth", "따뜻함": return .warmth
-        case "joy", "즐거움":   return .joy
-        case "sad", "슬픔":     return .sad
-        case "insight", "깨달음": return .insight
-        default: return nil
-        }
-    }
-    
-    static func from(seed: Seed) -> Self? {
-        return from(seedName: seed.name)
-    }
-}
-
 final class SeedReportView: BaseView {
     private let titleLabel = BKLabel(
         text: "내가 모은 씨앗",
