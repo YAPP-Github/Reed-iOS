@@ -34,6 +34,16 @@ final class SettingViewController: BaseViewController<SettingView> {
         super.init()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.tabBarController?.tabBar.isHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.tabBarController?.tabBar.isHidden = false
+    }
+    
     override func bindAction() {
         viewModel.send(.onAppear)
         contentView.eventPublisher
@@ -54,7 +64,7 @@ final class SettingViewController: BaseViewController<SettingView> {
                     case .license:
                         self?.coordinator?.presentWeb(url: DocsType.licenses.url)
                     case .version:
-                        self?.openAppStore()
+                        AppStoreLinker.openAppStore()
                     }
                 }
             }
@@ -161,16 +171,5 @@ private extension SettingViewController {
         )
         
         sheet.show(from: self, animated: true)
-    }
-    
-    func openAppStore() {
-        let appID = "6747740414"
-        guard let url = URL(string: "itms-apps://itunes.apple.com/app/id\(appID)") else { return }
-        
-        if UIApplication.shared.canOpenURL(url) {
-            UIApplication.shared.open(url)
-        } else {
-            print("Can't open App Store URL")
-        }
     }
 }
