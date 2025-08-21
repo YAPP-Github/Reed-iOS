@@ -165,27 +165,29 @@ extension SentenceRegistrationView: RegistrationFormProvidable, FormInputNotifia
     }
     
     private func setupTextFieldFocusHandling() {
-        // NotificationCenter를 통한 포커스 감지
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(textViewDidBeginEditing),
-            name: UITextView.textDidBeginEditingNotification,
-            object: sentenceTextView.textView
+        // BKTextView의 메서드를 통한 포커스 감지
+        sentenceTextView.addTextViewFocusObserver(
+            target: self,
+            selector: #selector(textViewDidBeginEditing)
+        )
+        
+        // BKTextFieldView의 메서드를 통한 포커스 감지  
+        pageField.addTextFieldFocusObserver(
+            target: self,
+            selector: #selector(pageFieldDidBeginEditing)
         )
     }
     
     @objc private func textViewDidBeginEditing(_ notification: Notification) {
-        if notification.object as? UITextView == sentenceTextView.textView {
-            onSentenceTextViewFocused?()
-        }
+        onSentenceTextViewFocused?()
+    }
+    
+    @objc private func pageFieldDidBeginEditing(_ notification: Notification) {
+        onPageFieldFocused?()
     }
 }
 
 extension SentenceRegistrationView: UITextFieldDelegate {
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        onPageFieldFocused?()
-    }
-    
     func textField(
         _ textField: UITextField,
         shouldChangeCharactersIn range: NSRange,

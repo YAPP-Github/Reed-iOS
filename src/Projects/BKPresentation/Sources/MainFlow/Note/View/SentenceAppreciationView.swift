@@ -115,19 +115,15 @@ final class SentenceAppreciationView: BaseView {
     }
     
     private func setupTextViewFocusHandling() {
-        // NotificationCenter를 통한 포커스 감지
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(textViewDidBeginEditing),
-            name: UITextView.textDidBeginEditingNotification,
-            object: appreciationTextView.textView
+        // BKTextView의 메서드를 통한 포커스 감지
+        appreciationTextView.addTextViewFocusObserver(
+            target: self,
+            selector: #selector(textViewDidBeginEditing)
         )
     }
     
     @objc private func textViewDidBeginEditing(_ notification: Notification) {
-        if notification.object as? UITextView == appreciationTextView.textView {
-            onAppreciationTextViewFocused?()
-        }
+        onAppreciationTextViewFocused?()
     }
 }
 
