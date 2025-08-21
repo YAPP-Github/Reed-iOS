@@ -12,7 +12,10 @@ final class HomeView: BaseView {
     private var cancellable: Set<AnyCancellable> = []
     
     private var books: [HomeBookInfo] = []
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
     private let backgroundColorView = UIView()
+    private let topBounceView = UIView()
     
     private let topArea = UIView()
     private let mainTitleLabel = BKLabel(
@@ -75,7 +78,9 @@ final class HomeView: BaseView {
     private let homeEmptyView = HomeEmptyView()
     
     override func setupView() {
-        addSubviews(
+        addSubviews(topBounceView, scrollView)
+        scrollView.addSubview(contentView)
+        contentView.addSubviews(
             backgroundColorView,
             topArea,
             bookSectionTitleLabel,
@@ -87,7 +92,15 @@ final class HomeView: BaseView {
     }
     
     override func configure() {
-        backgroundColorView.backgroundColor = UIColor(hex: "F0F9E8")
+        backgroundColor = .bkBaseColor(.primary)
+        backgroundColorView.backgroundColor = .bkBackgroundColor(.home)
+        contentView.backgroundColor = .bkBaseColor(.primary)
+        topBounceView.backgroundColor = .bkBackgroundColor(.home)
+        
+        scrollView.backgroundColor = .clear
+        scrollView.alwaysBounceVertical = true
+        scrollView.showsVerticalScrollIndicator = false
+        
         mainTitleLabel.numberOfLines = 2
         bookCollectionView.dataSource = self
         bookCollectionView.delegate = self
@@ -105,14 +118,29 @@ final class HomeView: BaseView {
     }
     
     override func setupLayout() {
+        scrollView.snp.makeConstraints {
+            $0.edges.equalTo(safeAreaLayoutGuide)
+        }
+        
+        topBounceView.snp.makeConstraints {
+            $0.top.equalTo(scrollView)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(200)
+        }
+        
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview()
+        }
+        
         backgroundColorView.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide)
-            $0.directionalHorizontalEdges.equalTo(safeAreaLayoutGuide)
+            $0.top.equalToSuperview()
+            $0.directionalHorizontalEdges.equalToSuperview()
             $0.height.equalTo(LayoutConstants.backgroundHeight)
         }
         
         topArea.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide.snp.top)
+            $0.top.equalToSuperview()
                 .inset(LayoutConstants.topAreaTopInset)
             $0.leading.equalToSuperview()
                 .offset(LayoutConstants.topAreaLeading)
@@ -163,6 +191,7 @@ final class HomeView: BaseView {
             $0.top.equalTo(bookCollectionView.snp.bottom)
             $0.centerX.equalToSuperview()
             $0.height.equalTo(LayoutConstants.pageControlHeight)
+            $0.bottom.equalToSuperview().inset(20)
         }
     }
     
