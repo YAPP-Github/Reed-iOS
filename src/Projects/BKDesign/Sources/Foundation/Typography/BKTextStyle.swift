@@ -301,14 +301,14 @@ public enum BKTextStyle {
                     letterSpacing: .pNegative1
                 )
             }
-        case .body3(let weight):
+        case .body3:
             return BKFontAttributes(
                 fontName: .santteutM,
                 fontSize: .pt18,
                 lineHeight: .p155,
                 letterSpacing: .pNegative1_5
             )
-        case .caption3(let weight):
+        case .caption3:
             return BKFontAttributes(
                 fontName: .santteutM,
                 fontSize: .pt16,
