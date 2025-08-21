@@ -2,6 +2,7 @@
 
 import BKDesign
 import BKDomain
+import Combine
 import SnapKit
 import UIKit
 
@@ -30,8 +31,9 @@ final class SentenceCardView: BaseView {
         size: .large
     )
     private let shareButton: BKButton = BKButton(size: .large)
-    
     private lazy var bottomButtons = BKButtonGroup(buttons: [saveButton, shareButton])
+    
+    let eventPublisher = PassthroughSubject<SentenceCardViewEvent, Never>()
     
     override func setupView() {
         backgroundColor = .bkBaseColor(.primary)
@@ -39,9 +41,10 @@ final class SentenceCardView: BaseView {
         sentenceLabel.numberOfLines = 7
         titleLabel.numberOfLines = 1
         sentenceLabel.lineBreakMode = .byTruncatingTail
-        titleLabel.lineBreakMode = .byTruncatingTail
+        titleLabel.lineBreakMode = .byTruncatingMiddle
         
         emotionBackgroundImageView.clipsToBounds = true
+        emotionBackgroundImageView.layer.masksToBounds = true
         emotionBackgroundImageView.layer.cornerRadius = BKRadius.medium
         emotionBackgroundImageView.contentMode = .scaleAspectFill
         emotionBackgroundImageView.backgroundColor = .clear
@@ -50,6 +53,9 @@ final class SentenceCardView: BaseView {
         saveButton.title = "이미지 저장"
         shareButton.leftIcon = BKImage.Icon.share2
         shareButton.title = "카드 공유"
+        
+        saveButton.addTarget(self, action: #selector(didTapSaveButton), for: .touchUpInside)
+        shareButton.addTarget(self, action: #selector(didTapShareButton), for: .touchUpInside)
         
         guideLabel.numberOfLines = 2
         
@@ -70,7 +76,7 @@ final class SentenceCardView: BaseView {
         
         emotionBackgroundImageView.snp.makeConstraints {
             $0.top.directionalHorizontalEdges.equalToSuperview().inset(20)
-            $0.height.equalTo(468)
+            $0.height.equalTo(emotionBackgroundImageView.snp.width).multipliedBy(468.0 / 335.0)
         }
         
         guideLabel.snp.makeConstraints {
@@ -93,11 +99,55 @@ final class SentenceCardView: BaseView {
             emotionBackgroundImageView.backgroundColor = .bkBaseColor(.secondary)
         }
     }
+    
+    public func renderCardImageWithoutCornerRadius() -> UIImage {
+        let targetView = self.emotionBackgroundImageView
+        let originalCornerRadius = targetView.layer.cornerRadius
+        defer {
+            targetView.layer.cornerRadius = originalCornerRadius
+        }
+        targetView.layer.cornerRadius = 0
+        
+        return targetView.asImage()
+    }
+}
+
+private extension SentenceCardView {
+    @objc func didTapSaveButton() {
+        eventPublisher.send(.didTapSaveButton)
+    }
+    
+    @objc func didTapShareButton() {
+        eventPublisher.send(.didTapShareButton)
+    }
 }
 
 extension String {
     /// 문자열 앞뒤에 『 』 괄호를 추가하여 새로운 문자열을 반환합니다.
     func withCornerBrackets() -> String {
         return "『\(self)』"
+    }
+}
+
+extension UIView {
+    /// 현재 뷰의 내용을 기반으로 UIImage를 생성합니다.
+    func asImage(scale: CGFloat = UIScreen.main.scale) -> UIImage {
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = max(scale, 3.0)
+        format.opaque = false
+        format.preferredRange = .standard
+        
+        let renderer = UIGraphicsImageRenderer(bounds: self.bounds, format: format)
+        
+        return renderer.image { context in
+            context.cgContext.interpolationQuality = .high
+            context.cgContext.setShouldAntialias(true)
+            context.cgContext.setAllowsAntialiasing(true)
+            context.cgContext.setShouldSmoothFonts(true)
+            context.cgContext.setFillColor(UIColor.clear.cgColor)
+            context.cgContext.fill(self.bounds)
+
+            layer.render(in: context.cgContext)
+        }
     }
 }
