@@ -26,17 +26,24 @@ final class SettingViewModel: BaseViewModel {
     struct State: Equatable {
         var firstMenuItems = FirstMenuItem.allCases
         var secondMenuItems: [SecondMenuItem] = []
+        var latestAppVersion: String = ""
         var appVersion: String = ""
         var isLoggedOut: Bool = false
         var isLoading: Bool = false
         var error: DomainError? = nil
         var isLoginRequired: Bool = false
+        
+        var isUpdateAvailable: Bool {
+            appVersion.compare(latestAppVersion, options: .numeric) == .orderedAscending
+        }
+        
     }
     
     enum Action {
         case onAppear
         case accessModeChanged(AppAccessMode)
         case fetchAppVersionSuccessed(String)
+        case fetchLatestAppVersionSucceeded(String)
         case loginButtonTapped
         case logoutButtonTapped
         case logoutSuccessed
@@ -49,6 +56,7 @@ final class SettingViewModel: BaseViewModel {
     
     enum SideEffect {
         case appVersion
+        case fetchLatestAppVersion
         case logout
         case withdraw
     }
@@ -89,6 +97,7 @@ final class SettingViewModel: BaseViewModel {
         case .onAppear:
             send(.accessModeChanged(AccessModeCenter.shared.mode.value))
             effects.append(.appVersion)
+            effects.append(.fetchLatestAppVersion)
             
         case .accessModeChanged(let mode):
             if mode == .member {
@@ -99,6 +108,9 @@ final class SettingViewModel: BaseViewModel {
 
         case .fetchAppVersionSuccessed(let version):
             newState.appVersion = version
+        
+        case .fetchLatestAppVersionSucceeded(let latestVersion):
+            newState.latestAppVersion = latestVersion
             
         case .loginButtonTapped:
             newState.isLoginRequired = true
@@ -137,6 +149,15 @@ final class SettingViewModel: BaseViewModel {
         case .appVersion:
             return appVersionUseCase.execute()
                 .map(Action.fetchAppVersionSuccessed)
+                .eraseToAnyPublisher()
+            
+        case .fetchLatestAppVersion:
+            return appVersionUseCase.executeRecentVersion()
+                .map { Action.fetchLatestAppVersionSucceeded($0) }
+                .catch { error -> Just<Action> in
+                    print("Failed to fetch latest app version: \(error)")
+                    return Just(Action.fetchLatestAppVersionSucceeded(""))
+                }
                 .eraseToAnyPublisher()
             
         case .logout:

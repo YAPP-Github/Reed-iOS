@@ -54,7 +54,7 @@ final class SettingViewController: BaseViewController<SettingView> {
                     case .license:
                         self?.coordinator?.presentWeb(url: DocsType.licenses.url)
                     case .version:
-                        break
+                        self?.openAppStore()
                     }
                 }
             }
@@ -75,10 +75,16 @@ final class SettingViewController: BaseViewController<SettingView> {
         
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
-            .map { $0.appVersion }
-            .removeDuplicates()
-            .sink { [weak self] version in
-                self?.contentView.setAppVersion(version)
+            .removeDuplicates { prev, current in
+                return prev.appVersion == current.appVersion &&
+                       prev.latestAppVersion == current.latestAppVersion
+            }
+            .sink { [weak self] data in
+                self?.contentView.setVersion(
+                    current: data.appVersion,
+                    recent: data.latestAppVersion,
+                    data.isUpdateAvailable
+                )
             }
             .store(in: &cancellable)
         
@@ -155,5 +161,16 @@ private extension SettingViewController {
         )
         
         sheet.show(from: self, animated: true)
+    }
+    
+    func openAppStore() {
+        let appID = "6747740414"
+        guard let url = URL(string: "itms-apps://itunes.apple.com/app/id\(appID)") else { return }
+        
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url)
+        } else {
+            print("Can't open App Store URL")
+        }
     }
 }
