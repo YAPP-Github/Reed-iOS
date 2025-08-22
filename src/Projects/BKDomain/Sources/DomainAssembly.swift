@@ -221,5 +221,12 @@ public struct DomainAssembly: Assembly {
             @Autowired var repository: RecordRepository
             return DefaultDeleteRecordUseCase(repository: repository)
         }
+        
+        container.register(
+            type: DeleteBookUseCase.self
+        ) { _ in
+            @Autowired var repository: BookRepository
+            return DefaultDeleteBookUseCase(repository: repository)
+        }
     }
 }
