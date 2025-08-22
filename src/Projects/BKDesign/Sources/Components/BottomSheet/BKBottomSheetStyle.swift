@@ -4,4 +4,5 @@
 public enum BKBottomSheetStyle {
     case leadingCloseButton
     case centered
+    case contentOnly
 }
