@@ -52,8 +52,19 @@ final class SettingView: BaseView {
         _ isUpdateAvailable: Bool
     ) {
         self.appVersion = appVersion
-        self.recentVersion = recentVersion
         self.isUpdateAvailable = isUpdateAvailable
+        
+        if let currentVersion = Version(appVersion),
+           let lastestVersion = Version(recentVersion) {
+            if lastestVersion < currentVersion {
+                self.recentVersion = appVersion
+            } else {
+                self.recentVersion = recentVersion
+            }
+        } else {
+            self.recentVersion = recentVersion
+        }
+        
         collectionView.reloadData()
     }
 }
