@@ -36,6 +36,8 @@ public enum BKImage {
         public static let xCircle = BKDesignAsset.xCircle.image
         public static let home = BKDesignAsset.home.image
         public static let archive = BKDesignAsset.folder.image
+        public static let share2 = BKDesignAsset.share2.image
+        public static let download = BKDesignAsset.download.image
     }
     
     public enum Checkbox {
@@ -70,6 +72,10 @@ public enum BKImage {
         public static let sadEmotion = BKDesignAsset.sadEmotion.image
         public static let warm = BKDesignAsset.warm.image
         public static let warmEmotion = BKDesignAsset.warmEmotion.image
+        public static let insightCard = BKDesignAsset.recordcardInsight.image
+        public static let joyCard = BKDesignAsset.recordcardJoy.image
+        public static let sadCard = BKDesignAsset.recordcardSad.image
+        public static let warmCard = BKDesignAsset.recordcardWarm.image
     }
     
     public enum Logos {
