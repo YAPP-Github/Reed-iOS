@@ -1,22 +1,33 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import BKDesign
 import Combine
 import UIKit
 
 final class NoteCompletionViewController: BaseViewController<NoteCompletionView> {
-    override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
-        return .standard(viewController: self)
-    }
     override var bkNavigationTitle: String {
         return "독서 기록"
     }
     
+    override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
+        .standard(
+            viewController: self,
+            rightButton: .init(
+                target: self,
+                action: #selector(handleMoreButtonTapped)
+            )
+        )
+    }
+    
+    weak var coordinator: NoteCompletionCoordinator?
     private var cancellable: Set<AnyCancellable> = []
     private let viewModel: AnyViewBindableViewModel<NoteCompletionViewModel.State, NoteCompletionViewModel.Action>
+    private let recordId: String
     
-    init(viewModel: NoteCompletionViewModel) {
+    init(viewModel: NoteCompletionViewModel, recordId: String) {
         self.viewModel = AnyViewBindableViewModel(viewModel)
+        self.recordId = recordId
         super.init()
     }
     
@@ -31,7 +42,6 @@ final class NoteCompletionViewController: BaseViewController<NoteCompletionView>
             action: #selector(customBackButtonTapped)
         )
         navigationItem.leftBarButtonItem = backButton
-        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         
         viewModel.send(.onAppear)
     }
@@ -81,9 +91,95 @@ final class NoteCompletionViewController: BaseViewController<NoteCompletionView>
                 self?.present(alert, animated: true)
             }
             .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map { $0.deleteCompleted }
+            .removeDuplicates()
+            .filter { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.dismiss(animated: true)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .filter { $0.shareTriggered }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                guard let recordInfo = state.recordInfo else { return }
+                let item = BookDetailItem.from(recordInfo: recordInfo)
+                if let self = self {
+                    self.coordinator?.goToShareView(item: item)
+                }
+                self?.viewModel.send(.shareHandled)
+            }
+            .store(in: &cancellable)
+    }
+    
+    func presentNoteMoreMenu() {
+        let sheet = BKBottomSheetViewController.makeMoreMenuSheet(
+            onShare: { [weak self] in
+                self?.dismiss(animated: true) {
+                    self?.handleNoteShareButtonTapped()
+                }
+            },
+            onEdit: { [weak self] in
+                self?.dismiss(animated: true) { [weak self] in
+                    self?.handleNoteEditButtonTapped()
+                }
+            },
+            onDelete: { [weak self] in
+                self?.dismiss(animated: true) {
+                    self?.handleNoteDeleteButtonTapped()
+                }
+            }
+        )
+        
+        sheet.show(from: self, animated: true)
+    }
+    
+    func handleNoteShareButtonTapped() {
+        viewModel.send(.shareButtonTapped)
+    }
+    
+    func handleNoteEditButtonTapped() {
+        coordinator?.didTapEditButton(recordId: recordId)
+    }
+    
+    func handleNoteDeleteButtonTapped() {
+        presentDeletionConfirmDialog()
+    }
+    
+    func presentDeletionConfirmDialog() {
+        let dialog = BKDialog(
+            title: """
+            삭제하면 기록을 복구할 수 없어요.
+            정말 삭제하시겠어요?
+            """,
+            config: .init(
+                leftButtonTitle: "취소",
+                leftButtonAction: { [weak self] in
+                    guard let self else { return }
+                    self.dismiss(animated: true)
+                },
+                rightButtonTitle: "삭제",
+                rightButtonAction: { [weak self] in
+                    guard let self else { return }
+                    self.dismiss(animated: true) {
+                        self.viewModel.send(.deleteButtonTapped)
+                    }
+                }
+            )
+        )
+        let dialogViewController = BKDialogViewController(dialog: dialog)
+        present(dialogViewController, animated: true)
     }
     
     @objc private func customBackButtonTapped() {
         dismiss(animated: true)
+    }
+    
+    @objc func handleMoreButtonTapped() {
+        presentNoteMoreMenu()
     }
 }

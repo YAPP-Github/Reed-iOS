@@ -9,6 +9,8 @@ final class NoteCompletionViewModel: BaseViewModel {
         var recordInfo: RecordInfo?
         var isLoading: Bool = false
         var error: DomainError?
+        var deleteCompleted: Bool = false
+        var shareTriggered: Bool = false
     }
     
     enum Action {
@@ -16,10 +18,15 @@ final class NoteCompletionViewModel: BaseViewModel {
         case fetchRecordDetailSuccessed(RecordInfo)
         case errorOccured(DomainError)
         case errorHandled
+        case deleteButtonTapped
+        case deleteRecordSuccessed
+        case shareButtonTapped
+        case shareHandled
     }
     
     enum SideEffect {
         case fetchRecordDetail(String)
+        case deleteRecord(String)
     }
     
     @Published private var state: State
@@ -27,6 +34,7 @@ final class NoteCompletionViewModel: BaseViewModel {
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
     
     @Autowired private var fetchRecordDetailUseCase: FetchRecordDetailUseCase
+    @Autowired private var deleteRecordUseCase: DeleteRecordUseCase
     
     private let recordId: String
     
@@ -65,6 +73,20 @@ final class NoteCompletionViewModel: BaseViewModel {
             
         case .errorHandled:
             newState.error = nil
+            
+        case .deleteButtonTapped:
+            newState.isLoading = true
+            effects.append(.deleteRecord(recordId))
+            
+        case .deleteRecordSuccessed:
+            newState.isLoading = false
+            newState.deleteCompleted = true
+            
+        case .shareButtonTapped:
+            newState.shareTriggered = true
+            
+        case .shareHandled:
+            newState.shareTriggered = false
         }
         
         return (newState, effects)
@@ -75,6 +97,12 @@ final class NoteCompletionViewModel: BaseViewModel {
         case .fetchRecordDetail(let id):
             return fetchRecordDetailUseCase.execute(id: id)
                 .map { Action.fetchRecordDetailSuccessed($0) }
+                .catch { Just(Action.errorOccured($0)) }
+                .eraseToAnyPublisher()
+                
+        case .deleteRecord(let id):
+            return deleteRecordUseCase.execute(recordId: id)
+                .map { _ in Action.deleteRecordSuccessed }
                 .catch { Just(Action.errorOccured($0)) }
                 .eraseToAnyPublisher()
         }
