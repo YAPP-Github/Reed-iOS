@@ -207,5 +207,19 @@ public struct DomainAssembly: Assembly {
             @Autowired var repository: AuthRepository
             return DefautWithdrawAccountUseCase(repository: repository)
         }
+        
+        container.register(
+            type: PatchRecordUseCase.self
+        ) { _ in
+            @Autowired var repository: RecordRepository
+            return DefaultPatchRecordUseCase(repository: repository)
+        }
+        
+        container.register(
+            type: DeleteRecordUseCase.self
+        ) { _ in
+            @Autowired var repository: RecordRepository
+            return DefaultDeleteRecordUseCase(repository: repository)
+        }
     }
 }
