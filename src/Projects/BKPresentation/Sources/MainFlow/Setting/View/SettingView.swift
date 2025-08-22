@@ -20,7 +20,9 @@ final class SettingView: BaseView {
     private var firstMenus: [FirstMenuItem] = []
     private var secondMenus: [SecondMenuItem] = []
     private var appVersion: String = ""
-
+    private var recentVersion: String = ""
+    private var isUpdateAvailable: Bool = true
+    
     override func setupView() {
         addSubview(collectionView)
     }
@@ -44,8 +46,14 @@ final class SettingView: BaseView {
         collectionView.reloadData()
     }
     
-    func setAppVersion(_ appVersion: String) {
+    func setVersion(
+        current appVersion: String,
+        recent recentVersion: String,
+        _ isUpdateAvailable: Bool
+    ) {
         self.appVersion = appVersion
+        self.recentVersion = recentVersion
+        self.isUpdateAvailable = isUpdateAvailable
         collectionView.reloadData()
     }
 }
@@ -67,7 +75,7 @@ private extension SettingView {
             return section
         }
     }
-
+    
     func makeCollectionView() -> UICollectionView {
         let collectionView = UICollectionView(
             frame: .zero,
@@ -76,7 +84,7 @@ private extension SettingView {
         collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         return collectionView
     }
-
+    
     func configureCollectionView() {
         collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         collectionView.backgroundColor = .bkBaseColor(.primary)
@@ -123,12 +131,11 @@ extension SettingView: UICollectionViewDelegate {
         _ collectionView: UICollectionView,
         shouldSelectItemAt indexPath: IndexPath
     ) -> Bool {
-        switch (indexPath.section, indexPath.item) {
-        case (0, 3):
-            return false
-        default:
-            return true
+        if indexPath.section == Section.top.rawValue,
+           firstMenus[indexPath.item] == .version {
+            return isUpdateAvailable
         }
+        return true
     }
     
     func collectionView(
@@ -143,16 +150,16 @@ extension SettingView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return Section.allCases.count
     }
-
+    
     func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
         return section == Section.top.rawValue
-            ? firstMenus.count
-            : secondMenus.count
+        ? firstMenus.count
+        : secondMenus.count
     }
-
+    
     func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
@@ -163,23 +170,32 @@ extension SettingView: UICollectionViewDataSource {
         ) as? SettingCell else {
             return UICollectionViewCell()
         }
-
-        let title: String = indexPath.section == Section.top.rawValue
-            ? firstMenus[indexPath.item].title
-            : secondMenus[indexPath.item].title
         
-        switch (indexPath.section, indexPath.item) {
-        case (Section.top.rawValue, FirstMenuItem.allCases.count - 1):
-            cell.configure(title: title, style: .label, appVersion: appVersion)
-        case (Section.bottom.rawValue, _):
-            cell.configure(title: title, style: .none)
-        default:
-            cell.configure(title: title, style: .chevron)
+        let title: String = indexPath.section == Section.top.rawValue
+        ? firstMenus[indexPath.item].title
+        : secondMenus[indexPath.item].title
+        
+        if indexPath.section == Section.top.rawValue {
+            let menuItem = firstMenus[indexPath.item]
+            if menuItem == .version {
+                cell.configure(
+                    title: title,
+                    style: .label,
+                    recentVersion: recentVersion,
+                    appVersion: appVersion
+                )
+            } else {
+                cell.configure(title: menuItem.title, style: .chevron)
+            }
+            
+        } else {
+            let menuItem = secondMenus[indexPath.item]
+            cell.configure(title: menuItem.title, style: .none)
         }
         
         return cell
     }
-
+    
     func collectionView(
         _ collectionView: UICollectionView,
         viewForSupplementaryElementOfKind kind: String,
@@ -190,7 +206,7 @@ extension SettingView: UICollectionViewDataSource {
             withReuseIdentifier: BKDividerFooterView.identifier,
             for: indexPath
         )
-
+        
         footer.isHidden = indexPath.section != Section.top.rawValue
         return footer
     }

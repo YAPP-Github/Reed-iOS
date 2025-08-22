@@ -34,6 +34,16 @@ final class SettingViewController: BaseViewController<SettingView> {
         super.init()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.tabBarController?.tabBar.isHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.tabBarController?.tabBar.isHidden = false
+    }
+    
     override func bindAction() {
         viewModel.send(.onAppear)
         contentView.eventPublisher
@@ -54,7 +64,7 @@ final class SettingViewController: BaseViewController<SettingView> {
                     case .license:
                         self?.coordinator?.presentWeb(url: DocsType.licenses.url)
                     case .version:
-                        break
+                        AppStoreLinker.openAppStore()
                     }
                 }
             }
@@ -75,10 +85,16 @@ final class SettingViewController: BaseViewController<SettingView> {
         
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
-            .map { $0.appVersion }
-            .removeDuplicates()
-            .sink { [weak self] version in
-                self?.contentView.setAppVersion(version)
+            .removeDuplicates { prev, current in
+                return prev.appVersion == current.appVersion &&
+                       prev.latestAppVersion == current.latestAppVersion
+            }
+            .sink { [weak self] data in
+                self?.contentView.setVersion(
+                    current: data.appVersion,
+                    recent: data.latestAppVersion,
+                    data.isUpdateAvailable
+                )
             }
             .store(in: &cancellable)
         

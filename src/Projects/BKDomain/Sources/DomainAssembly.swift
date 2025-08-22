@@ -66,7 +66,8 @@ public struct DomainAssembly: Assembly {
         container.register(
             type: AppVersionUseCase.self
         ) { _ in
-            return DefaultAppVersionUseCase()
+            @Autowired var repository: AppStoreRepository
+            return DefaultAppVersionUseCase(repository: repository)
         }
         
         container.register(

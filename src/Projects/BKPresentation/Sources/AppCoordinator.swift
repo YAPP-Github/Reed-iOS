@@ -1,6 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDomain
+import BKDesign
 import Combine
 import Foundation
 import UIKit
@@ -13,26 +14,57 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying 
     private let authStateUseCase: AuthStateUseCase
     private let onboardingCheckUseCase: OnboardingCheckUseCase
     private let markOnboardingSeenUseCase: MarkOnboardingSeenUseCase
+    private let appVersionUseCase: AppVersionUseCase
     private var cancellable: Set<AnyCancellable> = []
     
     public init(
         navigationController: UINavigationController,
         authStateUseCase: AuthStateUseCase,
         onboardingCheckUseCase: OnboardingCheckUseCase,
-        markOnboardingSeenUseCase: MarkOnboardingSeenUseCase
+        markOnboardingSeenUseCase: MarkOnboardingSeenUseCase,
+        appVersionUseCase: AppVersionUseCase
     ) {
         self.navigationController = navigationController
         self.authStateUseCase = authStateUseCase
         self.onboardingCheckUseCase = onboardingCheckUseCase
         self.markOnboardingSeenUseCase = markOnboardingSeenUseCase
+        self.appVersionUseCase = appVersionUseCase
     }
     
     public func start() {
-        proceedWithAppFlow()
+        checkAppUpdate()
     }
     
     func notifyAuthenticationRequired(onFinish: (() -> Void)?) {
         presentAuthFlow(animated: true, onFinishAuth: onFinish)
+    }
+    
+    private func checkAppUpdate() {
+        Publishers.Zip(
+            appVersionUseCase.execute().setFailureType(to: Error.self),
+            appVersionUseCase.executeRecentVersion()
+        )
+        .receive(on: DispatchQueue.main)
+        .sink(receiveCompletion: { [weak self] completion in
+            if case .failure = completion {
+                self?.proceedWithAppFlow()
+            }
+        }, receiveValue: { [weak self] currentVersionString, latestVersionString in
+            guard let self = self,
+                  let currentVersion = Version(currentVersionString),
+                  let latestVersion = Version(latestVersionString)
+            else {
+                self?.proceedWithAppFlow()
+                return
+            }
+            
+            if currentVersion.isMajorOrMinorUpdateRequired(from: latestVersion) {
+                self.presentUpdateSheet()
+            } else {
+                self.proceedWithAppFlow()
+            }
+        })
+        .store(in: &cancellable)
     }
     
     private func proceedWithAppFlow() {
@@ -61,7 +93,7 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying 
             parentCoordinator: self,
             navigationController: authNavigationController
         )
-
+        
         loginCoordinator.onFinish = { [weak self] in
             guard let self else { return }
             
@@ -70,7 +102,7 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying 
             self.checkAuthAndRoute()
             onFinishAuth?()
         }
-
+        
         addChildCoordinator(loginCoordinator)
         loginCoordinator.start()
         
@@ -82,7 +114,7 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying 
             parentCoordinator: self,
             navigationController: navigationController
         )
-
+        
         addChildCoordinator(tabBarCoordinator)
         tabBarCoordinator.start()
     }
@@ -143,5 +175,22 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying 
                 }
             )
             .store(in: &cancellable)
+    }
+    
+    private func presentUpdateSheet() {
+        let dialog = BKDialog(
+            title: "최신 버전이 출시되었습니다",
+            subtitle: "최적의 사용 환경을 위해 업데이트해주세요.",
+            config: .init(
+                leftButtonTitle: "업데이트 하기",
+                leftButtonAction: AppStoreLinker.openAppStore
+            )
+        )
+        
+        let dialogViewController = BKDialogViewController(dialog: dialog)
+        dialogViewController.isModalInPresentation = true
+        DispatchQueue.main.async {
+            self.navigationController.present(dialogViewController, animated: true)
+        }
     }
 }
