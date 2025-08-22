@@ -21,6 +21,11 @@ final class BookDetailViewModel: BaseViewModel {
         var nextPage: Int = 0
         var hasMore: Bool = true
         var totalResults = 0
+        var deleteCompleted: Bool = false
+        var isDeletingBook: Bool = false
+        var isDeletingRecord: Bool = false
+        var shareTriggered: Bool = false
+        var shareItem: BookDetailItem?
     }
     
     enum Action {
@@ -42,6 +47,12 @@ final class BookDetailViewModel: BaseViewModel {
         case retryTapped
         case loadNextPage
         case appendRecordsSuccessed(items: [BookDetailItem], hasMore: Bool)
+        case deleteBookButtonTapped
+        case deleteBookSuccessed
+        case deleteRecordButtonTapped(String)
+        case deleteRecordSuccessed
+        case shareButtonTapped(String)
+        case shareHandled
     }
     
     enum SideEffect {
@@ -49,6 +60,8 @@ final class BookDetailViewModel: BaseViewModel {
         case fetchRecords(page: Int)
         case fetchSeedStats
         case fetchBookDetail
+        case deleteBook
+        case deleteRecord(String)
     }
     
     @Published private var state: State
@@ -60,6 +73,8 @@ final class BookDetailViewModel: BaseViewModel {
     @Autowired private var fetchSeedStatsUseCase: FetchSeedStatsUseCase
     @Autowired private var fetchBookDetailUseCase: FetchBookDetailUseCase
     @Autowired private var bookUpsertUseCase: BookUpsertUseCase
+    @Autowired private var deleteBookUseCase: DeleteBookUseCase
+    @Autowired private var deleteRecordUseCase: DeleteRecordUseCase
     
     private let isbn: String
     
@@ -127,6 +142,8 @@ final class BookDetailViewModel: BaseViewModel {
             newState.seeds = seeds
             
         case .errorOccured(let error):
+            newState.isDeletingBook = false
+            newState.isDeletingRecord = false
             if newState.isRetrying == false {
                 newState.isRetrying = true
             } else {
@@ -161,6 +178,33 @@ final class BookDetailViewModel: BaseViewModel {
             newState.items.append(contentsOf: deduped)
             if hasMore { newState.nextPage += 1 }
             newState.hasMore = hasMore
+            
+        case .deleteBookButtonTapped:
+            newState.isDeletingBook = true
+            effects.append(.deleteBook)
+            
+        case .deleteBookSuccessed:
+            newState.isDeletingBook = false
+            newState.deleteCompleted = true
+            
+        case .deleteRecordButtonTapped(let recordId):
+            newState.isDeletingRecord = true
+            effects.append(.deleteRecord(recordId))
+            
+        case .deleteRecordSuccessed:
+            newState.isDeletingRecord = false
+            effects.append(.fetchRecords(page: 0))
+            effects.append(.fetchSeedStats)
+            
+        case .shareButtonTapped(let recordId):
+            if let item = newState.items.first(where: { $0.recordId == recordId }) {
+                newState.shareTriggered = true
+                newState.shareItem = item
+            }
+            
+        case .shareHandled:
+            newState.shareTriggered = false
+            newState.shareItem = nil
         }
         
         return (newState, effects)
@@ -213,6 +257,24 @@ final class BookDetailViewModel: BaseViewModel {
                 .map { Action.fetchSeedStatsSuccessed($0) }
                 .catch { [weak self] in
                     self?.lastEffect = .fetchSeedStats
+                    return Just(Action.errorOccured($0))
+                }
+                .eraseToAnyPublisher()
+                
+        case .deleteBook:
+            return deleteBookUseCase.execute(bookId: state.userBookId)
+                .map { _ in Action.deleteBookSuccessed }
+                .catch { [weak self] in
+                    self?.lastEffect = .deleteBook
+                    return Just(Action.errorOccured($0))
+                }
+                .eraseToAnyPublisher()
+                
+        case .deleteRecord(let recordId):
+            return deleteRecordUseCase.execute(recordId: recordId)
+                .map { _ in Action.deleteRecordSuccessed }
+                .catch { [weak self] in
+                    self?.lastEffect = .deleteRecord(recordId)
                     return Just(Action.errorOccured($0))
                 }
                 .eraseToAnyPublisher()
