@@ -37,7 +37,7 @@ final class ToastMessageView: UIView {
     private func setupLayout() {
         messageLabel.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.horizontalEdges.greaterThanOrEqualToSuperview().inset(16)
+            $0.horizontalEdges.equalToSuperview().inset(16)
             $0.verticalEdges.equalToSuperview().inset(12)
         }
     }
@@ -58,7 +58,7 @@ final class ToastMessageView: UIView {
         toastView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.bottom.equalTo(keyWindow.safeAreaLayoutGuide.snp.bottom).inset(88)
-            $0.width.equalTo(keyWindow.safeAreaLayoutGuide.snp.width).inset(72)
+            $0.width.equalTo(keyWindow.safeAreaLayoutGuide.snp.width).inset(36)
         }
         
         toastView.alpha = 0.0
