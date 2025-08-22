@@ -114,6 +114,11 @@ extension EmotionRegistrationView: RegistrationFormProvidable, FormInputNotifiab
         guard let selectedEmotion else { return nil }
         return .emotion(.init(emotion: selectedEmotion))
     }
+    
+    func setSelectedEmotion(_ emotion: Emotion) {
+        selectedEmotion = emotion
+        updateSelectionUI()
+    }
 }
 
 private extension EmotionRegistrationView {

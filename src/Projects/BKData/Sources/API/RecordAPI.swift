@@ -8,6 +8,8 @@ enum RecordAPI {
     case fetch(userBookId: String, dto: FetchRecordRequestDTO)
     case detail(userRecordId: String)
     case seed(userRecordId: String)
+    case patch(readingRecordId: String, recordData: RecordVO)
+    case delete(readingRecordId: String)
 }
 
 extension RecordAPI: RequestTarget {
@@ -25,6 +27,10 @@ extension RecordAPI: RequestTarget {
             return "/detail/\(userRecordId)"
         case .seed(let userRecordId):
             return "/\(userRecordId)/seed/stats"
+        case .patch(let readingRecordId, _):
+            return "/\(readingRecordId)"
+        case .delete(let readingRecordId):
+            return "/\(readingRecordId)"
         }
     }
 
@@ -34,6 +40,10 @@ extension RecordAPI: RequestTarget {
             return .post
         case .fetch, .detail, .seed:
             return .get
+        case .patch:
+            return .patch
+        case .delete:
+            return .delete
         }
     }
 
@@ -48,16 +58,16 @@ extension RecordAPI: RequestTarget {
 
     var body: Encodable? {
         switch self {
-        case .insert(_, let data):
+        case .insert(_, let data), .patch(_, let data):
             return InsertRecordRequestDTO(data: data)
-        case .fetch, .detail, .seed:
+        case .fetch, .detail, .seed, .delete:
             return nil
         }
     }
 
     var query: [String: Any] {
         switch self {
-        case .insert, .seed:
+        case .insert, .seed, .patch, .delete:
             return [:]
         case .fetch(_, let dto):
             return dto.toDictionary()

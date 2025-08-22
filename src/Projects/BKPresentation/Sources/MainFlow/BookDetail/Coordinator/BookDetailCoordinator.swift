@@ -9,6 +9,7 @@ final class BookDetailCoordinator: Coordinator {
     
     private let isbn: String
     private let userBookId: String
+    private weak var bookDetailViewController: BookDetailViewController?
     
     init(
         parentCoordinator: Coordinator?,
@@ -30,6 +31,7 @@ final class BookDetailCoordinator: Coordinator {
             )
         )
         viewController.coordinator = self
+        bookDetailViewController = viewController
         navigationController.pushViewController(viewController, animated: true)
     }
 }
@@ -52,13 +54,33 @@ extension BookDetailCoordinator {
     }
     
     func didTapCell(recordId: String) {
-        let viewController = NoteCompletionViewController(
-            viewModel: NoteCompletionViewModel(recordId: recordId)
-        )
-        let noteNavigationController = UINavigationController(rootViewController: viewController)
-
+        let noteNavigationController = UINavigationController()
         noteNavigationController.modalPresentationStyle = .fullScreen
+        
+        let noteCompletionCoordinator = NoteCompletionCoordinator(
+            parentCoordinator: self,
+            navigationController: noteNavigationController,
+            recordId: recordId
+        )
+        addChildCoordinator(noteCompletionCoordinator)
+        noteCompletionCoordinator.start()
+        
         navigationController.present(noteNavigationController, animated: true)
+    }
+    
+    func didTapEditButton(recordId: String, from presentingController: UIViewController) {
+        let editNavigationController = UINavigationController()
+        editNavigationController.modalPresentationStyle = .fullScreen
+        
+        let noteEditCoordinator = NoteEditCoordinator(
+            parentCoordinator: self,
+            navigationController: editNavigationController,
+            recordId: recordId
+        )
+        addChildCoordinator(noteEditCoordinator)
+        noteEditCoordinator.start()
+        
+        presentingController.present(editNavigationController, animated: true)
     }
     
     /// 문장 카드 확인 및 공유하기 화면으로 이동합니다.
@@ -71,4 +93,3 @@ extension BookDetailCoordinator {
         navigationController.pushViewController(viewController, animated: true)
     }
 }
-

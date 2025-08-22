@@ -18,4 +18,13 @@ public protocol RecordRepository {
     func findBy(
         id recordId: String
     ) -> AnyPublisher<RecordInfo, DomainError>
+    
+    func patch(
+        recordId: String,
+        recordData: RecordVO
+    ) -> AnyPublisher<RecordInfo, DomainError>
+    
+    func delete(
+        recordId: String
+    ) -> AnyPublisher<Void, DomainError>
 }

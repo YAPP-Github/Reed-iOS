@@ -128,6 +128,8 @@ private extension SearchView {
         collectionView.backgroundColor = .bkBaseColor(.primary)
         collectionView.delegate = self
         collectionView.alwaysBounceVertical = false
+        collectionView.contentInset = .zero
+        collectionView.scrollIndicatorInsets = .zero
         collectionView.register(RecentKeywordCell.self, forCellWithReuseIdentifier: RecentKeywordCell.identifier)
         collectionView.register(SearchResultCell.self, forCellWithReuseIdentifier: SearchResultCell.identifier)
         
@@ -248,7 +250,9 @@ private extension SearchView {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = .zero
+        layout.minimumInteritemSpacing = .zero
         layout.sectionInset = .zero
+        layout.estimatedItemSize = .zero // 정확한 사이즈 계산을 위해 추가
         return layout
     }
 

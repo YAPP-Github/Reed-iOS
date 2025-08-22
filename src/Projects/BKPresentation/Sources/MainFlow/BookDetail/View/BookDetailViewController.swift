@@ -1,5 +1,6 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import BKDesign
 import BKDomain
 import Combine
@@ -10,13 +11,20 @@ enum BookDetailViewEvent: Equatable {
     case didTapAddNoteButton
     case didTapSortMenuButton(SortOption?)
     case didTapCell(recordId: String)
+    case didTapMoreButton(recordId: String)
     case didReachBottom
 }
 
 final class BookDetailViewController: BaseViewController<BookDetailView> {
     override var bkNavigationTitle: String { "" }
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
-        .standard(viewController: self)
+        .standard(
+            viewController: self,
+            rightButton: .init(
+                target: self,
+                action: #selector(handleMoreButtonTapped)
+            )
+        )
     }
     
     weak var coordinator: BookDetailCoordinator?
@@ -76,6 +84,16 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
             }
             .sink { [weak self] recordId in
                 self?.viewModel.send(.cellTapped(recordId: recordId))
+            }
+            .store(in: &cancellable)
+        
+        contentView.eventPublisher
+            .compactMap { event -> String? in
+                if case let .didTapMoreButton(recordId) = event { return recordId }
+                return nil
+            }
+            .sink { [weak self] recordId in
+                self?.presentNoteMoreMenu(recordId: recordId)
             }
             .store(in: &cancellable)
         
@@ -188,7 +206,41 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
                 self?.contentView.applySeedReport(with: $0)
             }
             .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map { $0.deleteCompleted }
+            .removeDuplicates()
+            .filter { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.navigationController?.popViewController(animated: true)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map { $0.isDeletingBook || $0.isDeletingRecord }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isDeleting in
+                if isDeleting {
+                    self?.showLoading()
+                } else {
+                    self?.hideLoading()
+                }
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .filter { $0.shareTriggered }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                guard let item = state.shareItem else { return }
+                self?.coordinator?.goToShareView(item: item)
+                self?.viewModel.send(.shareHandled)
+            }
+            .store(in: &cancellable)
     }
+    
 }
 
 private extension BookDetailViewController {
@@ -196,10 +248,6 @@ private extension BookDetailViewController {
         let itemIDs: [String]
         let items: [BookDetailItem]
         let total: Int
-
-        static func == (lhs: Self, rhs: Self) -> Bool {
-            lhs.itemIDs == rhs.itemIDs && lhs.total == rhs.total
-        }
     }
     
     func presentBookRegistration(_ book: Book? = nil) {
@@ -241,5 +289,88 @@ private extension BookDetailViewController {
             }
         )
         sheet.show(from: self, animated: true)
+    }
+    
+    func presentBookMoreMenu() {
+        let sheet = BKBottomSheetViewController.makeDeleteOnlyMenuSheet(
+            onDelete: { [weak self] in
+                self?.dismiss(animated: true) {
+                    self?.handleDeleteButtonTapped()
+                }
+            }
+        )
+        
+        sheet.show(from: self, animated: true)
+    }
+    
+    func presentNoteMoreMenu(recordId: String) {
+        let sheet = BKBottomSheetViewController.makeMoreMenuSheet(
+            onShare: { [weak self] in
+                self?.dismiss(animated: true) {
+                    self?.handleNoteShareButtonTapped(recordId: recordId)
+                }
+            },
+            onEdit: { [weak self] in
+                self?.dismiss(animated: true) {
+                    self?.handleNoteEditButtonTapped(recordId: recordId)
+                }
+            },
+            onDelete: { [weak self] in
+                self?.dismiss(animated: true) {
+                    self?.handleNoteDeleteButtonTapped(recordId: recordId)
+                }
+            }
+        )
+        
+        sheet.show(from: self, animated: true)
+    }
+    
+    func presentDeletionConfirmDialog(recordId: String = "") {
+        let dialog = BKDialog(
+            title: """
+            삭제하면 기록을 복구할 수 없어요.
+            정말 삭제하시겠어요?
+            """,
+            config: .init(
+                leftButtonTitle: "취소",
+                leftButtonAction: { [weak self] in
+                    guard let self else { return }
+                    self.dismiss(animated: true)
+                },
+                rightButtonTitle: "삭제",
+                rightButtonAction: { [weak self] in
+                    guard let self else { return }
+                    self.dismiss(animated: true) {
+                        if recordId.isEmpty {
+                            self.viewModel.send(.deleteBookButtonTapped)
+                        } else {
+                            self.viewModel.send(.deleteRecordButtonTapped(recordId))
+                        }
+                    }
+                }
+            )
+        )
+        let dialogViewController = BKDialogViewController(dialog: dialog)
+        present(dialogViewController, animated: true)
+    }
+    
+    @objc func handleMoreButtonTapped() {
+        presentBookMoreMenu()
+    }
+    
+    func handleNoteShareButtonTapped(recordId: String) {
+        viewModel.send(.shareButtonTapped(recordId))
+    }
+    
+    func handleNoteEditButtonTapped(recordId: String) {
+        coordinator?.didTapEditButton(recordId: recordId, from: self)
+    }
+    
+    func handleNoteDeleteButtonTapped(recordId: String) {
+        presentDeletionConfirmDialog(recordId: recordId)
+    }
+    
+    func handleDeleteButtonTapped() {
+        presentDeletionConfirmDialog()
     }
 }

@@ -155,7 +155,7 @@ final class SettingViewModel: BaseViewModel {
             return appVersionUseCase.executeRecentVersion()
                 .map { Action.fetchLatestAppVersionSucceeded($0) }
                 .catch { error -> Just<Action> in
-                    print("Failed to fetch latest app version: \(error)")
+                    Log.debug("Failed to fetch latest app version: \(error)", logger: AppLogger.viewModel)
                     return Just(Action.fetchLatestAppVersionSucceeded(""))
                 }
                 .eraseToAnyPublisher()

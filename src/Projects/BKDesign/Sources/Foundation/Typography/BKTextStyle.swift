@@ -26,6 +26,8 @@ public enum BKTextStyle {
     /// 문장 공유 카드 전용
     case caption3(weight: BKFontWeight)
     
+    case italic
+    
     // MARK: - fontAttributes: 폰트 속성 구조체 반환
     public var fontAttributes: BKFontAttributes {
         switch self {
@@ -284,6 +286,7 @@ public enum BKTextStyle {
                     letterSpacing: .pNegative1
                 )
             }
+            
         case .caption2(let weight):
             switch weight {
             case .regular:
@@ -301,6 +304,15 @@ public enum BKTextStyle {
                     letterSpacing: .pNegative1
                 )
             }
+            
+        case .italic:
+            return BKFontAttributes(
+                fontName: .pretendardRegular, // 이건 사용되지 않음 (systemFont 사용)
+                fontSize: .pt14,
+                lineHeight: .p142_9,
+                letterSpacing: .pNegative1
+            )
+            
         case .body3:
             return BKFontAttributes(
                 fontName: .santteutM,
@@ -308,6 +320,7 @@ public enum BKTextStyle {
                 lineHeight: .p155,
                 letterSpacing: .pNegative1_5
             )
+            
         case .caption3:
             return BKFontAttributes(
                 fontName: .santteutM,
@@ -319,10 +332,19 @@ public enum BKTextStyle {
     }
     
     public var uiFont: UIFont? {
-        return UIFont(
-            name: fontAttributes.fontName.rawValue,
-            size: fontAttributes.fontSize.rawValue
-        )
+        switch self {
+        case .italic:
+            let systemFont = UIFont.systemFont(ofSize: fontAttributes.fontSize.rawValue, weight: .medium)
+            if let descriptor = systemFont.fontDescriptor.withSymbolicTraits([.traitItalic]) {
+                return UIFont(descriptor: descriptor, size: fontAttributes.fontSize.rawValue)
+            }
+            return UIFont.italicSystemFont(ofSize: fontAttributes.fontSize.rawValue)
+        default:
+            return UIFont(
+                name: fontAttributes.fontName.rawValue,
+                size: fontAttributes.fontSize.rawValue
+            )
+        }
     }
     
     public var paragraphStyle: NSMutableParagraphStyle {

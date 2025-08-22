@@ -46,6 +46,7 @@ final class NoteViewController: BaseViewController<NoteView> {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.tabBarController?.tabBar.isHidden = false
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
     
     override func bindAction() {

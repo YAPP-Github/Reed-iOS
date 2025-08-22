@@ -48,6 +48,8 @@ private extension BKBottomSheetTitleView {
                 subtitleLabel.setFontStyle(style: .label1(weight: .medium))
             case .centered:
                 subtitleLabel.setFontStyle(style: .body1(weight: .medium))
+            default:
+                break
             }
         }
         
@@ -69,6 +71,8 @@ private extension BKBottomSheetTitleView {
             addLeadingLayout()
         case .centered:
             addCenteredLayout()
+        default:
+            break
         }
     }
     

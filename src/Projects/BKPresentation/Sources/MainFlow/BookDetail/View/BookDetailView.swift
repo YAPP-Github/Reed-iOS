@@ -295,6 +295,9 @@ private extension BookDetailView {
                 return UICollectionViewCell()
             }
             cell.configure(with: item)
+            cell.applyMoreButtonGesture { [weak self] in
+                self?.eventPublisher.send(.didTapMoreButton(recordId: item.recordId))
+            }
             return cell
         }
         return dataSource

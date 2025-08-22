@@ -31,7 +31,9 @@ public enum BKImage {
         public static let plus = BKDesignAsset.plus.image
         public static let search = BKDesignAsset.search.image
         public static let settings = BKDesignAsset.settings.image
+        public static let share = BKDesignAsset.share.image
         public static let star = BKDesignAsset.star.image
+        public static let trash = BKDesignAsset.trash.image
         public static let x = BKDesignAsset.x.image
         public static let xCircle = BKDesignAsset.xCircle.image
         public static let home = BKDesignAsset.home.image

@@ -185,7 +185,7 @@ private extension UINavigationController {
     
     func makeHomeTitleView(_ text: String) -> UIView {
         let label = BKLabel()
-        let font = BKTextStyle.title1(weight: .bold).uiFont!
+        let font = BKTextStyle.title1(weight: .bold).uiFont ?? UIFont.systemFont(ofSize: 28, weight: .bold)
         let attr = NSMutableAttributedString(string: text, attributes: [
             .font: font,
             .foregroundColor: UIColor.bkContentColor(.brand)
@@ -204,7 +204,7 @@ private extension UINavigationController {
     
     func makeLeadingTitle(_ text: String) -> UIView {
         let label = BKLabel()
-        let font = BKTextStyle.heading1(weight: .bold).uiFont!
+        let font = BKTextStyle.heading1(weight: .bold).uiFont ?? UIFont.systemFont(ofSize: 22, weight: .bold)
         let attr = NSMutableAttributedString(string: text, attributes: [
             .font: font,
             .foregroundColor: UIColor.bkContentColor(.primary)
@@ -267,7 +267,7 @@ private extension UINavigationController {
         
         let backImage = BKImage.Icon.chevronLeft
             .withRenderingMode(.alwaysTemplate)
-            .imageWithOffset(x: -4, y: 2)!
+            .imageWithOffset(x: -4, y: 2) ?? BKImage.Icon.chevronLeft
             .withAlignmentRectInsets(
                 UIEdgeInsets(top: 0, left: -16, bottom: 0, right: 0)
             )

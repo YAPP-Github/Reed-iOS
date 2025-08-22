@@ -93,6 +93,21 @@ public final class BKTextFieldView: UIView {
             object: textField
         )
     }
+    
+    public func setText(_ text: String) {
+        textField.text = text
+    }
+    
+    public func startEditing() {
+        guard window != nil, superview != nil else { return }
+        
+        if textField.window != nil, !textField.isFirstResponder {
+            DispatchQueue.main.async {
+                self.textField.becomeFirstResponder()
+            }
+        }
+    }
+    
 }
 
 private extension BKTextFieldView {
