@@ -93,6 +93,108 @@ extension BKBottomSheetViewController {
         return sheet
     }
     
+    static func makeMoreMenuSheet(
+        onShare: @escaping () -> Void,
+        onEdit: @escaping () -> Void,
+        onDelete: @escaping () -> Void
+    ) -> BKBottomSheetViewController {
+        let menuStack = UIStackView()
+        menuStack.axis = .vertical
+        menuStack.spacing = 0
+        
+        let shareMenuView = makeMenuItemView(
+            icon: BKImage.Icon.share,
+            title: "공유하기",
+            color: .bkContentColor(.primary),
+            action: onShare
+        )
+        
+        let editMenuView = makeMenuItemView(
+            icon: BKImage.Icon.edit,
+            title: "수정하기",
+            color: .bkContentColor(.primary),
+            action: onEdit
+        )
+        
+        let deleteMenuView = makeMenuItemView(
+            icon: BKImage.Icon.trash,
+            title: "삭제하기",
+            color: .bkContentColor(.error),
+            action: onDelete
+        )
+        
+        menuStack.addArrangedSubview(shareMenuView)
+        menuStack.addArrangedSubview(editMenuView)
+        menuStack.addArrangedSubview(deleteMenuView)
+        
+        let sheet = BKBottomSheetViewController(
+            style: .contentOnly,
+            suppliedContentStyle: .lower(menuStack)
+        )
+        
+        return sheet
+    }
+    
+    static func makeDeleteOnlyMenuSheet(
+        onDelete: @escaping () -> Void
+    ) -> BKBottomSheetViewController {
+        let deleteMenuView = makeMenuItemView(
+            icon: BKImage.Icon.trash.withTintColor(.bkContentColor(.error)),
+            title: "삭제하기",
+            color: .bkContentColor(.error),
+            action: onDelete
+        )
+        
+        let sheet = BKBottomSheetViewController(
+            style: .contentOnly,
+            suppliedContentStyle: .lower(deleteMenuView)
+        )
+        
+        return sheet
+    }
+    
+    private static func makeMenuItemView(
+        icon: UIImage,
+        title: String,
+        color: UIColor,
+        action: @escaping () -> Void
+    ) -> UIView {
+        let menuView = UIView()
+        let iconImageView = UIImageView(image: icon.withRenderingMode(.alwaysTemplate))
+        let titleLabel = BKLabel(
+            text: title,
+            fontStyle: .body1(weight: .medium),
+            color: color
+        )
+        
+        iconImageView.tintColor = color
+        menuView.addSubviews(iconImageView, titleLabel)
+        
+        iconImageView.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(BKInset.inset6)
+            $0.size.equalTo(CGSize(width: 20, height: 20))
+            $0.centerY.equalToSuperview()
+        }
+        
+        titleLabel.snp.makeConstraints {
+            $0.leading.equalTo(iconImageView.snp.trailing).offset(BKInset.inset3)
+            $0.top.bottom.equalToSuperview().inset(BKInset.inset5)
+        }
+        
+        menuView.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer()
+        tapGesture.addTarget(
+            BKBottomSheetMenuActionTarget.shared,
+            action: #selector(BKBottomSheetMenuActionTarget.handleTap)
+        )
+        menuView.addGestureRecognizer(tapGesture)
+        
+        // 액션을 저장
+        BKBottomSheetMenuActionTarget.shared.setAction(for: menuView, action: action)
+        
+        return menuView
+    }
+    
     private static func makeOptionView(
         option: SortOption,
         isSelected: Bool,
@@ -134,5 +236,19 @@ extension BKBottomSheetViewController {
         @objc private func handleTap() {
             confirmAction(option)
         }
+    }
+}
+
+fileprivate class BKBottomSheetMenuActionTarget {
+    static let shared = BKBottomSheetMenuActionTarget()
+    private var actions: [UIView: () -> Void] = [:]
+    
+    func setAction(for view: UIView, action: @escaping () -> Void) {
+        actions[view] = action
+    }
+    
+    @objc func handleTap(_ gesture: UITapGestureRecognizer) {
+        guard let view = gesture.view else { return }
+        actions[view]?()
     }
 }

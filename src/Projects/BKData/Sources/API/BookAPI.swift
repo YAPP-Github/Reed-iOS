@@ -9,6 +9,7 @@ enum BookAPI {
     case search(dto: SearchBookRequestDTO)
     case guestSearch(dto: SearchBookRequestDTO)
     case upsert(dto: UserBookRegisterRequestDTO)
+    case delete(bookId: String)
 }
 
 extension BookAPI: RequestTarget {
@@ -28,6 +29,8 @@ extension BookAPI: RequestTarget {
             return "/guest/search"
         case .upsert:
             return "/upsert"
+        case .delete(let bookId):
+            return "/my-library/\(bookId)"
         }
     }
     
@@ -37,6 +40,8 @@ extension BookAPI: RequestTarget {
             return .put
         case .detail, .myLibrary, .search, .guestSearch:
             return .get
+        case .delete:
+            return .delete
         }
     }
     
@@ -46,14 +51,14 @@ extension BookAPI: RequestTarget {
             return [
                 "Content-Type": "application/json"
             ]
-        case .detail, .myLibrary, .search, .guestSearch:
+        case .detail, .myLibrary, .search, .guestSearch, .delete:
             return [:]
         }
     }
     
     var body: Encodable? {
         switch self {
-        case .detail, .myLibrary, .search, .guestSearch:
+        case .detail, .myLibrary, .search, .guestSearch, .delete:
             return nil
         case .upsert(let dto):
             return dto
@@ -70,7 +75,7 @@ extension BookAPI: RequestTarget {
             return dto.dictionary
         case .guestSearch(let dto):
             return dto.dictionary
-        case .upsert:
+        case .upsert, .delete:
             return [:]
         }
     }

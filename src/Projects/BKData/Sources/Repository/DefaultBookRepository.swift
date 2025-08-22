@@ -7,9 +7,11 @@ import Foundation
 
 public struct DefaultBookRepository: BookRepository {
     private let networkProvider: NetworkProvider
+    private let defaultNetworkProvider: NetworkProvider
     
-    public init(networkProvider: NetworkProvider) {
+    public init(networkProvider: NetworkProvider, defaultNetworkProvider: NetworkProvider) {
         self.networkProvider = networkProvider
+        self.defaultNetworkProvider = defaultNetworkProvider
     }
     
     public func search(
@@ -42,7 +44,7 @@ public struct DefaultBookRepository: BookRepository {
     public func guestSearch(
         _ parameters: SearchBookParameters
     ) -> AnyPublisher<([Book], totalResults: Int), DomainError> {
-        networkProvider.request(
+        defaultNetworkProvider.request(
             target: BookAPI.guestSearch(
                 dto: SearchBookRequestDTO(
                     query: parameters.query,
@@ -130,6 +132,21 @@ public struct DefaultBookRepository: BookRepository {
         .mapError { $0.toDomainError() }
         .debugError(logger: AppLogger.network)
         .map { $0.toBook() }
+        .eraseToAnyPublisher()
+    }
+    
+    public func delete(
+        bookId: String
+    ) -> AnyPublisher<Void, DomainError> {
+        networkProvider.request(
+            target: BookAPI.delete(
+                bookId: bookId
+            ),
+            type: EmptyResponse.self
+        )
+        .mapError { $0.toDomainError() }
+        .debugError(logger: AppLogger.network)
+        .map { _ in }
         .eraseToAnyPublisher()
     }
 }

@@ -62,4 +62,36 @@ public final class DefaultRecordRepository: RecordRepository {
         .map { $0.toRecordInfo() }
         .eraseToAnyPublisher()
     }
+    
+    public func patch(
+        recordId: String,
+        recordData: RecordVO
+    ) -> AnyPublisher<RecordInfo, DomainError> {
+        networkProvider.request(
+            target: RecordAPI.patch(
+                readingRecordId: recordId,
+                recordData: recordData
+            ),
+            type: InsertRecordResponseDTO.self
+        )
+        .mapError { $0.toDomainError() }
+        .debugError(logger: AppLogger.network)
+        .map { $0.toRecordInfo() }
+        .eraseToAnyPublisher()
+    }
+    
+    public func delete(
+        recordId: String
+    ) -> AnyPublisher<Void, DomainError> {
+        networkProvider.request(
+            target: RecordAPI.delete(
+                readingRecordId: recordId
+            ),
+            type: EmptyResponse.self
+        )
+        .mapError { $0.toDomainError() }
+        .debugError(logger: AppLogger.network)
+        .map { _ in }
+        .eraseToAnyPublisher()
+    }
 }

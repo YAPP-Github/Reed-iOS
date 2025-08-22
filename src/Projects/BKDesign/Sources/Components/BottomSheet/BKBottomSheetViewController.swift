@@ -16,7 +16,7 @@ public final class BKBottomSheetViewController: UIViewController {
     private let rootStack = UIStackView()
     
     public init(
-        title: String,
+        title: String = "",
         subtitle: String? = nil,
         style: BKBottomSheetStyle = .leadingCloseButton,
         suppliedContentStyle: SuppliedContentStyle? = nil,
@@ -25,11 +25,16 @@ public final class BKBottomSheetViewController: UIViewController {
         self.style = style
         self.suppliedContentStyle = suppliedContentStyle
         self.button = buttonConfiguration
-        self.titleView = BKBottomSheetTitleView(
-            style: style == .leadingCloseButton ? .leadingCloseButton : .centered,
-            title: title,
-            subtitle: subtitle
-        )
+        
+        if style == .contentOnly {
+            self.titleView = BKBottomSheetTitleView(style: .centered, title: "", subtitle: nil)
+        } else {
+            self.titleView = BKBottomSheetTitleView(
+                style: style == .leadingCloseButton ? .leadingCloseButton : .centered,
+                title: title,
+                subtitle: subtitle
+            )
+        }
         super.init(nibName: nil, bundle: nil)
         setup()
     }
@@ -169,9 +174,16 @@ private extension BKBottomSheetViewController {
     }
     
     func layout() {
-        rootStack.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(BKSpacing.spacing5)
-            $0.leading.trailing.equalToSuperview().inset(BKSpacing.spacing5)
+        if style == .contentOnly {
+            rootStack.snp.makeConstraints {
+                $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(BKSpacing.spacing5)
+                $0.leading.trailing.equalToSuperview()
+            }
+        } else {
+            rootStack.snp.makeConstraints {
+                $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(BKSpacing.spacing5)
+                $0.leading.trailing.equalToSuperview().inset(BKSpacing.spacing5)
+            }
         }
         
         if let button {
@@ -189,6 +201,8 @@ private extension BKBottomSheetViewController {
             makeLeadingContent()
         case .centered:
             makeCenteredContent()
+        case .contentOnly:
+            makeContentOnlyLayout()
         }
 
         if let button {
@@ -245,6 +259,20 @@ private extension BKBottomSheetViewController {
          
         paddedContainer.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview()
+        }
+    }
+    
+    func makeContentOnlyLayout() {
+        rootStack.alignment = .fill
+        
+        switch suppliedContentStyle {
+        case .upper(let contentView), .lower(let contentView):
+            rootStack.addArrangedSubview(contentView)
+            applyRatioIfNeeded(to: contentView)
+        case .none:
+            let emptyView = UIView()
+            emptyView.snp.makeConstraints { $0.height.equalTo(BKSpacing.spacing5) }
+            rootStack.addArrangedSubview(emptyView)
         }
     }
     

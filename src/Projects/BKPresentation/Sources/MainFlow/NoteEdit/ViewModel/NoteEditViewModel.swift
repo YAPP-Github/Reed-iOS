@@ -3,14 +3,17 @@
 import BKCore
 import BKDomain
 import Combine
+import Foundation
 
-final class NoteCompletionViewModel: BaseViewModel {
+final class NoteEditViewModel: BaseViewModel {
     struct State {
         var recordInfo: RecordInfo?
+        var selectedEmotion: Emotion?
         var isLoading: Bool = false
         var error: DomainError?
+        var shouldPresentEmotionEdit: (emotion: Emotion?, timestamp: Date)?
+        var saveCompleted: Bool = false
         var deleteCompleted: Bool = false
-        var shareTriggered: Bool = false
     }
     
     enum Action {
@@ -18,14 +21,17 @@ final class NoteCompletionViewModel: BaseViewModel {
         case fetchRecordDetailSuccessed(RecordInfo)
         case errorOccured(DomainError)
         case errorHandled
+        case presentEmotionEdit
+        case emotionSelected(Emotion)
+        case saveButtonTapped(formData: (page: Int?, sentence: String, appreciation: String))
+        case patchRecordSuccessed(RecordInfo)
         case deleteButtonTapped
         case deleteRecordSuccessed
-        case shareButtonTapped
-        case shareHandled
     }
     
     enum SideEffect {
         case fetchRecordDetail(String)
+        case patchRecord(String, NoteForm)
         case deleteRecord(String)
     }
     
@@ -34,6 +40,7 @@ final class NoteCompletionViewModel: BaseViewModel {
     private let sideEffectSubject = PassthroughSubject<SideEffect, Never>()
     
     @Autowired private var fetchRecordDetailUseCase: FetchRecordDetailUseCase
+    @Autowired private var patchRecordUseCase: PatchRecordUseCase
     @Autowired private var deleteRecordUseCase: DeleteRecordUseCase
     
     private let recordId: String
@@ -41,6 +48,7 @@ final class NoteCompletionViewModel: BaseViewModel {
     var statePublisher: AnyPublisher<State, Never> {
         $state.eraseToAnyPublisher()
     }
+    
     
     init(recordId: String) {
         self.recordId = recordId
@@ -65,6 +73,10 @@ final class NoteCompletionViewModel: BaseViewModel {
             
         case .fetchRecordDetailSuccessed(let recordInfo):
             newState.recordInfo = recordInfo
+            // 사용자가 이미 감정을 선택했다면 덮어쓰지 않음
+            if newState.selectedEmotion == nil {
+                newState.selectedEmotion = recordInfo.emotionTags.first
+            }
             newState.isLoading = false
             
         case .errorOccured(let error):
@@ -74,6 +86,35 @@ final class NoteCompletionViewModel: BaseViewModel {
         case .errorHandled:
             newState.error = nil
             
+        case .presentEmotionEdit:
+            newState.shouldPresentEmotionEdit = (emotion: state.selectedEmotion, timestamp: Date())
+            
+        case .emotionSelected(let emotion):
+            newState.selectedEmotion = emotion
+            
+        case .saveButtonTapped(let formData):
+            guard let selectedEmotion = state.selectedEmotion,
+                  let page = formData.page,
+                  !formData.sentence.isEmpty,
+                  !formData.appreciation.isEmpty else { 
+                break 
+            }
+            
+            let noteForm = NoteForm(
+                page: page,
+                sentence: formData.sentence,
+                emotion: selectedEmotion,
+                appreciation: formData.appreciation
+            )
+            
+            newState.isLoading = true
+            effects.append(.patchRecord(recordId, noteForm))
+            
+        case .patchRecordSuccessed(let recordInfo):
+            newState.recordInfo = recordInfo
+            newState.isLoading = false
+            newState.saveCompleted = true
+            
         case .deleteButtonTapped:
             newState.isLoading = true
             effects.append(.deleteRecord(recordId))
@@ -81,12 +122,6 @@ final class NoteCompletionViewModel: BaseViewModel {
         case .deleteRecordSuccessed:
             newState.isLoading = false
             newState.deleteCompleted = true
-            
-        case .shareButtonTapped:
-            newState.shareTriggered = true
-            
-        case .shareHandled:
-            newState.shareTriggered = false
         }
         
         return (newState, effects)
@@ -100,6 +135,15 @@ final class NoteCompletionViewModel: BaseViewModel {
                 .catch { Just(Action.errorOccured($0)) }
                 .eraseToAnyPublisher()
                 
+        case .patchRecord(let id, let noteForm):
+            return patchRecordUseCase.execute(
+                recordId: id,
+                record: noteForm.toRecordVO()
+            )
+            .map { Action.patchRecordSuccessed($0) }
+            .catch { Just(Action.errorOccured($0)) }
+            .eraseToAnyPublisher()
+            
         case .deleteRecord(let id):
             return deleteRecordUseCase.execute(recordId: id)
                 .map { _ in Action.deleteRecordSuccessed }
@@ -117,3 +161,4 @@ final class NoteCompletionViewModel: BaseViewModel {
             .store(in: &cancellables)
     }
 }
+
