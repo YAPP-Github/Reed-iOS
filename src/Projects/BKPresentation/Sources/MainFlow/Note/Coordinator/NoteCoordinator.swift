@@ -45,13 +45,25 @@ extension NoteCoordinator: AuthenticationRequiredNotifying, ErrorHandleable {
 
 extension NoteCoordinator {
     func didCompleteNoteCreation(recordInfo: RecordInfo) {
-        let viewController = NoteCompletionViewController(
-            viewModel: NoteCompletionViewModel(recordId: recordInfo.recordId)
-        )
-        let noteNavigationController = UINavigationController(rootViewController: viewController)
-        
+        let noteNavigationController = UINavigationController()
         noteNavigationController.modalPresentationStyle = .fullScreen
-        navigationController.present(noteNavigationController, animated: true) {
+        
+        // ✅ 부모를 내 부모(예: BookDetailCoordinator)로 올려준다
+        let parent = self.parentCoordinator ?? self
+        
+        let noteCompletionCoordinator = NoteCompletionCoordinator(
+            parentCoordinator: parent,
+            navigationController: noteNavigationController,
+            recordId: recordInfo.recordId
+        )
+        
+        // 부모의 child로 달기 (addChildCoordinator는 부모 쪽 메서드여야 함)
+        parent.addChildCoordinator(noteCompletionCoordinator)
+        noteCompletionCoordinator.start()
+        
+        // 프리젠터는 parent의 navigationController가 가장 안전
+        parent.navigationController.present(noteNavigationController, animated: true) {
+            // 이제 NoteCoordinator를 정리해도 완료 플로우는 안 죽음
             self.popAndFinish()
         }
     }
