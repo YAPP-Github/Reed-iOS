@@ -33,4 +33,8 @@ public protocol BookRepository {
     func detail(
         isbn: String
     ) -> AnyPublisher<Book, DomainError>
+    
+    func delete(
+        bookId: String
+    ) -> AnyPublisher<Void, DomainError>
 }
