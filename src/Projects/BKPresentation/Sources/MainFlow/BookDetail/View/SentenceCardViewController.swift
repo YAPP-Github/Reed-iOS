@@ -83,6 +83,16 @@ final class SentenceCardViewController: BaseViewController<SentenceCardView> {
             .store(in: &cancellables)
         
         viewModel.statePublisher
+            .map(\.requestAccess)
+            .removeDuplicates()
+            .filter { $0 == true }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.presentSettingsAlert()
+            }
+            .store(in: &cancellables)
+        
+        viewModel.statePublisher
             .map { $0.isLoading }
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
@@ -95,7 +105,6 @@ final class SentenceCardViewController: BaseViewController<SentenceCardView> {
             }
             .store(in: &cancellables)
     }
-    
 }
 
 extension SentenceCardViewController {
@@ -117,5 +126,28 @@ extension SentenceCardViewController {
         }
         
         self.present(activityViewController, animated: true, completion: completion)
+    }
+    
+    private func presentSettingsAlert() {
+        let dialog = BKDialog(
+            title: "접근 권한 필요",
+            subtitle: "설정에서 사진 추가 권한을 허용해주세요.",
+            config: .init(
+                leftButtonTitle: "취소",
+                leftButtonAction: { [weak self] in
+                    self?.viewModel.send(.settingsAlertDismissed)
+                },
+                rightButtonTitle: "설정으로 이동",
+                rightButtonAction: { [weak self] in
+                    self?.viewModel.send(.settingsAlertDismissed)
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+            )
+        )
+        
+        let dialogViewController = BKDialogViewController(dialog: dialog)
+        present(dialogViewController, animated: true)
     }
 }

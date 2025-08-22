@@ -7,10 +7,15 @@ import Foundation
 import Photos
 import UIKit
 
+enum PhotoAccessError: Error {
+    case denied
+}
+
 final class SentenceCardViewModel: BaseViewModel {
     struct State {
         var data: BookDetailItem?
         var alertInfo: String?
+        var requestAccess: Bool = false
         var isLoading: Bool = false
     }
     
@@ -19,6 +24,7 @@ final class SentenceCardViewModel: BaseViewModel {
         case didTapSaveButton(image: UIImage)
         case saveImageResult(Result<Void, Error>)
         case alertDismissed
+        case settingsAlertDismissed
         case prepareToSaveImage
     }
     
@@ -60,11 +66,16 @@ final class SentenceCardViewModel: BaseViewModel {
             case .success:
                 newState.alertInfo = "이미지를 저장했습니다!"
             case .failure(let error):
-                // TODO : error는 로그로 찍어서 수집하기
-                newState.alertInfo = "[저장 실패] 잠시 후 다시 시도해주세요."
+                if error is PhotoAccessError {
+                    newState.requestAccess = true
+                } else {
+                    newState.alertInfo = "[저장 실패] 잠시 후 다시 시도해주세요."
+                }
             }
         case .alertDismissed:
             newState.alertInfo = nil
+        case .settingsAlertDismissed:
+            newState.requestAccess = false
         case .prepareToSaveImage:
             newState.isLoading = true
         }
@@ -108,12 +119,14 @@ final class SentenceCardViewModel: BaseViewModel {
         if status == .notDetermined {
             status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
         }
-        guard status == .authorized || status == .limited else {
-            throw NSError(
-                domain: "PhotoLibrary",
-                code: 2,
-                userInfo: [NSLocalizedDescriptionKey: "포토 라이브러리 접근 권한이 필요합니다."]
-            )
+        
+        switch status {
+        case .authorized, .limited:
+            return
+        case .denied, .restricted:
+            throw PhotoAccessError.denied
+        default:
+            throw PhotoAccessError.denied
         }
     }
 }
