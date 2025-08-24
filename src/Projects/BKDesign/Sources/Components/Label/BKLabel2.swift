@@ -2,6 +2,7 @@
 
 import UIKit
 
+/// 행간과 baseline offset이 적용되지는 않으나, 1줄짜리 텍스트를 보여줄 때 사용 가능한 라벨
 public final class BKLabel2: UILabel {
     public enum LabelType {
         case medium
