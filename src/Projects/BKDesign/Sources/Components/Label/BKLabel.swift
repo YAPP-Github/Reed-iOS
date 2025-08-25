@@ -2,6 +2,7 @@
 
 import UIKit
 
+/// 행간, baseline offset 모두 잘 적용되는 Label
 public final class BKLabel: UILabel {
     public enum LabelType {
         case medium
@@ -36,21 +37,18 @@ public final class BKLabel: UILabel {
     
     public var highlightedWord: String? {
         didSet {
-//            apply()
             applyRecommended()
         }
     }
     
     public var highlightColor: UIColor {
         didSet {
-//            apply()
             applyRecommended()
         }
     }
     
     public var highlightFont: UIFont? {
         didSet {
-//            apply()
             applyRecommended()
         }
     }
@@ -73,7 +71,6 @@ public final class BKLabel: UILabel {
         self.highlightColor = highlightColor
         self.highlightFont = highlightFont
         super.init(frame: frame)
-//        apply()
         applyRecommended()
     }
     
@@ -102,63 +99,53 @@ public final class BKLabel: UILabel {
     
     public func setFontStyle(style: BKTextStyle) {
         self.fontStyle = style
-//        apply()
         applyRecommended()
     }
     
     public func setText(text: String) {
         self.labelText = text
-//        apply()
         applyRecommended()
     }
     
     public func setColor(color: UIColor) {
         self.labelColor = color
-//        apply()
-        
         applyRecommended()
     }
 }
 
 private extension BKLabel {
-    func apply() {
-        let baseText = fontStyle.attributedString(
-            from: labelText,
-            color: labelColor
-        )
-        let attributedString = NSMutableAttributedString(attributedString: baseText)
-        let range = NSRange(location: 0, length: attributedString.length)
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = alignment
-        paragraphStyle.lineBreakMode = self.lineBreakMode
-        
-        attributedString.addAttribute(
-            .paragraphStyle,
-            value: paragraphStyle,
-            range: range
-        )
-        
-        if let word = highlightedWord, !word.isEmpty {
-            let wordRange = (labelText as NSString).range(of: word)
-            if wordRange.location != NSNotFound {
-                attributedString.addAttribute(.foregroundColor, value: highlightColor, range: wordRange)
-                if let highlightFont = highlightFont {
-                    attributedString.addAttribute(.font, value: highlightFont, range: wordRange)
-                }
-            }
-        }
-        
-        attributedText = attributedString
-    }
-    
     func applyRecommended() {
         let customParagraphStyle = fontStyle.paragraphStyle
         customParagraphStyle.alignment = alignment
         customParagraphStyle.lineBreakMode = self.lineBreakMode
         
-        let extraAttributes: [NSAttributedString.Key: Any] = [
+        // BKTextStyle에서 실제 폰트와 라인 높이 정보 가져오기
+        guard let actualFont = fontStyle.uiFont else {
+            // 폰트를 가져올 수 없는 경우 기본 처리
+            let attributedString = fontStyle.mutableAttributedString(
+                from: labelText,
+                color: labelColor,
+                extraAttributes: [.paragraphStyle: customParagraphStyle]
+            )
+            attributedText = attributedString
+            return
+        }
+        
+        let desiredLineHeight = customParagraphStyle.minimumLineHeight
+        var baselineOffset: CGFloat = 0
+
+        if desiredLineHeight > 0 && desiredLineHeight != actualFont.lineHeight {
+            baselineOffset = (desiredLineHeight - actualFont.lineHeight) / 2.0
+        }
+
+        var extraAttributes: [NSAttributedString.Key: Any] = [
             .paragraphStyle: customParagraphStyle
         ]
+        
+        // baseline offset가 0이 아닐 때만 추가
+        if baselineOffset != 0 {
+            extraAttributes[.baselineOffset] = baselineOffset
+        }
         
         let attributedString = fontStyle.mutableAttributedString(
             from: labelText,
