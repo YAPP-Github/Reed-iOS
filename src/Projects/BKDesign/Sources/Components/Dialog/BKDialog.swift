@@ -59,6 +59,8 @@ public final class BKDialog: UIView {
     private let titleText: String
     private let subtitleText: String?
     
+    let leftButtonAction: () -> Void
+    
     public init(
         title: String,
         subtitle: String? = nil,
@@ -69,6 +71,7 @@ public final class BKDialog: UIView {
         self.subtitleText = subtitle
         self.buttonGroup = Self.makeButtonGroup(config: config)
         self.suppliedContentStyle = suppliedContentStyle
+        self.leftButtonAction = config.leftButtonAction
         super.init(frame: .zero)
         
         setup()
