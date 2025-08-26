@@ -116,4 +116,3 @@ final class NoteViewModel: BaseViewModel {
             .store(in: &cancellables)
     }
 }
-
