@@ -111,7 +111,7 @@ public final class BKTextView: UIView {
     public func startEditing(
         _ willMoveCaret: Bool = true
     ) {
-        guard window == textView.window else { return }
+        guard textView.window != nil else { return }
         
         if !textView.isFirstResponder {
             DispatchQueue.main.async {
