@@ -78,8 +78,9 @@ final class NoteViewController: BaseViewController<NoteView> {
     override func bindState() {
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
-            .removeDuplicates()
             .map { $0.selectedGuideText }
+            .removeDuplicates()
+            .filter { !$0.isEmpty }
             .sink { [weak self] selectedText in
                 self?.contentView.setAppreciationText(selectedText)
             }
@@ -89,9 +90,8 @@ final class NoteViewController: BaseViewController<NoteView> {
             .receive(on: DispatchQueue.main)
             .map { $0.shouldStartEditing }
             .filter { $0 }
-            .removeDuplicates()
             .sink { [weak self] _ in
-                self?.contentView.startEditingIfNeeded() 
+                self?.contentView.startEditingIfNeeded()
             }
             .store(in: &cancellable)
         
@@ -107,8 +107,8 @@ final class NoteViewController: BaseViewController<NoteView> {
         
         viewModel.statePublisher
             .map(\.error)
-            .removeDuplicates()
             .compactMap { $0 }
+            .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
                 self?.coordinator?.handleError(error)
@@ -176,7 +176,7 @@ private extension NoteViewController {
                 leftButtonTitle: "닫기",
                 leftButtonAction: { [weak self] in
                     self?.dismiss(animated: true)
-                    self?.navigationController?.popViewController(animated: true)
+                    self?.coordinator?.popAndFinish()
                 },
                 rightButtonTitle: "기록 보러가기",
                 rightButtonAction: { [weak self] in
