@@ -92,6 +92,7 @@ final class SearchViewModel: BaseViewModel {
         var searchBarPlaceholder: String
         var searchViewTitle: String
         var isUpserted: String? = nil
+        var viewType: SearchViewType? = nil
     }
     
     enum Action {
@@ -164,7 +165,8 @@ final class SearchViewModel: BaseViewModel {
         self.searchViewType = searchViewType
         self.state = State(
             searchBarPlaceholder: searchViewType.searchBarPlaceholder,
-            searchViewTitle: searchViewType.searchViewTitle
+            searchViewTitle: searchViewType.searchViewTitle,
+            viewType: searchViewType
         )
         bindSideEffects()
     }
