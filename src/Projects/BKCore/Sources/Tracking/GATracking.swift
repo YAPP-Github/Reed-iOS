@@ -19,7 +19,7 @@ public enum GATracking {
     // MARK: - Home & Library
     public struct HomeAndLibrary {
         private init() { }
-        public static let main = "home_main"
+        public static let homeMain = "home_main"
         public static let libraryMain = "library_main"
         public static let searchBook = "library_search_book"
         public static let bookDetail = "library_book_detail"

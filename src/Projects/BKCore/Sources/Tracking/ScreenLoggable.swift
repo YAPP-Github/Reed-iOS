@@ -1,7 +1,8 @@
 // Copyright © 2025 Booket. All rights reserved
 
-import Foundation
+import Firebase
 import FirebaseAnalytics
+import Foundation
 
 /// 스크린 로깅 기능을 위한 프로토콜
 public protocol ScreenLoggable {
