@@ -29,7 +29,8 @@ let debugAppTarget = Target.target(
         .external(dependency: .PulseUI),
         .external(dependency: .PulseProxy),
         .external(dependency: .FirebaseCore),
-        .external(dependency: .FirebaseCrashlytics)
+        .external(dependency: .FirebaseCrashlytics),
+        .external(dependency: .FirebaseAnalytics)
     ],
     settings: .settings(
         base: [

@@ -16,7 +16,6 @@
             "FirebaseCore" : .staticLibrary,
             "FirebaseAnalytics" : .staticLibrary,
             "FirebaseCrashlytics" : .staticLibrary,
-            "FirebaseAnalyticsSwift" : .staticLibrary,
             "FirebaseRemoteConfig" : .staticLibrary
         ]
     )
