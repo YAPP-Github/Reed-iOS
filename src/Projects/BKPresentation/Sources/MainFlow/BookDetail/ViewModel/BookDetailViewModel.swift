@@ -22,6 +22,7 @@ final class BookDetailViewModel: BaseViewModel {
         var hasMore: Bool = true
         var totalResults = 0
         var deleteCompleted: Bool = false
+        var deleteRecordCompleted: Bool = false
         var isDeletingBook: Bool = false
         var isDeletingRecord: Bool = false
         var shareTriggered: Bool = false
@@ -53,6 +54,7 @@ final class BookDetailViewModel: BaseViewModel {
         case deleteRecordSuccessed
         case shareButtonTapped(String)
         case shareHandled
+        case initDeleteRecordValue
     }
     
     enum SideEffect {
@@ -193,6 +195,7 @@ final class BookDetailViewModel: BaseViewModel {
             
         case .deleteRecordSuccessed:
             newState.isDeletingRecord = false
+            newState.deleteRecordCompleted = true
             effects.append(.fetchRecords(page: 0))
             effects.append(.fetchSeedStats)
             
@@ -205,6 +208,9 @@ final class BookDetailViewModel: BaseViewModel {
         case .shareHandled:
             newState.shareTriggered = false
             newState.shareItem = nil
+            
+        case .initDeleteRecordValue:
+            newState.deleteRecordCompleted = false
         }
         
         return (newState, effects)
