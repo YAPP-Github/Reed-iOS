@@ -50,6 +50,10 @@ final class NoteCompletionView: BaseView {
         )
     }
     
+    override func configure() {
+        scrollView.showsVerticalScrollIndicator = false
+    }
+    
     override func setupLayout() {
         scrollView.snp.makeConstraints {
             $0.edges.equalToSuperview()
