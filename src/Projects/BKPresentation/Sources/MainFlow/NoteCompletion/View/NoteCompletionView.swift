@@ -6,6 +6,7 @@ import SnapKit
 import UIKit
 
 final class NoteCompletionView: BaseView {
+    private let scrollView = UIScrollView()
     private let containerView = UIView()
     private let resultView = BKBookSummaryView(style: .compact)
     private let divider = BKDivider(type: .medium)
@@ -21,7 +22,8 @@ final class NoteCompletionView: BaseView {
     private let appreciationResultView = AppreciationResultView()
     
     override func setupView() {
-        addSubview(containerView)
+        addSubview(scrollView)
+        scrollView.addSubview(containerView)
         containerView.addSubviews(resultView, divider, contentStack)
         [collectedSentenceView, appreciationResultView].forEach(contentStack.addArrangedSubview(_:))
     }
@@ -49,8 +51,13 @@ final class NoteCompletionView: BaseView {
     }
     
     override func setupLayout() {
+        scrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
         containerView.snp.makeConstraints {
             $0.edges.equalToSuperview()
+            $0.width.equalTo(scrollView.snp.width)
         }
         
         resultView.snp.makeConstraints {
@@ -69,6 +76,8 @@ final class NoteCompletionView: BaseView {
                 .offset(LayoutConstants.contentStackSpacing)
             $0.horizontalEdges.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
+            $0.bottom.lessThanOrEqualToSuperview()
+                .inset(LayoutConstants.bottomInset)
         }
         
         collectedSentenceView.snp.makeConstraints {
@@ -87,5 +96,6 @@ private extension NoteCompletionView {
         static let horizontalInset = BKInset.inset5
         static let dividerTopOffset = BKInset.inset2
         static let resultViewHeight: CGFloat = 100
+        static let bottomInset = BKInset.inset5
     }
 }
