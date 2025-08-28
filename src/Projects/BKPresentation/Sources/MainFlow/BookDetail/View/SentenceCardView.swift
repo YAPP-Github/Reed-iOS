@@ -7,6 +7,9 @@ import SnapKit
 import UIKit
 
 final class SentenceCardView: BaseView {
+    private lazy var scrollView = UIScrollView()
+    private lazy var contentView = UIView()
+    
     private lazy var emotionBackgroundImageView = UIImageView()
     private lazy var sentenceLabel = BKLabel(
         fontStyle: .body3(weight: .stMedium),
@@ -59,8 +62,14 @@ final class SentenceCardView: BaseView {
         
         guideLabel.numberOfLines = 2
         
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.showsHorizontalScrollIndicator = false
+        
         emotionBackgroundImageView.addSubviews(sentenceLabel, titleLabel)
-        addSubviews(emotionBackgroundImageView, guideLabel, bottomButtons)
+        contentView.addSubviews(emotionBackgroundImageView, guideLabel)
+        
+        scrollView.addSubview(contentView)
+        addSubviews(scrollView, bottomButtons)
     }
     
     override func setupLayout() {
@@ -74,14 +83,27 @@ final class SentenceCardView: BaseView {
             $0.directionalHorizontalEdges.equalToSuperview().inset(32)
         }
         
+        scrollView.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide.snp.top)
+            $0.directionalHorizontalEdges.equalToSuperview()
+            $0.bottom.equalTo(bottomButtons.snp.top)
+        }
+        
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview()
+        }
+        
         emotionBackgroundImageView.snp.makeConstraints {
-            $0.top.directionalHorizontalEdges.equalToSuperview().inset(20)
+            $0.top.equalToSuperview().inset(20)
+            $0.directionalHorizontalEdges.equalToSuperview().inset(20)
             $0.height.equalTo(emotionBackgroundImageView.snp.width).multipliedBy(468.0 / 335.0)
         }
         
         guideLabel.snp.makeConstraints {
             $0.top.equalTo(emotionBackgroundImageView.snp.bottom).offset(32)
             $0.directionalHorizontalEdges.equalToSuperview().inset(20)
+            $0.bottom.equalToSuperview().inset(24)
         }
         
         bottomButtons.snp.makeConstraints {
