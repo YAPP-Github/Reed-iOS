@@ -6,20 +6,16 @@ import Combine
 import Foundation
 import NaturalLanguage
 import VisionKit
+import UIKit
 
 final class OCRScannerViewModel: BaseViewModel {
-    
-    // MARK: - Core Components
     struct State: Equatable {
         var isScanning: Bool = false
         var capturedText: String?
         var capturedSentences: [String] = []
-        
-        // 에러 핸들링
         var shouldShowAlert: Bool = false
         var shouldShowDialog: Bool = false
         var failureCount: Int = 0
-        
         var isLoading: Bool = false
     }
     
@@ -33,6 +29,7 @@ final class OCRScannerViewModel: BaseViewModel {
         case captureButtonTapped
         case closeButtonTapped
         case textCaptured(String)
+        case visionTextCaptured([String])
         case alertDismissed
         case dialogDismissed
         case resetFailureCount
@@ -57,9 +54,9 @@ final class OCRScannerViewModel: BaseViewModel {
         sideEffectSubject.eraseToAnyPublisher()
     }
     
-    init() {
-        bindSideEffects()
-    }
+    private let nlp = NLPPostprocessor()
+
+    init() { bindSideEffects() }
     
     // MARK: - Methods
     func send(_ action: Action) {
@@ -68,10 +65,7 @@ final class OCRScannerViewModel: BaseViewModel {
         effects.forEach { sideEffectSubject.send($0) }
     }
     
-    func reduce(
-        action: Action,
-        state: State
-    ) -> (State, [SideEffect]) {
+    func reduce(action: Action, state: State) -> (State, [SideEffect]) {
         var newState = state
         var effects: [SideEffect] = []
         newState.shouldShowAlert = false
@@ -86,39 +80,30 @@ final class OCRScannerViewModel: BaseViewModel {
         case .stopScanning:
             newState.isScanning = false
             
-        case .itemsAdded(_, let allItems):
-            currentRecognizedItems = allItems
-            
-        case .itemsUpdated(_, let allItems):
-            currentRecognizedItems = allItems
-            
-        case .itemsRemoved(_, let allItems):
+        case .itemsAdded(_, let allItems),
+             .itemsUpdated(_, let allItems),
+             .itemsRemoved(_, let allItems):
             currentRecognizedItems = allItems
             
         case .captureButtonTapped:
-            Log.debug("\(newState.failureCount)", logger: AppLogger.viewModel)
             newState.isLoading = true
+            let rawLines = extractTexts(items: currentRecognizedItems)
             
-            let capturedTexts = extractTextsInScanArea(items: currentRecognizedItems)
-            
-            if !capturedTexts.isEmpty {
+            if !rawLines.isEmpty {
+                let sentences = normalizeToSentences(rawLines)
+                let scored = nlp.reflowWithScores(sentences: sentences)
+                let finalSentences = nlp.spellcheckEnglishIfNeeded(scored.map(\.text))
+                
                 newState.failureCount = 0
-                
-                newState.capturedSentences = capturedTexts
-                let combinedText = capturedTexts.joined(separator: "\n")
-                
-                newState.capturedText = combinedText
+                newState.capturedSentences = finalSentences
+                newState.capturedText = finalSentences.joined(separator: "\n")
                 newState.isLoading = false
-                effects.append(.showRecognizedSentences(capturedTexts))
+                effects.append(.showRecognizedSentences(finalSentences))
             } else {
                 newState.failureCount += 1
                 newState.isLoading = false
-                
-                if newState.failureCount >= 3 {
-                    newState.shouldShowDialog = true
-                } else {
-                    newState.shouldShowAlert = true
-                }
+                newState.shouldShowDialog = newState.failureCount >= 3
+                newState.shouldShowAlert = !newState.shouldShowDialog
             }
             
         case .closeButtonTapped:
@@ -126,6 +111,19 @@ final class OCRScannerViewModel: BaseViewModel {
             
         case .textCaptured(let text):
             newState.capturedText = text
+            
+        case .visionTextCaptured(let texts):
+            newState.isLoading = true
+            let sentences = normalizeToSentences(texts)
+            
+            let scored = nlp.reflowWithScores(sentences: sentences)
+            let finalSentences = nlp.spellcheckEnglishIfNeeded(scored.map(\.text))
+            
+            newState.failureCount = 0
+            newState.capturedSentences = finalSentences
+            newState.capturedText = finalSentences.joined(separator: "\n")
+            newState.isLoading = false
+            effects.append(.showRecognizedSentences(finalSentences))
             
         case .alertDismissed:
             newState.shouldShowAlert = false
@@ -144,7 +142,6 @@ final class OCRScannerViewModel: BaseViewModel {
         switch effect {
         case .showRecognizedSentences:
             return Empty().eraseToAnyPublisher()
-            
         case .dismissScanner:
             return Empty().eraseToAnyPublisher()
         }
@@ -158,44 +155,39 @@ final class OCRScannerViewModel: BaseViewModel {
             .sink(receiveValue: send)
             .store(in: &cancellables)
     }
-    
-    // MARK: - Private Methods
-    private func extractTextsInScanArea(
-        items: [RecognizedItem],
-        scanAreaFrame: CGRect? = nil
-    ) -> [String] {
-        var capturedTexts: [String] = []
-        
+}
+
+// MARK: - Text Processing
+private extension OCRScannerViewModel {
+    func extractTexts(items: [RecognizedItem]) -> [String] {
+        var texts: [String] = []
         for item in items {
-            switch item {
-            case .text(let textItem):
-                let lines = textItem.transcript.components(separatedBy: .newlines)
-                for line in lines {
-                    let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
-                    if !trimmedLine.isEmpty {
-                        let sentences = splitByToken(trimmedLine)
-                        capturedTexts.append(contentsOf: sentences)
-                    }
-                }
-            default:
-                break
+            if case let .text(recognizedText) = item {
+                texts.append(recognizedText.transcript)
             }
         }
-        
-        return capturedTexts
+        return texts
     }
     
-    func splitByToken(_ text: String) -> [String] {
+    func normalizeToSentences(_ lines: [String]) -> [String] {
+        var text = lines.joined(separator: "\n")
+        
+        text = text.replacingOccurrences(of: "-\\s*\\n", with: "", options: .regularExpression)
+        text = text.replacingOccurrences(of: "\\s+([.,?!…])", with: "$1", options: .regularExpression)
+        text = text.replacingOccurrences(of: "[\"\"]", with: "\"", options: .regularExpression)
+        text = text.replacingOccurrences(of: "['']", with: "'",  options: .regularExpression)
+        text = text.replacingOccurrences(of: "[\\u00A0\\u2001-\\u200B\\u202F\\u2060\\u3000\\uFEFF]", with: " ", options: .regularExpression)
+        text = text.replacingOccurrences(of: "\\u00AD", with: "", options: .regularExpression)
+        text = text.replacingOccurrences(of: "\\s{2,}", with: " ", options: .regularExpression)
+        
         let tokenizer = NLTokenizer(unit: .sentence)
         tokenizer.string = text
-        var results: [String] = []
+        var sentences: [String] = []
         tokenizer.enumerateTokens(in: text.startIndex..<text.endIndex) { range, _ in
             let sentence = String(text[range]).trimmingCharacters(in: .whitespacesAndNewlines)
-            if !sentence.isEmpty {
-                results.append(sentence)
-            }
+            if !sentence.isEmpty { sentences.append(sentence) }
             return true
         }
-        return results
+        return sentences
     }
 }
