@@ -5,7 +5,9 @@ import BKDesign
 import Combine
 import UIKit
 
-final class NoteCompletionViewController: BaseViewController<NoteCompletionView> {
+final class NoteCompletionViewController: BaseViewController<NoteCompletionView>, ScreenLoggable {
+    var screenName: String = GATracking.RecordFlow.detail
+
     override var bkNavigationTitle: String {
         return "독서 기록"
     }
@@ -49,6 +51,11 @@ final class NoteCompletionViewController: BaseViewController<NoteCompletionView>
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.tabBarController?.tabBar.isHidden = false
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        logScreenView()
     }
     
     override func bindState() {

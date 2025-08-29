@@ -6,7 +6,9 @@ import BKDomain
 import Combine
 import UIKit
 
-final class NoteEditViewController: BaseViewController<NoteEditView> {
+final class NoteEditViewController: BaseViewController<NoteEditView>, ScreenLoggable {
+    var screenName: String = GATracking.RecordFlow.edit
+
     override var bkNavigationTitle: String {
         return "독서 기록 수정"
     }
@@ -41,6 +43,11 @@ final class NoteEditViewController: BaseViewController<NoteEditView> {
         navigationItem.leftBarButtonItem = backButton
         
         viewModel.send(.onAppear)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        logScreenView()
     }
     
     override func bindState() {

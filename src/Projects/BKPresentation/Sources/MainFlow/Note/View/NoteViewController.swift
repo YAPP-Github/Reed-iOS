@@ -1,5 +1,6 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import BKDesign
 import BKDomain
 import Combine
@@ -12,7 +13,8 @@ enum NoteViewEvent: Equatable {
     case setScannedText(String)
 }
 
-final class NoteViewController: BaseViewController<NoteView> {
+final class NoteViewController: BaseViewController<NoteView>, ScreenLoggable {
+    var screenName: String = ""
     weak var coordinator: NoteCoordinator?
     
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
@@ -147,12 +149,33 @@ final class NoteViewController: BaseViewController<NoteView> {
                 }
             }
             .store(in: &cancellable)
+        
+        contentView.pageControl.publisher(for: \.currentPage)
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] currentPage in
+                self?.logPageView(for: currentPage)
+            }
+            .store(in: &cancellable)
     }
 }
 
 extension NoteViewController {
     func setScannedText(_ text: String) {
         contentView.handleEvent(.setScannedText(text))
+    }
+    
+    private func logPageView(for pageIndex: Int) {
+        switch pageIndex {
+        case 0: // sentence 페이지
+            logScreenView(name: GATracking.RecordFlow.inputSentence)
+        case 1: // emotion 페이지
+            logScreenView(name: GATracking.RecordFlow.selectEmotion)
+        case 2: // appreciation 페이지
+            logScreenView(name: GATracking.RecordFlow.inputOpinion)
+        default:
+            break
+        }
     }
 }
 
@@ -167,8 +190,9 @@ private extension NoteViewController {
     }
     
     func presentRegistrationSuccessDialog(recordInfo: RecordInfo) {
-        let imageView = UIImageView(image: BKImage.Graphics.noteCompleted)
+        logScreenView(name: GATracking.RecordFlow.complete)
         
+        let imageView = UIImageView(image: BKImage.Graphics.noteCompleted)
         let dialog = BKDialog(
             title: "기록이 저장되었어요!",
             subtitle: "방금 남긴 기록을 확인해볼까요?",
@@ -213,6 +237,8 @@ private extension NoteViewController {
     }
     
     func presentAppreciationGuide() {
+        logScreenView(name: GATracking.RecordFlow.inputHelp)
+        
         let sheet = BKBottomSheetViewController.makeAppreciationGuideSheet(
             confirmAction: { [weak self] selectedGuide in
                 self?.viewModel.send(.appreciationGuideSelected(selectedGuide.rawValue))

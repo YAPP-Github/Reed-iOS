@@ -149,6 +149,7 @@ final class SearchViewController: BaseViewController<SearchView>, ScreenLoggable
             }
             .removeDuplicates()
             .sink { [weak self] snapshot in
+                self?.logScreenView(name: GATracking.SearchAndRegister.result)
                 self?.contentView.applySnapshot(
                     with: snapshot.state,
                     count: snapshot.count

@@ -6,7 +6,8 @@ import Combine
 import SnapKit
 import UIKit
 
-final class RecognizedTextViewController: UIViewController {
+final class RecognizedTextViewController: UIViewController, ScreenLoggable {
+    var screenName: String = GATracking.RecordFlow.ocrSentence
     
     // MARK: - Properties
     private let viewModel: RecognizedTextViewModel
@@ -52,6 +53,11 @@ final class RecognizedTextViewController: UIViewController {
         bindViewModel()
         
         viewModel.send(.viewDidLoad(recognizedTexts))
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        logScreenView()
     }
     
     // MARK: - Setup
