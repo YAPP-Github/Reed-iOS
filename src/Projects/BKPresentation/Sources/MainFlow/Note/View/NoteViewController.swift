@@ -150,13 +150,13 @@ final class NoteViewController: BaseViewController<NoteView>, ScreenLoggable {
             }
             .store(in: &cancellable)
         
-        contentView.pageControl.publisher(for: \.currentPage)
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] currentPage in
-                self?.logPageView(for: currentPage)
-            }
-            .store(in: &cancellable)
+//        contentView.pageControl.publisher(for: \.currentPage)
+//            .removeDuplicates()
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] currentPage in
+//                self?.logPageView(for: currentPage)
+//            }
+//            .store(in: &cancellable)
     }
 }
 
