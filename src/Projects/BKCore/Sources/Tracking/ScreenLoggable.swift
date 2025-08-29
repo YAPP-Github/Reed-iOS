@@ -27,3 +27,21 @@ extension ScreenLoggable where Self: UIViewController {
         }
     }
 }
+
+extension ScreenLoggable {
+    public func logGoogleAnalytics(name: String? = nil) {
+        if let name = name {
+            Analytics.logEvent(AnalyticsEventScreenView,
+                               parameters: [
+                                AnalyticsParameterScreenName: name,
+                                AnalyticsParameterScreenClass: String(describing: type(of: self))
+                               ])
+        } else {
+            Analytics.logEvent(AnalyticsEventScreenView,
+                               parameters: [
+                                AnalyticsParameterScreenName: screenName,
+                                AnalyticsParameterScreenClass: String(describing: type(of: self))
+                               ])
+        }
+    }
+}

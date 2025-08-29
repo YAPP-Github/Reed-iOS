@@ -9,7 +9,6 @@ public enum GATracking {
     // MARK: - Onboarding & Auth
     public struct OnboardingAndAuth {
         private init() { }
-        
         public static let splash = "splash"
         public static let onboarding = "onboarding"
         public static let selectMethod = "login_select_method"
@@ -32,7 +31,6 @@ public enum GATracking {
         private init() { }
         public static let start = "search_book_start"
         public static let result = "search_book_result"
-        public static let noResult = "search_book_noresult"
         public static let selectOption = "register_book_option"
         public static let complete = "register_book_complete"
     }
@@ -76,11 +74,8 @@ public enum GATracking {
     // MARK: - Error
     public struct Error {
         private init() { }
-        public static let network = "error_network"
         public static let login = "error_login"
         public static let saveRecord = "error_record_save"
         public static let registerBook = "error_register_book"
-        public static let search = "error_search"
-        public static let searchLoading = "error_search_loading"
     }
 }
