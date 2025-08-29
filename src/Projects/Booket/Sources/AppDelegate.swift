@@ -1,5 +1,6 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import BKData
 import KakaoSDKCommon
 import Firebase
@@ -24,6 +25,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 #endif
         KakaoSDK.initSDK(appKey: kakaoAPIkey)
         FirebaseApp.configure()
+        GAManger.configureAnalytics()
         return true
     }
     
