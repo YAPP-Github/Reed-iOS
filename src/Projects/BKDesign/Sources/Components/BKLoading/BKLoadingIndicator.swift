@@ -1,32 +1,42 @@
 // Copyright © 2025 Booket. All rights reserved
 
-import UIKit
 import SnapKit
+import UIKit
 
 public final class LoadingIndicator {
     
     private static let tag = 999999
+    private static var delayedWorkItem: DispatchWorkItem?
     
     /// 로딩 인디케이터 보여주기
-    public static func show() {
+    public static func show(
+        delay: TimeInterval = 0.5
+    ) {
         DispatchQueue.main.async {
-            guard let window = getKeyWindow() else { return }
-            
-            if window.viewWithTag(tag) != nil {
-                return
+            guard delayedWorkItem == nil else { return }
+
+            let workItem = DispatchWorkItem {
+                guard let window = getKeyWindow(), window.viewWithTag(tag) == nil else { return }
+
+                let loadingIndicatorView = createLoadingView(frame: window.bounds)
+                loadingIndicatorView.tag = tag
+
+                window.addSubview(loadingIndicatorView)
+                loadingIndicatorView.startAnimating()
+                delayedWorkItem = nil
             }
-            
-            let loadingIndicatorView = createLoadingView(frame: window.bounds)
-            loadingIndicatorView.tag = tag
-            
-            window.addSubview(loadingIndicatorView)
-            loadingIndicatorView.startAnimating()
+
+            delayedWorkItem = workItem
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: workItem)
         }
     }
     
     /// 로딩 인디케이터 숨기기
     public static func hide() {
         DispatchQueue.main.async {
+            delayedWorkItem?.cancel()
+            delayedWorkItem = nil
+                
             guard let window = getKeyWindow() else { return }
             
             window.subviews.filter({ $0.tag == tag }).forEach {
