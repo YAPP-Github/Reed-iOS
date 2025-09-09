@@ -16,14 +16,15 @@ public final class LoadingIndicator {
             guard delayedWorkItem == nil else { return }
 
             let workItem = DispatchWorkItem {
-                guard let window = getKeyWindow(), window.viewWithTag(tag) == nil else { return }
-
+                defer { delayedWorkItem = nil }
+                guard Self.delayedWorkItem?.isCancelled != true else { return }
+                guard let window = getKeyWindow() else { return }
+                guard window.viewWithTag(tag) == nil else { return }
+                
                 let loadingIndicatorView = createLoadingView(frame: window.bounds)
                 loadingIndicatorView.tag = tag
-
                 window.addSubview(loadingIndicatorView)
                 loadingIndicatorView.startAnimating()
-                delayedWorkItem = nil
             }
 
             delayedWorkItem = workItem
@@ -39,9 +40,9 @@ public final class LoadingIndicator {
                 
             guard let window = getKeyWindow() else { return }
             
-            window.subviews.filter({ $0.tag == tag }).forEach {
-                $0.removeFromSuperview()
-            }
+            window.subviews
+                .filter{ $0.tag == tag }
+                .forEach { $0.removeFromSuperview() }
         }
     }
     
