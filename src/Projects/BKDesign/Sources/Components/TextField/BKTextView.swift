@@ -99,13 +99,29 @@ public final class BKTextView: UIView {
         textViewDidChange(textView)
     }
     
-    public func startEditing() {
-        guard window != nil, superview != nil else { return }
-
-        if textView.window != nil, !textView.isFirstResponder {
+    public func appendText(_ text: String) {
+        if self.textView.text.isEmpty {
+            self.textView.text = text
+        } else {
+            self.textView.text += "\n\(text)"
+        }
+        textViewDidChange(textView)
+    }
+    
+    public func startEditing(
+        _ willMoveCaret: Bool = true
+    ) {
+        guard textView.window != nil else { return }
+        
+        if !textView.isFirstResponder {
             DispatchQueue.main.async {
-                self.textView.selectedRange = NSRange(location: 0, length: 0)
                 self.textView.becomeFirstResponder()
+            }
+        }
+        
+        if willMoveCaret {
+            DispatchQueue.main.async {
+                self.textView.moveCaretToStartOfLastLine()
             }
         }
     }

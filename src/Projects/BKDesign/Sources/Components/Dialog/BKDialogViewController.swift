@@ -38,7 +38,7 @@ private extension BKDialogViewController {
     
     func configure() {
         dimView.tapHandler = { [weak self] in
-            self?.dismiss(animated: true)
+            self?.dialog.leftButtonAction()
         }
     }
     

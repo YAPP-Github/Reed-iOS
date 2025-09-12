@@ -5,6 +5,7 @@ import BKDesign
 import Combine
 import SnapKit
 import UIKit
+import Vision
 import VisionKit
 
 final class OCRScannerViewController: UIViewController, ScreenLoggable {
@@ -40,6 +41,16 @@ final class OCRScannerViewController: UIViewController, ScreenLoggable {
     private var scannerViewController: DataScannerViewController?
     private var topDimView = UIView()
     private var bottomDimView = UIView()
+    
+    private lazy var ciContext = CIContext(options: [.useSoftwareRenderer: false])
+    
+    private struct Preproc {
+        static let exposureEV: CGFloat = 0.5
+        static let unsharpRadius: CGFloat = 1.5
+        static let unsharpIntensity: CGFloat = 0.4
+        static let shadowLift: CGFloat = 0.25
+        static let minTextHeight: CGFloat = 0.012   // 0.008~0.015 범위에서 튜닝
+    }
     
     private let guideLabel = BKLabel(
         text: LabelString.guideText,
@@ -92,6 +103,7 @@ final class OCRScannerViewController: UIViewController, ScreenLoggable {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         logScreenView()
+        updateRegionOfInterest()
     }
     
     // MARK: - Setup
@@ -178,11 +190,9 @@ final class OCRScannerViewController: UIViewController, ScreenLoggable {
     
     private func setupScanner() {
         guard DataScannerViewController.isSupported else {
-            // "이 기기에서는 텍스트 스캔을 지원하지 않습니다."
-            return
+                return
         }
         
-        // OCR 인식 가능한 언어
         let recognizedDataTypes: Set<DataScannerViewController.RecognizedDataType> = [
             .text(languages: ["ko-KR", "en-US"])
         ]
@@ -194,7 +204,7 @@ final class OCRScannerViewController: UIViewController, ScreenLoggable {
             isHighFrameRateTrackingEnabled: false,
             isPinchToZoomEnabled: true,
             isGuidanceEnabled: false,
-            isHighlightingEnabled: false
+            isHighlightingEnabled: true
         )
         
         scanner.delegate = self
@@ -207,6 +217,24 @@ final class OCRScannerViewController: UIViewController, ScreenLoggable {
         scanner.didMove(toParent: self)
         
         scannerViewController = scanner
+        updateRegionOfInterest()
+    }
+    
+    private func updateRegionOfInterest() {
+        guard let scanner = scannerViewController else { return }
+
+        view.layoutIfNeeded()
+
+        let parentBounds = view.bounds
+        let regionOfInterest = CGRect(
+            x: 0,
+            y: LayoutGuide.topDimHeight,
+            width: parentBounds.width,
+            height: parentBounds.height - LayoutGuide.topDimHeight - LayoutGuide.bottomDimHeight
+        )
+
+        let convertedRegion = scanner.view.convert(regionOfInterest, from: view)
+        scanner.regionOfInterest = convertedRegion
     }
     
     private func bindViewModel() {
@@ -251,13 +279,162 @@ final class OCRScannerViewController: UIViewController, ScreenLoggable {
             do {
                 try scannerViewController?.startScanning()
             } catch {
-                Log.debug("\(error)", logger: AppLogger.ui)
+                // Silently handle scanning errors
             }
         }
     }
     
     private func stopScanning() {
         scannerViewController?.stopScanning()
+    }
+    
+    // MARK: - Vision Processing
+    private func captureCurrentFrame() {
+        guard let scanner = scannerViewController else { return }
+        
+        viewModel.send(.captureButtonTapped)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.captureFrameAndProcessWithVision(from: scanner)
+        }
+    }
+    
+    private func captureFrameAndProcessWithVision(from scanner: DataScannerViewController) {
+        guard let v = scanner.view else { return }
+
+        let fmt = UIGraphicsImageRendererFormat.default()
+        fmt.scale = UIScreen.main.scale
+        let renderer = UIGraphicsImageRenderer(bounds: v.bounds, format: fmt)
+        let fullUIImage = renderer.image { _ in
+            v.drawHierarchy(in: v.bounds, afterScreenUpdates: false)
+        }
+        guard let fullCG = fullUIImage.cgImage else {
+            processImageWithVision(fullUIImage)
+            return
+        }
+
+        guard let roi = scanner.regionOfInterest else { return }
+        let scale = fullUIImage.scale
+        let cropRectPx = CGRect(
+            x: roi.origin.x * scale,
+            y: roi.origin.y * scale,
+            width: roi.size.width * scale,
+            height: roi.size.height * scale
+        ).integral
+
+        let croppedImage = fullCG.cropping(to: cropRectPx) ?? fullCG
+
+        let preprocessedImage = preprocessForOCR(croppedImage) ?? croppedImage
+        processCGImageWithVision(preprocessedImage)
+    }
+    
+    private func preprocessForOCR(_ cgImage: CGImage) -> CGImage? {
+        var ciImage = CIImage(cgImage: cgImage)
+
+        ciImage = ciImage.applyingFilter("CIPhotoEffectMono")
+        ciImage = ciImage.applyingFilter("CIExposureAdjust", parameters: [kCIInputEVKey: Preproc.exposureEV])
+        ciImage = ciImage.applyingFilter("CIUnsharpMask", parameters: [
+            kCIInputRadiusKey: Preproc.unsharpRadius,
+            kCIInputIntensityKey: Preproc.unsharpIntensity
+        ])
+        ciImage = ciImage.applyingFilter("CIHighlightShadowAdjust", parameters: [
+            "inputShadowAmount": Preproc.shadowLift
+        ])
+
+        return ciContext.createCGImage(ciImage, from: ciImage.extent)
+    }
+    
+    private func processCGImageWithVision(_ cgImage: CGImage) {
+        let request = VNRecognizeTextRequest { [weak self] req, err in
+            DispatchQueue.main.async {
+                self?.handleVisionResult(request: req, error: err)
+            }
+        }
+        request.recognitionLevel = .accurate
+        request.recognitionLanguages = ["ko-KR", "en-US"]
+        request.usesLanguageCorrection = true
+        request.minimumTextHeight = Float(Preproc.minTextHeight)
+
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                try handler.perform([request])
+            } catch {
+                DispatchQueue.main.async { [weak self] in
+                    self?.handleVisionResult(request: nil, error: error)
+                }
+            }
+        }
+    }
+    
+    private func processImageWithVision(_ image: UIImage) {
+        guard let cgImage = image.cgImage else { return }
+        
+        let request = VNRecognizeTextRequest { [weak self] request, error in
+            DispatchQueue.main.async {
+                self?.handleVisionResult(request: request, error: error)
+            }
+        }
+        
+        request.recognitionLevel = .accurate
+        request.recognitionLanguages = ["ko-KR", "en-US"]
+        request.usesLanguageCorrection = true
+        
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                try handler.perform([request])
+            } catch {
+                DispatchQueue.main.async { [weak self] in
+                    self?.handleVisionResult(request: nil, error: error)
+                }
+            }
+        }
+    }
+    
+    private func handleVisionResult(request: VNRequest?, error: Error?) {
+        if let error = error {
+            viewModel.send(.captureButtonTapped)
+            return
+        }
+        
+        guard let observations = request?.results as? [VNRecognizedTextObservation] else {
+            viewModel.send(.captureButtonTapped)
+            return
+        }
+        
+        let recognizedTexts = extractTextFromVisionObservations(observations)
+        
+        if recognizedTexts.isEmpty {
+            viewModel.send(.captureButtonTapped)
+        } else {
+            viewModel.send(.visionTextCaptured(recognizedTexts))
+        }
+    }
+    
+    private func extractTextFromVisionObservations(_ observations: [VNRecognizedTextObservation]) -> [String] {
+        var texts: [String] = []
+        
+        let sortedObservations = observations.sorted { obs1, obs2 in
+            let box1 = obs1.boundingBox
+            let box2 = obs2.boundingBox
+            
+            if abs(box1.origin.y - box2.origin.y) < 0.05 {
+                return box1.origin.x < box2.origin.x
+            }
+            return box1.origin.y > box2.origin.y
+        }
+        
+        for observation in sortedObservations {
+            guard let topCandidate = observation.topCandidates(1).first else { continue }
+            let text = topCandidate.string.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !text.isEmpty {
+                texts.append(text)
+            }
+        }
+        
+        return texts
     }
 }
 
@@ -269,7 +446,9 @@ extension OCRScannerViewController {
     
     @objc
     private func captureButtonTapped() {
-        viewModel.send(.captureButtonTapped)
+        scannerViewController?.stopScanning()
+        captureCurrentFrame()
+        try? scannerViewController?.startScanning()
     }
     
     private func showFailureDialog() {
