@@ -10,7 +10,7 @@ public final class BKPageControl: UIControl {
         }
     }
     
-    public var currentPage: Int = 0 {
+    @objc dynamic public var currentPage: Int = 0 {
         didSet {
             updateIndicators()
             sendActions(for: .valueChanged)
