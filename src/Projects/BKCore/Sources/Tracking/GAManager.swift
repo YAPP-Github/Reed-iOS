@@ -27,6 +27,12 @@ public final class GAManager {
             Analytics.setUserProperty("\(version)(\(build))", forName: "app_version")
         }
         
+        Analytics.setConsent([
+          .adStorage: .denied,
+          .adUserData: .denied,
+          .adPersonalization: .denied
+        ])
+        
         // 기기 정보 설정
         setDeviceInfo()
         
@@ -43,7 +49,7 @@ public final class GAManager {
         let systemVersion = UIDevice.current.systemVersion
         Analytics.setUserProperty(systemVersion, forName: "ios_version")
         
-        // 정확한 기기 식별자
+        // 정확한 기기 식별자 (기기명)
         let deviceIdentifier = getDeviceIdentifier()
         Analytics.setUserProperty(deviceIdentifier, forName: "device_identifier")
         
