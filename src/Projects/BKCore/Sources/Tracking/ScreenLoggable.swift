@@ -13,17 +13,21 @@ public protocol ScreenLoggable {
 extension ScreenLoggable where Self: UIViewController {
     public func logScreenView(name: String? = nil) {
         if let name = name {
-            Analytics.logEvent(name,
-                               parameters: [
-                                AnalyticsParameterScreenName: name,
-                                AnalyticsParameterScreenClass: String(describing: type(of: self))
-                               ])
+            Analytics.logEvent(
+                name,
+                parameters: [
+                    AnalyticsParameterScreenName: name,
+                    AnalyticsParameterScreenClass: String(describing: type(of: self))
+                ]
+            )
         } else {
-            Analytics.logEvent(screenName,
-                               parameters: [
-                                AnalyticsParameterScreenName: screenName,
-                                AnalyticsParameterScreenClass: String(describing: type(of: self))
-                               ])
+            Analytics.logEvent(
+                screenName,
+                parameters: [
+                    AnalyticsParameterScreenName: screenName,
+                    AnalyticsParameterScreenClass: String(describing: type(of: self))
+                ]
+            )
         }
     }
 }
@@ -31,17 +35,21 @@ extension ScreenLoggable where Self: UIViewController {
 extension ScreenLoggable {
     public func logGoogleAnalytics(name: String? = nil) {
         if let name = name {
-            Analytics.logEvent(name,
-                               parameters: [
-                                AnalyticsParameterScreenName: name,
-                                AnalyticsParameterScreenClass: String(describing: type(of: self))
-                               ])
+            Analytics.logEvent(
+                name,
+                parameters: [
+                    AnalyticsParameterScreenName: name,
+                    AnalyticsParameterScreenClass: String(describing: type(of: self))
+                ]
+            )
         } else {
-            Analytics.logEvent(screenName,
-                               parameters: [
-                                AnalyticsParameterScreenName: screenName,
-                                AnalyticsParameterScreenClass: String(describing: type(of: self))
-                               ])
+            Analytics.logEvent(
+                screenName,
+                parameters: [
+                    AnalyticsParameterScreenName: screenName,
+                    AnalyticsParameterScreenClass: String(describing: type(of: self))
+                ]
+            )
         }
     }
 }
