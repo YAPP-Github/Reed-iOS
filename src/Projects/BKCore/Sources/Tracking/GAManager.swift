@@ -41,54 +41,42 @@ public final class GAManager {
     }
     
     private static func setDeviceInfo() {
-        // 기기 모델
-        let deviceModel = UIDevice.current.model
-        Analytics.setUserProperty(deviceModel, forName: "device_model")
-        
-        // iOS 버전
-        let systemVersion = UIDevice.current.systemVersion
-        Analytics.setUserProperty(systemVersion, forName: "ios_version")
-        
-        // 정확한 기기 식별자 (기기명)
-        let deviceIdentifier = getDeviceIdentifier()
-        Analytics.setUserProperty(deviceIdentifier, forName: "device_identifier")
-        
-        // 화면 크기
-        let screenSize = UIScreen.main.bounds.size
-        let screenSizeString = "\(Int(screenSize.width))x\(Int(screenSize.height))"
-        Analytics.setUserProperty(screenSizeString, forName: "screen_size")
-        
-        // 화면 스케일
-        let screenScale = UIScreen.main.scale
-        Analytics.setUserProperty("\(screenScale)", forName: "screen_scale")
+        Analytics.setDefaultEventParameters([
+            "device_model": UIDevice.current.model,
+            "ios_version": UIDevice.current.systemVersion,
+            "device_identifier": getDeviceIdentifier(),
+            "screen_size": "\(Int(UIScreen.main.bounds.width))x\(Int(UIScreen.main.bounds.height))",
+            "screen_scale": "\(UIScreen.main.scale)"
+        ])
     }
     
     private static func setLocationInfo() {
         let currentLocale = Locale.current
-        
+        var params: [String: Any] = [:]
+
         // 국가 코드
         if let countryCode = currentLocale.region?.identifier {
-            Analytics.setUserProperty(countryCode, forName: "country_code")
+            params["country_code"] = countryCode
         }
-        
+
         // 언어 코드
         if let languageCode = currentLocale.language.languageCode?.identifier {
-            Analytics.setUserProperty(languageCode, forName: "language_code")
+            params["language_code"] = languageCode
         }
-        
+
         // 전체 로케일
-        let localeIdentifier = currentLocale.identifier
-        Analytics.setUserProperty(localeIdentifier, forName: "locale")
-        
+        params["locale"] = currentLocale.identifier
+
         // 국가 이름
         if let countryCode = currentLocale.region?.identifier,
            let countryName = currentLocale.localizedString(forRegionCode: countryCode) {
-            Analytics.setUserProperty(countryName, forName: "country_name")
+            params["country_name"] = countryName
         }
-        
+
         // 타임존
-        let timeZone = TimeZone.current.identifier
-        Analytics.setUserProperty(timeZone, forName: "time_zone")
+        params["time_zone"] = TimeZone.current.identifier
+
+        Analytics.setDefaultEventParameters(params)
     }
     
     private static func getDeviceIdentifier() -> String {
