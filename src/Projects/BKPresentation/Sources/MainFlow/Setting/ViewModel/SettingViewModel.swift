@@ -36,7 +36,6 @@ final class SettingViewModel: BaseViewModel {
         var isUpdateAvailable: Bool {
             appVersion.compare(latestAppVersion, options: .numeric) == .orderedAscending
         }
-        
     }
     
     enum Action {

@@ -138,6 +138,16 @@ final class SettingViewController: BaseViewController<SettingView>, ScreenLoggab
                 self?.coordinator?.notifyAuthenticationRequired { }
             }
             .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map { $0.isLoggedOut }
+            .removeDuplicates()
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.logScreenView(name: GATracking.Settings.logoutComplete)
+            }
+            .store(in: &cancellable)
     }
 }
 
@@ -153,7 +163,6 @@ private extension SettingViewController {
                 rightButtonTitle: "로그아웃",
                 rightButtonAction: { [weak self] in
                     self?.viewModel.send(.logoutButtonTapped)
-                    self?.logScreenView(name: GATracking.Settings.logoutComplete)
                     self?.dismiss(animated: true)
                 }
             )
