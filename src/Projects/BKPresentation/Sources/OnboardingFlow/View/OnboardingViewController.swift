@@ -1,5 +1,6 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import Combine
 import UIKit
 
@@ -7,7 +8,9 @@ enum OnboardingViewEvent {
     case onboardingDidFinish
 }
 
-final class OnboardingViewController: BaseViewController<OnboardingView> {
+final class OnboardingViewController: BaseViewController<OnboardingView>, ScreenLoggable {
+    var screenName: String = GATracking.OnboardingAndAuth.onboarding
+
     weak var coordinator: OnboardingCoordinator?
     private var cancellable = Set<AnyCancellable>()
     
@@ -26,6 +29,11 @@ final class OnboardingViewController: BaseViewController<OnboardingView> {
         super.viewWillDisappear(animated)
         navigationController?.navigationBar.isHidden = false
         tabBarController?.tabBar.isHidden = false
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        logScreenView()
     }
     
     override func bindAction() {

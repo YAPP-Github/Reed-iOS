@@ -6,7 +6,8 @@ import Combine
 import SafariServices
 import UIKit
 
-final class TermsViewController: BaseViewController<TermsView> {
+final class TermsViewController: BaseViewController<TermsView>, ScreenLoggable {
+    var screenName: String = GATracking.OnboardingAndAuth.termsAgreement
     weak var coordinator: TermsCoordinator?
     
     let viewModel: AnyViewBindableViewModel<TermsViewModel.State, TermsViewModel.Action>
@@ -26,6 +27,11 @@ final class TermsViewController: BaseViewController<TermsView> {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBar.isHidden = true
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        logScreenView()
     }
     
     override func viewWillDisappear(_ animated: Bool) {

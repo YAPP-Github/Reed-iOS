@@ -1,12 +1,15 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import BKDomain
 import BKDesign
 import Combine
 import Foundation
 import UIKit
 
-public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying {
+public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying, ScreenLoggable {
+    public var screenName: String = GATracking.OnboardingAndAuth.splash
+
     public weak var parentCoordinator: Coordinator?
     public var childCoordinators = [Coordinator]()
     public var navigationController: UINavigationController
@@ -32,6 +35,7 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying 
     }
     
     public func start() {
+        logGoogleAnalytics()
         checkAppUpdate()
     }
     

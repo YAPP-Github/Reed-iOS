@@ -1,5 +1,6 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import BKDesign
 import BKDomain
 import Combine
@@ -10,7 +11,9 @@ enum SentenceCardViewEvent: Equatable {
     case didTapShareButton
 }
 
-final class SentenceCardViewController: BaseViewController<SentenceCardView> {
+final class SentenceCardViewController: BaseViewController<SentenceCardView>, ScreenLoggable {
+    var screenName: String = GATracking.RecordCard.main
+
     override var bkNavigationTitle: String { "" }
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
         .standard(viewController: self)
@@ -40,6 +43,11 @@ final class SentenceCardViewController: BaseViewController<SentenceCardView> {
         self.tabBarController?.tabBar.isHidden = false
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        logScreenView()
+    }
+    
     override func bindAction() {
         contentView.eventPublisher
             .sink { [weak self] event in
@@ -49,6 +57,7 @@ final class SentenceCardViewController: BaseViewController<SentenceCardView> {
                     self.viewModel.send(.prepareToSaveImage)
                     let image = self.contentView.renderCardImageWithoutCornerRadius()
                     self.viewModel.send(.didTapSaveButton(image: image))
+                    self.logScreenView(name: GATracking.RecordCard.save)
                 case .didTapShareButton:
                     self.showLoading()
                     let image = self.contentView.renderCardImageWithoutCornerRadius()
@@ -126,6 +135,7 @@ extension SentenceCardViewController {
         }
         
         self.present(activityViewController, animated: true, completion: completion)
+        self.logScreenView(name: GATracking.RecordCard.share)
     }
     
     private func presentSettingsAlert() {

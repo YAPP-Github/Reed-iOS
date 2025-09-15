@@ -13,7 +13,8 @@ enum ArchiveViewEvent: Equatable {
     case loadNextPage
 }
 
-final class ArchiveViewController: BaseViewController<ArchiveView> {
+final class ArchiveViewController: BaseViewController<ArchiveView>, ScreenLoggable {
+    var screenName: String = GATracking.HomeAndLibrary.libraryMain
     weak var coordinator: (ArchiveCoordinator & AuthenticationRequiredNotifying)?
     
     override var bkNavigationTitle: String {
@@ -44,6 +45,11 @@ final class ArchiveViewController: BaseViewController<ArchiveView> {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         viewModel.send(.onAppear)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        logScreenView()
     }
     
     override func bindAction() {

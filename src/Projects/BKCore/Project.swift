@@ -12,7 +12,9 @@ let project = Project.project(
             scripts: [
                 swiftLintScript
             ],
-            dependencies: []
+            dependencies: [
+                .external(dependency: .FirebaseAnalytics)
+            ]
         ),
         
         Target.target(

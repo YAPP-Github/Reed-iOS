@@ -13,7 +13,8 @@ enum SettingViewEvent {
     case firstMenuTapped(FirstMenuItem)
 }
 
-final class SettingViewController: BaseViewController<SettingView> {
+final class SettingViewController: BaseViewController<SettingView>, ScreenLoggable {
+    var screenName: String = GATracking.Settings.main
     weak var coordinator: (SettingCoordinator & AuthenticationRequiredNotifying)?
     
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
@@ -42,6 +43,11 @@ final class SettingViewController: BaseViewController<SettingView> {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.tabBarController?.tabBar.isHidden = false
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        logScreenView()
     }
     
     override func bindAction() {
@@ -132,6 +138,16 @@ final class SettingViewController: BaseViewController<SettingView> {
                 self?.coordinator?.notifyAuthenticationRequired { }
             }
             .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map { $0.isLoggedOut }
+            .removeDuplicates()
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.logScreenView(name: GATracking.Settings.logoutComplete)
+            }
+            .store(in: &cancellable)
     }
 }
 
@@ -156,6 +172,7 @@ private extension SettingViewController {
     }
     
     func presentWithdrawalSheet() {
+        logScreenView(name: GATracking.Settings.withdrawalWarning)
         let sheet = BKBottomSheetViewController.makeWithdrawalSheet(
             title: "정말 탈퇴하시겠어요?",
             subtitle: """
@@ -165,8 +182,10 @@ private extension SettingViewController {
             agreementText: "확인하였으며 이에 동의합니다",
             cancelAction: { [weak self] in self?.dismiss(animated: true) },
             confirmAction: { [weak self] in
-                self?.viewModel.send(.withdrawButtonTapped)
-                self?.dismiss(animated: true)
+                guard let self = self else { return }
+                self.viewModel.send(.withdrawButtonTapped)
+                self.logScreenView(name: GATracking.Settings.withdrawalComplete)
+                self.dismiss(animated: true)
             }
         )
         

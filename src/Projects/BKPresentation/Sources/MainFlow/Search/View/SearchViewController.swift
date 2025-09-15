@@ -13,11 +13,13 @@ enum SearchViewEvent: Equatable {
     case goToBookDetail(isbn: String, userBookId: String)
 }
 
-final class SearchViewController: BaseViewController<SearchView> {
+final class SearchViewController: BaseViewController<SearchView>, ScreenLoggable {
+    var screenName: String = ""
+
     weak var coordinator: SearchCoordinator?
     
     override var bkNavigationTitle: String {
-        return "도서 검색"
+        return ""
     }
     
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
@@ -123,6 +125,22 @@ final class SearchViewController: BaseViewController<SearchView> {
         
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
+            .map { $0.viewType }
+            .removeDuplicates()
+            .sink { [weak self] type in
+                switch type {
+                case .defaultSearch:
+                    self?.logScreenView(name: GATracking.SearchAndRegister.start)
+                case .myLibrarySearch:
+                    self?.logScreenView(name: GATracking.HomeAndLibrary.searchBook)
+                default:
+                    return
+                }
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
             .map { state in
                 Snapshot(
                     state: state.searchState,
@@ -131,6 +149,7 @@ final class SearchViewController: BaseViewController<SearchView> {
             }
             .removeDuplicates()
             .sink { [weak self] snapshot in
+                self?.logScreenView(name: GATracking.SearchAndRegister.result)
                 self?.contentView.applySnapshot(
                     with: snapshot.state,
                     count: snapshot.count
@@ -188,6 +207,7 @@ final class SearchViewController: BaseViewController<SearchView> {
             .filter { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
+//                self?.logScreenView(name: GATracking.Error.search)
                 self?.coordinator?.presentCustomErrorAlert(
                     subtitle: """
                     일시적인 오류로 
@@ -207,6 +227,8 @@ final class SearchViewController: BaseViewController<SearchView> {
             .filter { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
+//                self?.logScreenView(name: GATracking.Error.search)
+
                 self?.coordinator?.presentCustomErrorAlert(
                     subtitle: """
                     일시적인 오류로 데이터를 불러올 수 없어요.
@@ -232,6 +254,8 @@ private extension SearchViewController {
             ) { [weak self] in
                 guard let selected = statusView.selectedStatus else { return }
                 self?.dismiss(animated: true)
+                self?.logScreenView(name: GATracking.SearchAndRegister.selectOption)
+                
                 self?.handleRegistrationSelection(status: selected, isbn: isbn)
             }
         )
@@ -255,6 +279,8 @@ private extension SearchViewController {
         graphicView.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 120, height: 120))
         }
+        logScreenView(name: GATracking.SearchAndRegister.complete)
+        
         let sheet = BKBottomSheetViewController(
             title: "도서가 등록되었어요!",
             subtitle: "독서 기록을 바로 시작할까요?",

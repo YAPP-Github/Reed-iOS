@@ -1,5 +1,6 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import BKDesign
 import BKDomain
 import Combine
@@ -12,7 +13,8 @@ enum HomeViewEvent: Equatable {
     case didTapEmptyBook
 }
 
-final class HomeViewController: BaseViewController<HomeView> {
+final class HomeViewController: BaseViewController<HomeView>, ScreenLoggable {
+    var screenName: String = GATracking.HomeAndLibrary.homeMain
     weak var coordinator: MainFlowCoordinator?
     
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
@@ -48,6 +50,11 @@ final class HomeViewController: BaseViewController<HomeView> {
         navigationController?.navigationBar.shadowImage = nil
         
         viewModel.send(.onDisappear)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        logScreenView()
     }
     
     override func bindAction() {

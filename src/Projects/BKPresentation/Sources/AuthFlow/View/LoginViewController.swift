@@ -1,12 +1,14 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
 import BKDesign
 import BKDomain
 import Combine
 import Foundation
 import UIKit
 
-final class LoginViewController: BaseViewController<LoginView> {
+final class LoginViewController: BaseViewController<LoginView>, ScreenLoggable {
+    var screenName: String = GATracking.OnboardingAndAuth.selectMethod
     weak var coordinator: LoginCoordinator?
     
     var cancellable: Set<AnyCancellable> = []
@@ -30,6 +32,11 @@ final class LoginViewController: BaseViewController<LoginView> {
     init(viewModel: LoginViewModel) {
         self.viewModel = AnyViewBindableViewModel(viewModel)
         super.init()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        logScreenView()
     }
     
     override func bindAction() {
@@ -61,6 +68,7 @@ final class LoginViewController: BaseViewController<LoginView> {
                     """,
                     onConfirm: {}
                 )
+                self?.logScreenView(name: GATracking.Error.login)
             }
             .store(in: &cancellable)
         

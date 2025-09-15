@@ -15,7 +15,9 @@ enum BookDetailViewEvent: Equatable {
     case didReachBottom
 }
 
-final class BookDetailViewController: BaseViewController<BookDetailView> {
+final class BookDetailViewController: BaseViewController<BookDetailView>, ScreenLoggable {
+    var screenName: String = GATracking.HomeAndLibrary.bookDetail
+
     override var bkNavigationTitle: String { "" }
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
         .standard(
@@ -50,6 +52,11 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.tabBarController?.tabBar.isHidden = false
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        logScreenView()
     }
     
     override func bindAction() {
@@ -213,6 +220,7 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
             .filter { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
+                self?.logScreenView(name: GATracking.HomeAndLibrary.deleteBookComplete)
                 self?.navigationController?.popViewController(animated: true)
             }
             .store(in: &cancellable)
@@ -227,6 +235,17 @@ final class BookDetailViewController: BaseViewController<BookDetailView> {
                 } else {
                     self?.hideLoading()
                 }
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
+            .map { $0.deleteRecordCompleted }
+            .removeDuplicates()
+            .filter { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.logScreenView(name: GATracking.RecordFlow.deleteComplete)
+                self?.viewModel.send(.initDeleteRecordValue)
             }
             .store(in: &cancellable)
         
@@ -343,8 +362,10 @@ private extension BookDetailViewController {
                     self.dismiss(animated: true) {
                         if recordId.isEmpty {
                             self.viewModel.send(.deleteBookButtonTapped)
+                            self.logScreenView(name: GATracking.HomeAndLibrary.deleteBook)
                         } else {
                             self.viewModel.send(.deleteRecordButtonTapped(recordId))
+                            self.logScreenView(name: GATracking.RecordFlow.delete)
                         }
                     }
                 }

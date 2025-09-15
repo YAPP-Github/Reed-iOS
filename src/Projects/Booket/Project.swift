@@ -29,7 +29,8 @@ let debugAppTarget = Target.target(
         .external(dependency: .PulseUI),
         .external(dependency: .PulseProxy),
         .external(dependency: .FirebaseCore),
-        .external(dependency: .FirebaseCrashlytics)
+        .external(dependency: .FirebaseCrashlytics),
+        .external(dependency: .FirebaseAnalytics)
     ],
     settings: .settings(
         base: [
@@ -101,7 +102,12 @@ let project = Project.project(
             name: "Reed-Debug",
             shared: true,
             buildAction: .buildAction(targets: ["Reed-Debug"]),
-            runAction: .runAction(configuration: "Debug"),
+            runAction: .runAction(
+                configuration: .debug,
+                arguments: .arguments(
+                    launchArguments: [.launchArgument(name: "-FIRAnalyticsDebugEnabled", isEnabled: true)]
+                )
+            ),
             archiveAction: .archiveAction(configuration: "Debug"),
             profileAction: .profileAction(configuration: "Debug"),
             analyzeAction: .analyzeAction(configuration: "Debug")

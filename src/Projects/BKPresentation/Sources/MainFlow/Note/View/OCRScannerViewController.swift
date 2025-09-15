@@ -8,7 +8,8 @@ import UIKit
 import Vision
 import VisionKit
 
-final class OCRScannerViewController: UIViewController {
+final class OCRScannerViewController: UIViewController, ScreenLoggable {
+    var screenName: String = GATracking.RecordFlow.ocrCamera
     
     enum LayoutGuide {
         static let buttonRadius: CGFloat = 36
@@ -101,6 +102,7 @@ final class OCRScannerViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        logScreenView()
         updateRegionOfInterest()
     }
     
