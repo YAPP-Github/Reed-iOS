@@ -14,7 +14,7 @@ enum NoteViewEvent: Equatable {
 }
 
 final class NoteViewController: BaseViewController<NoteView>, ScreenLoggable {
-    var screenName: String = ""
+    var screenName: String = GATracking.RecordFlow.start
     weak var coordinator: NoteCoordinator?
     
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
@@ -73,6 +73,15 @@ final class NoteViewController: BaseViewController<NoteView>, ScreenLoggable {
             .filter { $0 == .didTapOCRButton }
             .sink { [weak self] _ in
                 self?.coordinator?.showOCRScanner()
+            }
+            .store(in: &cancellable)
+        
+        // TODO: - Remove KVO Binding
+        contentView.pageControl.publisher(for: \.currentPage)
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] currentPage in
+                self?.logPageView(for: currentPage)
             }
             .store(in: &cancellable)
     }
@@ -147,14 +156,6 @@ final class NoteViewController: BaseViewController<NoteView>, ScreenLoggable {
                 } else {
                     self?.hideLoading()
                 }
-            }
-            .store(in: &cancellable)
-        
-        contentView.pageControl.publisher(for: \.currentPage)
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] currentPage in
-                self?.logPageView(for: currentPage)
             }
             .store(in: &cancellable)
     }
