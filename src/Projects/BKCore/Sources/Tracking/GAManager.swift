@@ -2,9 +2,9 @@
 
 import FirebaseAnalytics
 import FirebaseCore
+import UIKit
 
-public class GAManger {
-    
+public final class GAManager {
     public static func configureAnalytics() {
         #if DEBUG
             Analytics.setAnalyticsCollectionEnabled(false)
@@ -38,10 +38,6 @@ public class GAManger {
         // 기기 모델
         let deviceModel = UIDevice.current.model
         Analytics.setUserProperty(deviceModel, forName: "device_model")
-        
-        // 기기 이름
-        let deviceName = UIDevice.current.name
-        Analytics.setUserProperty(deviceName, forName: "device_name")
         
         // iOS 버전
         let systemVersion = UIDevice.current.systemVersion

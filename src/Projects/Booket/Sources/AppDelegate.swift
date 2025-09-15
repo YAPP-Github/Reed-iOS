@@ -25,7 +25,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 #endif
         KakaoSDK.initSDK(appKey: kakaoAPIkey)
         FirebaseApp.configure()
-        GAManger.configureAnalytics()
+        GAManager.configureAnalytics()
         return true
     }
     
