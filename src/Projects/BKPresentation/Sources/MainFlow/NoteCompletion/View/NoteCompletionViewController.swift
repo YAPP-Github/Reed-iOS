@@ -60,7 +60,6 @@ final class NoteCompletionViewController: BaseViewController<NoteCompletionView>
             }
             .store(in: &cancellable)
         
-        
         viewModel.statePublisher
             .map { $0.isLoading }
             .removeDuplicates()
@@ -77,18 +76,8 @@ final class NoteCompletionViewController: BaseViewController<NoteCompletionView>
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
             .compactMap { $0.error }
-            .sink { [weak self] error in
-                // 에러 알림 표시 -> BKStyle로 교체 필요
-                let alert = UIAlertController(
-                    title: "오류",
-                    message: "기록을 불러올 수 없습니다.",
-                    preferredStyle: .alert
-                )
-                alert.addAction(UIAlertAction(title: "확인", style: .default) { _ in
-                    self?.viewModel.send(.errorHandled)
-                    self?.dismiss(animated: true)
-                })
-                self?.present(alert, animated: true)
+            .sink { [weak self] _ in
+                self?.presentErrorDialog()
             }
             .store(in: &cancellable)
         
@@ -173,6 +162,22 @@ final class NoteCompletionViewController: BaseViewController<NoteCompletionView>
         )
         let dialogViewController = BKDialogViewController(dialog: dialog)
         present(dialogViewController, animated: true)
+    }
+    
+    func presentErrorDialog() {
+        let dialog = BKDialog(
+            title: "오류",
+            config: .init(
+                leftButtonTitle: "기록을 불러올 수 없습니다.",
+                leftButtonAction: { [weak self] in
+                    self?.dismiss(animated: true) { [weak self] in
+                        self?.viewModel.send(.errorHandled)
+                    }
+                }
+            )
+        )
+        let dialogViewController = BKDialogViewController(dialog: dialog)
+        self.present(dialogViewController, animated: true)
     }
     
     @objc private func customBackButtonTapped() {
