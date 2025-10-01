@@ -97,7 +97,15 @@ jobs:
             ### 참고 링크
             ${{ steps.issue-parser.outputs.issueparser_links }}
           mode: md2jira
-          
+
+      - name: Get Available Issue Types
+        run: |
+          curl -u ${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }} \
+            -X GET \
+            -H "Content-Type: application/json" \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/project/BOOK/statuses" \
+            | jq '.[] | select(.subtask == true) | .name'
+            
       - name: Create Issue
         id: create
         uses: atlassian/gajira-create@v3
