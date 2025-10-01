@@ -38,4 +38,4 @@ jobs:
         uses: atlassian/gajira-transition@v3
         with:
           issue: ${{ env.JIRA_KEY }}
-          transition: "33"  # 개발 완료
+          transition: 33  # 개발 완료
