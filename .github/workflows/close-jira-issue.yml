@@ -24,6 +24,15 @@ jobs:
           JIRA_KEY=$(echo "$ISSUE_TITLE" | grep -oE '[A-Z]+-[0-9]+' || true)
           echo "JIRA_KEY=$JIRA_KEY" >> $GITHUB_ENV
 
+      - name: Get available transitions
+        if: ${{ env.JIRA_KEY != '' }}
+        run: |
+          curl -u ${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }} \
+            -X GET \
+            -H "Content-Type: application/json" \
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ env.JIRA_KEY }}/transitions" \
+            | jq '.transitions[] | {id, name, to: .to.name}'
+            
       - name: Close Jira issue
         if: ${{ env.JIRA_KEY != '' }}
         uses: atlassian/gajira-transition@v3
