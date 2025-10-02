@@ -1,65 +1,57 @@
 name: Create Release Branch
 
 on:
-  release:
-    types: [published]
   workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Tag name (e.g., v1.0.0)'
-        required: true
-        type: string
 
 jobs:
   create-branch:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main branch
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref }}
           fetch-depth: 0
 
       - name: Extract tag name
         id: tag
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TAG_NAME="${{ inputs.tag }}"
+          # workflow_dispatch로 선택한 ref가 태그인지 확인
+          REF_NAME=${GITHUB_REF#refs/tags/}
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            TAG_NAME=$REF_NAME
           else
-            TAG_NAME=${GITHUB_REF#refs/tags/}
+            echo "Error: Please select a tag, not a branch"
+            exit 1
           fi
           echo "tag=${TAG_NAME}" >> $GITHUB_OUTPUT
           echo "branch=release/${TAG_NAME}" >> $GITHUB_OUTPUT
-
-      - name: Verify tag exists
-        run: |
-          if ! git rev-parse ${{ steps.tag.outputs.tag }} >/dev/null 2>&1; then
-            echo "Error: Tag ${{ steps.tag.outputs.tag }} does not exist"
-            exit 1
-          fi
 
       - name: Check if branch already exists
         id: check
         run: |
           if git ls-remote --heads origin ${{ steps.tag.outputs.branch }} | grep -q ${{ steps.tag.outputs.branch }}; then
             echo "exists=true" >> $GITHUB_OUTPUT
-            echo "Branch ${{ steps.tag.outputs.branch }} already exists"
           else
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create release branch
+      - name: Fetch main branch
+        run: git fetch origin main:main
+
+      - name: Create release branch from main
         if: steps.check.outputs.exists == 'false'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout main
           git checkout -b ${{ steps.tag.outputs.branch }}
           git push origin ${{ steps.tag.outputs.branch }}
 
       - name: Summary
         run: |
           if [ "${{ steps.check.outputs.exists }}" = "true" ]; then
-            echo "Branch ${{ steps.tag.outputs.branch }} already exists - skipped"
+            echo "⚠️ Branch ${{ steps.tag.outputs.branch }} already exists"
           else
-            echo "Created branch: ${{ steps.tag.outputs.branch }}"
+            echo "✅ Created branch: ${{ steps.tag.outputs.branch }}"
           fi
