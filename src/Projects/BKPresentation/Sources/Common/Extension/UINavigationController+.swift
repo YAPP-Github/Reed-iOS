@@ -324,6 +324,7 @@ private extension UINavigationController {
     
     func makeHomeImageTitleView(image: UIImage) -> UIView {
         let imageView = UIImageView(image: image)
+        imageView.tintColor = .bkBackgroundColor(.primary)
         imageView.contentMode = .scaleAspectFit
         
         let wrapper = UIView()
