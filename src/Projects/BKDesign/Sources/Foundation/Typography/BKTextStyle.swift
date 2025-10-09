@@ -271,6 +271,13 @@ public enum BKTextStyle {
             
         case .caption1(let weight):
             switch weight {
+            case .medium:
+                return BKFontAttributes(
+                    fontName: .pretendardMedium,
+                    fontSize: .pt12,
+                    lineHeight: .p133_4,
+                    letterSpacing: .pNegative1
+                )
             case .regular:
                 return BKFontAttributes(
                     fontName: .pretendardRegular,
@@ -286,7 +293,6 @@ public enum BKTextStyle {
                     letterSpacing: .pNegative1
                 )
             }
-            
         case .caption2(let weight):
             switch weight {
             case .regular:
