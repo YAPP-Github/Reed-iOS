@@ -37,14 +37,14 @@ public enum BKAtomicColor {
     public enum Green: String {
         case g50 = "#f2fff6"
         case g100 = "#e3f8e9"
-        case g200 = "#c1e8ca"
-        case g300 = "#82c090"
-        case g400 = "#40bf5d"
-        case g500 = "#2f9647"
-        case g600 = "#257838"
-        case g700 = "#1c5a2a"
-        case g800 = "#123c1c"
-        case g900 = "#091d0e"
+        case g200 = "#c4eccd"
+        case g300 = "#9ce0ad"
+        case g400 = "#6bd184"
+        case g500 = "#3bc25b"
+        case g600 = "#33a94f"
+        case g700 = "#247938"
+        case g800 = "#174822"
+        case g900 = "#07180b"
         
         public var color: UIColor {
             return UIColor(hex: self.rawValue)
