@@ -4,7 +4,7 @@ import Combine
 import UIKit
 
 public final class BKTextFieldView: UIView {
-    private let titleLabel = BKLabel2()
+    private let titleLabel = BKLabel()
     private let textField = BKBaseTextField()
     private let helpMessageLabel = BKLabel(type: .help)
     

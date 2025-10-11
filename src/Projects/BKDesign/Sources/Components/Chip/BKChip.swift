@@ -3,8 +3,8 @@
 import UIKit
 
 public final class BKChip: UIView {
-    private var titleLabel = BKLabel2()
-    private var countLabel = BKLabel2()
+    private var titleLabel = BKLabel()
+    private var countLabel = BKLabel()
     private let labelContainer = UIView()
     public var onTap: (() -> Void)?
     

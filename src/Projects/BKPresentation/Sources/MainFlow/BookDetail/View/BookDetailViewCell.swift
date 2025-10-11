@@ -21,17 +21,17 @@ final class BookDetailViewCell: UICollectionViewCell {
     }()
     
     private let emotionIcon = UIImageView()
-    private let emotionLabel = BKLabel2(
+    private let emotionLabel = BKLabel(
         fontStyle: .body1(weight: .semiBold),
         color: .bkContentColor(.brand)
     )
     
-    private let creationLabel = BKLabel2(
+    private let creationLabel = BKLabel(
         fontStyle: .label1(weight: .medium),
         color: .bkContentColor(.tertiary)
     )
     
-    private let pageLabel = BKLabel2(
+    private let pageLabel = BKLabel(
         fontStyle: .italic,
         color: .bkContentColor(.tertiary)
     )

@@ -20,7 +20,7 @@ final class SeedReportView: BaseView {
         return stackView
     }()
     
-    private let reportLabel = BKLabel2(
+    private let reportLabel = BKLabel(
         fontStyle: .label2(weight: .regular),
         color: .bkContentColor(.secondary),
         highlightColor: .bkContentColor(.brand),

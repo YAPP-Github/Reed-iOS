@@ -70,7 +70,6 @@ final class ArchiveView: BaseView, UIGestureRecognizerDelegate {
         setupChipActions()
         setupScrollView()
         addSubviews(chipScrollView, bookCollectionView, emptyStateView)
-        setupLayout()
         updateEmptyState()
         
         emptyStateView.onTapLogin = { [weak self] in

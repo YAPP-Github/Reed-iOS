@@ -7,7 +7,7 @@ import UIKit
 
 final class ToastMessageView: UIView {
     // MARK: - UI Components
-    private let messageLabel = BKLabel2(
+    private let messageLabel = BKLabel(
         fontStyle: .label1(weight: .regular),
         color: .bkBaseColor(.primary),
         alignment: .center
