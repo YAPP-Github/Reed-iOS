@@ -92,6 +92,7 @@ final class SearchViewModel: BaseViewModel {
         var searchBarPlaceholder: String
         var searchViewTitle: String
         var isUpserted: String? = nil
+        var selectedStatus: BookRegistrationStatus? = nil
         var viewType: SearchViewType? = nil
     }
     
@@ -274,6 +275,7 @@ final class SearchViewModel: BaseViewModel {
                 newState.error = .unauthorized
             } else {
                 newState.isLoading = true
+                newState.selectedStatus = status
                 effects.append(.upsert(isbn: isbn, status: status))
             }
             
@@ -284,6 +286,7 @@ final class SearchViewModel: BaseViewModel {
             
         case .noteSuggestionShown:
             newState.isUpserted = nil
+            newState.selectedStatus = nil
             
         case .errorOccured(let error):
             newState.isLoading = false
