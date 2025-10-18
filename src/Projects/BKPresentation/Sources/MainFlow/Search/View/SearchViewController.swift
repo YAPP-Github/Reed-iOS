@@ -168,11 +168,19 @@ final class SearchViewController: BaseViewController<SearchView>, ScreenLoggable
             .store(in: &cancellable)
         
         viewModel.statePublisher
-            .compactMap { $0.isUpserted }
-            .removeDuplicates()
+            .compactMap { state -> (isbn: String, status: BookRegistrationStatus)? in
+                guard let isbn = state.isUpserted,
+                      let status = state.selectedStatus else {
+                    return nil
+                }
+                return (isbn, status)
+            }
+            .removeDuplicates { previous, current in
+                return previous.isbn == current.isbn && previous.status == current.status
+            }
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] isbn in
-                self?.presentNoteSuggestion(with: isbn)
+            .sink { [weak self] (isbn, status) in
+                self?.presentNoteSuggestion(with: isbn, status: status)
                 self?.viewModel.send(.noteSuggestionShown)
             }
             .store(in: &cancellable)
@@ -273,32 +281,49 @@ private extension SearchViewController {
         viewModel.send(.upsertBook(isbn: isbn, status: status))
     }
     
-    func presentNoteSuggestion(with isbn: String) {
+    func presentNoteSuggestion(with isbn: String, status: BookRegistrationStatus) {
         let graphic = BKImage.Graphics.coinCheck
         let graphicView = UIImageView(image: graphic)
         graphicView.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 120, height: 120))
         }
+        
+        let sheetTitle = "도서가 등록되었어요!"
+        let cancelAction : (() -> Void)? = { [weak self] in
+            self?.dismiss(animated: true)
+            self?.hideLoading()
+        }
+        
+        let nextAction : (() -> Void)? = { [weak self] in
+            self?.dismiss(animated: true)
+            self?.viewModel.send(.loadNoteFlow)
+            self?.hideLoading()
+            
+        }
         logScreenView(name: GATracking.SearchAndRegister.complete)
         
+        var buttonGroup: BKButtonGroup?
+        
+        if status == .before {
+            buttonGroup = .singleFullButton(
+                title: status.getCancelButtonTitle(),
+                action: cancelAction
+            )
+        } else {
+            buttonGroup = .twoButtonGroup(
+                leftTitle: status.getCancelButtonTitle(),
+                rightTitle: status.getNextButtonTitle(),
+                leftAction: cancelAction,
+                rightAction: nextAction
+            )
+        }
+        
         let sheet = BKBottomSheetViewController(
-            title: "도서가 등록되었어요!",
-            subtitle: "독서 기록을 바로 시작할까요?",
+            title: sheetTitle,
+            subtitle: status.getSubTitle(),
             style: .centered,
             suppliedContentStyle: .upper(graphicView),
-            buttonConfiguration: .twoButtonGroup(
-                leftTitle: "나중에 하기",
-                rightTitle: "기록 시작하기",
-                leftAction: { [weak self] in
-                    self?.dismiss(animated: true)
-                    self?.hideLoading()
-                },
-                rightAction: { [weak self] in
-                    self?.dismiss(animated: true)
-                    self?.viewModel.send(.loadNoteFlow)
-                    self?.hideLoading()
-                }
-            )
+            buttonConfiguration: buttonGroup
         )
         
         sheet.show(from: self, animated: true)
