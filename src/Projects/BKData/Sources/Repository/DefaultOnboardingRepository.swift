@@ -21,4 +21,8 @@ public struct DefaultOnboardingRepository: OnboardingRepository {
     public func saveOnboardingSeen() {
         try? storage.save(true, for: key)
     }
+    
+    public func resetOnboardingSeen() {
+        try? storage.save(false, for: key)
+    }
 }

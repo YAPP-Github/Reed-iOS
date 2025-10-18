@@ -3,4 +3,5 @@
 public protocol OnboardingRepository {
     func fetchOnboardingSeen() -> Bool
     func saveOnboardingSeen()
+    func resetOnboardingSeen()
 }

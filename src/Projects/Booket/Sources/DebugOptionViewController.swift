@@ -15,8 +15,6 @@ import PulseUI
 import SwiftUI
 import UIKit
 
-import UIKit
-
 public final class DebugOptionViewController: UIViewController {
 
     private struct DebugSection {

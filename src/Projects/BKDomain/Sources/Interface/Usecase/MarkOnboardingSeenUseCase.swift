@@ -4,4 +4,5 @@ import Foundation
 
 public protocol MarkOnboardingSeenUseCase {
     func execute()
+    func reset()
 }
