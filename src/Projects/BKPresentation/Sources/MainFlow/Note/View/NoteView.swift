@@ -178,8 +178,13 @@ private extension NoteView {
     
     func updateNextButtonEnabled() {
         guard pageControl.currentPage < pageViews.count else { return }
-        let isValid = (currentView as? RegistrationFormProvidable)?.registrationForm() != nil
-        nextButton.primaryButton?.isEnabled = isValid
+        
+        if pageControl.currentPage == 2 {
+            nextButton.primaryButton?.isEnabled = true
+        } else {
+            let isValid = (currentView as? RegistrationFormProvidable)?.registrationForm() != nil
+            nextButton.primaryButton?.isEnabled = isValid
+        }
     }
     
     @objc func pageControlChanged(_ sender: BKPageControl) {

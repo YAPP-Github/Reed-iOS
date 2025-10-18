@@ -6,7 +6,7 @@ import SnapKit
 import UIKit
 
 struct SentenceAppreciationForm {
-    let appreciation: String
+    let appreciation: String?
 }
 
 final class SentenceAppreciationView: BaseView {
@@ -17,6 +17,8 @@ final class SentenceAppreciationView: BaseView {
         fontStyle: .heading1(weight: .bold)
     )
     
+    private let optionBadge = BadgeView(title: "선택")
+    
     private let subtitleLabel = BKLabel(
         text: "감상평 가이드로 쉽게 남길 수 있어요",
         fontStyle: .label1(weight: .medium),
@@ -26,6 +28,14 @@ final class SentenceAppreciationView: BaseView {
     private let appreciationTextView = BKTextView(
         placeholder: "내용을 입력해주세요."
     )
+    
+    private let titleRowStack: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = LayoutConstants.titleRowStackSpacing
+        stackView.alignment = .center
+        return stackView
+    }()
     
     private let titleStack: UIStackView = {
         let stackView = UIStackView()
@@ -67,7 +77,8 @@ final class SentenceAppreciationView: BaseView {
     
     override func setupView() {
         addSubviews(titleStack, appreciationTextView, guideButton, tooltipView)
-        [titleLabel, subtitleLabel].forEach(titleStack.addArrangedSubview(_:))
+        [titleLabel, optionBadge].forEach(titleRowStack.addArrangedSubview(_:))
+        [titleRowStack, subtitleLabel].forEach(titleStack.addArrangedSubview(_:))
     }
     
     override func configure() {
@@ -134,14 +145,12 @@ extension SentenceAppreciationView: RegistrationFormProvidable, FormInputNotifia
 
     func registrationForm() -> RegistrationForm? {
         let trimmedSentence = appreciationTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedSentence.isEmpty else {
-            return nil
-        }
         
         return .appreciation(SentenceAppreciationForm(
             appreciation: trimmedSentence
         ))
     }
+    
 }
 
 private extension SentenceAppreciationView {
@@ -151,5 +160,6 @@ private extension SentenceAppreciationView {
         static let sentenceViewOffset: CGFloat = 40
         static let buttonOffset: CGFloat = 12
         static let titleStackSpacing = BKSpacing.spacing1
+        static let titleRowStackSpacing: CGFloat = 10
     }
 }
