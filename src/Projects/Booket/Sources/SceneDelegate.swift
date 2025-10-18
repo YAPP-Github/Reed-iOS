@@ -94,7 +94,7 @@ class PulseWindow: UIWindow {
         super.motionEnded(motion, with: event)
         guard motion == .motionShake else { return }
         
-        let viewController = MainViewController()
+        let viewController = DebugOptionViewController()
         let navigation = UINavigationController(rootViewController: viewController)
         rootViewController?.present(navigation, animated: true)
     }
