@@ -12,4 +12,8 @@ public struct DefaultMarkOnboardingSeenUseCase: MarkOnboardingSeenUseCase {
     public func execute() {
         repository.saveOnboardingSeen()
     }
+    
+    public func reset() {
+        repository.resetOnboardingSeen()
+    }
 }
