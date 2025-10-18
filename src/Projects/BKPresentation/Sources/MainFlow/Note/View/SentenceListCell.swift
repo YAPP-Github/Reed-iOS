@@ -53,19 +53,22 @@ final class SentenceListCell: UICollectionViewCell {
     // MARK: - Configuration
     func configure(with sentence: RecognizedTextViewModel.SentenceItem) {
         sentenceLabel.setText(text: sentence.text)
-        updateSelectionState(isSelected: sentence.isSelected)
+        sentenceLabel.setColor(color: .bkContentColor(.primary))
+        UIView.animate(withDuration: 0.2) { [weak self] in
+            self?.updateSelectionState(isSelected: sentence.isSelected)
+        }
     }
     
     private func updateSelectionState(isSelected: Bool) {
         if isSelected {
+            sentenceLabel.setFontStyle(style: .body1(weight: .medium))
             contentView.backgroundColor = .bkBackgroundColor(.tertiary)
             contentView.layer.borderWidth = 1
             contentView.layer.borderColor = UIColor.bkBorderColor(.brand).cgColor
-            sentenceLabel.setColor(color: .bkContentColor(.brand))
         } else {
+            sentenceLabel.setFontStyle(style: .body1(weight: .regular))
             contentView.backgroundColor = .bkBackgroundColor(.secondary)
             contentView.layer.borderColor = UIColor.clear.cgColor
-            sentenceLabel.setColor(color: .bkContentColor(.primary))
         }
         
         UIView.animate(withDuration: 0.2) {
