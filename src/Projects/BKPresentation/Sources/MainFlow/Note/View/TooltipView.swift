@@ -4,6 +4,7 @@ import BKDesign
 import UIKit
 import SnapKit
 
+// 2차 작업 때, BKDesign component로 빼기
 final class TooltipView: BaseView {
     private let textLabel = BKLabel(
         text: "예시 문장을 알려드려요",
