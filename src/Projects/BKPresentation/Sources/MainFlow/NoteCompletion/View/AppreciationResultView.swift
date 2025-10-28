@@ -44,7 +44,7 @@ final class AppreciationResultView: BaseView {
     )
     
     private let rootStackBackgroundView = UIView()
-    private let rootStack: UIStackView = {
+    private lazy var rootStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = LayoutConstants.rootStackSpacing
@@ -139,12 +139,22 @@ final class AppreciationResultView: BaseView {
     func apply(
         emotion: EmotionIcon,
         creationDate: Date,
-        appreciation: String = ""
+        appreciation: String? = ""
     ) {
         emotionIcon.image = emotion.icon
         emotionLabel.setText(text: emotion.rawValue)
         creationLabel.setText(text: creationDate.toKoreanDateString())
-        appreciationLabel.setText(text: appreciation)
+        
+        if let review = appreciation, !review.isEmpty {
+            appreciationLabel.setText(text: review)
+            rootStack.spacing = LayoutConstants.rootStackSpacing
+        } else {
+            rootStack.spacing = 0
+            rootStack.removeArrangedSubview(appreciationLabel)
+        }
+        
+        rootStack.setNeedsLayout()
+        rootStack.layoutIfNeeded()
     }
 }
 
