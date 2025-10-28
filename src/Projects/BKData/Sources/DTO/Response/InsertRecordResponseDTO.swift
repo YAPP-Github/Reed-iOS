@@ -8,7 +8,7 @@ public struct InsertRecordResponseDTO: Decodable {
     let userBookId: String
     let pageNumber: Int
     let quote: String
-    let review: String
+    let review: String?
     let emotionTags: [Emotion]
     let createdAt: String
     let updatedAt: String
