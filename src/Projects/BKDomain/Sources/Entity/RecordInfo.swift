@@ -7,7 +7,7 @@ public struct RecordInfo: Decodable, Equatable {
     public let bookId: String
     public let pageNumber: Int
     public let quote: String
-    public let review: String
+    public let review: String?
     public let emotionTags: [Emotion]
     public let createdAt: Date
     public let updatedAt: Date?
@@ -21,7 +21,7 @@ public struct RecordInfo: Decodable, Equatable {
         bookId: String,
         pageNumber: Int,
         quote: String,
-        review: String,
+        review: String?,
         emotionTags: [Emotion],
         createdAt: Date,
         updatedAt: Date?,

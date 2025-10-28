@@ -5,13 +5,13 @@ import Foundation
 public struct RecordVO {
     public let pageNumber: Int
     public let quote: String
-    public let review: String
+    public let review: String?
     public let emotionTags: [String]
     
     public init(
         pageNumber: Int,
         quote: String,
-        review: String,
+        review: String?,
         emotionTags: [String]
     ) {
         self.pageNumber = pageNumber
