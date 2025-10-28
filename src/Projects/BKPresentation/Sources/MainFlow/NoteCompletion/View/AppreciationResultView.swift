@@ -139,7 +139,7 @@ final class AppreciationResultView: BaseView {
     func apply(
         emotion: EmotionIcon,
         creationDate: Date,
-        appreciation: String
+        appreciation: String = ""
     ) {
         emotionIcon.image = emotion.icon
         emotionLabel.setText(text: emotion.rawValue)
