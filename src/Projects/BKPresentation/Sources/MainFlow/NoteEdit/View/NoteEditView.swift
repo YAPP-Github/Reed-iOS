@@ -248,7 +248,12 @@ final class NoteEditView: BaseView {
         
         pageField.setText("\(recordInfo.pageNumber)")
         sentenceTextView.setText(recordInfo.quote)
-        appreciationTextView.setText(recordInfo.review)
+        
+        if let review = recordInfo.review {
+            appreciationTextView.setText(review)
+        } else {
+            
+        }
         
         // 감정 라벨은 selectedEmotion 바인딩에서만 설정
     }

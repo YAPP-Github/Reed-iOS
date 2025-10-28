@@ -6,7 +6,7 @@ struct NoteForm: Equatable {
     let page: Int
     let sentence: String
     let emotion: Emotion
-    let appreciation: String
+    let appreciation: String?
 }
     
 extension NoteForm {

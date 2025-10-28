@@ -23,7 +23,7 @@ final class NoteEditViewModel: BaseViewModel {
         case errorHandled
         case presentEmotionEdit
         case emotionSelected(Emotion)
-        case saveButtonTapped(formData: (page: Int?, sentence: String, appreciation: String))
+        case saveButtonTapped(formData: (page: Int?, sentence: String, appreciation: String?))
         case patchRecordSuccessed(RecordInfo)
         case deleteButtonTapped
         case deleteRecordSuccessed
@@ -95,9 +95,8 @@ final class NoteEditViewModel: BaseViewModel {
         case .saveButtonTapped(let formData):
             guard let selectedEmotion = state.selectedEmotion,
                   let page = formData.page,
-                  !formData.sentence.isEmpty,
-                  !formData.appreciation.isEmpty else { 
-                break 
+                  !formData.sentence.isEmpty else {
+                break
             }
             
             let noteForm = NoteForm(
