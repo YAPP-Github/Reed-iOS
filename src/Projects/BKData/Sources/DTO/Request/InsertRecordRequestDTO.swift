@@ -6,13 +6,13 @@ import Foundation
 struct InsertRecordRequestDTO: Encodable {
     let pageNumber: Int
     let quote: String
-    let review: String
+    let review: String?
     let emotionTags: [String]
     
     init(
         pageNumber: Int,
         quote: String,
-        review: String,
+        review: String?,
         emotionTags: [String]
     ) {
         self.pageNumber = pageNumber

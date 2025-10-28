@@ -8,7 +8,7 @@ public struct DetailRecordResponseDTO: Decodable {
     public let userBookId: String
     public let pageNumber: Int
     public let quote: String
-    public let review: String
+    public let review: String?
     public let emotionTags: [Emotion]
     public let createdAt: String
     public let updatedAt: String
