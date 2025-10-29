@@ -148,9 +148,14 @@ final class AppreciationResultView: BaseView {
         if let review = appreciation, !review.isEmpty {
             appreciationLabel.setText(text: review)
             rootStack.spacing = LayoutConstants.rootStackSpacing
+            if !rootStack.arrangedSubviews.contains(appreciationLabel) {
+                rootStack.addArrangedSubview(appreciationLabel)
+            }
         } else {
             rootStack.spacing = 0
-            rootStack.removeArrangedSubview(appreciationLabel)
+            if rootStack.arrangedSubviews.contains(appreciationLabel) {
+                rootStack.removeArrangedSubview(appreciationLabel)
+            }
         }
         
         rootStack.setNeedsLayout()
