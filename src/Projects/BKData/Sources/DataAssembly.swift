@@ -129,5 +129,23 @@ public struct DataAssembly: Assembly {
             @Autowired var networkProvider: NetworkProvider
             return DefaultAppStoreRepository(networkProvider: networkProvider)
         }
+
+        container.register(
+            type: NotificationRepository.self
+        ) { _ in
+            @Autowired(name: "OAuth") var networkProvider: NetworkProvider
+            return DefaultNotificationRepository(networkProvider: networkProvider)
+        }
+
+        container.register(
+            type: PushTokenRepository.self
+        ) { _ in
+            @Autowired var pushTokenProvider: PushTokenProvider
+            @Autowired var pushTokenStore: PushTokenStore
+            return DefaultPushTokenRepository(
+                pushTokenProvider: pushTokenProvider,
+                pushTokenStore: pushTokenStore
+            )
+        }
     }
 }
