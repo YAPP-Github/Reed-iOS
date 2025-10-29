@@ -8,18 +8,21 @@ public struct UserProfile {
     public let nickname: String
     public let provider: String
     public let termsAgreed: Bool
+    public let notificationEnabled: Bool
     
     public init(
         id: String,
         email: String,
         nickname: String,
         provider: String,
-        termsAgreed: Bool
+        termsAgreed: Bool,
+        notificationEnabled: Bool
     ) {
         self.id = id
         self.email = email
         self.nickname = nickname
         self.provider = provider
         self.termsAgreed = termsAgreed
+        self.notificationEnabled = notificationEnabled
     }
 }

@@ -40,5 +40,24 @@ public struct StorageAssembly: Assembly {
                 storage: keyValueStorage
             )
         }
+
+        container.register(
+            type: PushTokenProvider.self,
+            scope: .singleton
+        ) { _ in
+            @Autowired(name: "Keychain") var keyValueStorage: KeyValueStorage
+            return KeychainPushTokenProvider(
+                storage: keyValueStorage
+            )
+        }
+
+        container.register(
+            type: PushTokenStore.self
+        ) { _ in
+            @Autowired(name: "Keychain") var keyValueStorage: KeyValueStorage
+            return KeychainPushTokenStore(
+                storage: keyValueStorage
+            )
+        }
     }
 }
