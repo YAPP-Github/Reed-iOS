@@ -23,7 +23,7 @@ final class SettingCoordinator: Coordinator {
     }
 }
 
-extension SettingCoordinator: ErrorHandleable, WebPresenting, AuthenticationRequiredNotifying {
+extension SettingCoordinator: ErrorHandleable, URLPresenting, AuthenticationRequiredNotifying {
     func notifyAuthenticationRequired(onFinish: (() -> Void)?) {
         (parentCoordinator as? AuthenticationRequiredNotifying)?.notifyAuthenticationRequired(onFinish: onFinish)
     }
