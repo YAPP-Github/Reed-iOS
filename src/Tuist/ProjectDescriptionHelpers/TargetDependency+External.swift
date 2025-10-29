@@ -23,6 +23,7 @@ public enum External: String {
     case FirebaseCrashlytics
     case FirebaseAnalyticsSwift
     case FirebaseRemoteConfig
+    case FirebaseMessaging
     
     case Nimble
     case Quick
