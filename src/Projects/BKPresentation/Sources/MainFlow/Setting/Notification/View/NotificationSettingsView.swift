@@ -1,8 +1,8 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
-import UIKit
 import SnapKit
+import UIKit
 
 final class NotificationSettingsView: BaseView {
     // MARK: - Closures
@@ -163,6 +163,7 @@ final class NotificationSettingsView: BaseView {
     }
     
     override func configure() {
+        permissionRequestContent.numberOfLines = .zero
         permissionRequestView.backgroundColor = .bkBaseColor(.secondary)
         permissionRequestView.layer.cornerRadius = BKRadius.medium
         permissionToggle.addTarget(self, action: #selector(didTapPermissionToggle), for: .valueChanged)
@@ -177,9 +178,11 @@ final class NotificationSettingsView: BaseView {
 extension NotificationSettingsView {
     func updateNotificationToggle(isEnabled: Bool, animated: Bool = true) {
         guard permissionToggle.isOn != isEnabled else { return }
-
         permissionToggle.setOn(isEnabled, animated: false)
-        updatePermissionRequestVisibility(isToggleOn: isEnabled, animated: animated)
+    }
+
+    func updatePermissionRequestVisibility(shouldShow: Bool, animated: Bool) {
+        updatePermissionRequestContainerVisibility(shouldShow: shouldShow, animated: animated)
     }
 }
 
@@ -187,7 +190,6 @@ private extension NotificationSettingsView {
     @objc
     func didTapPermissionToggle() {
         onNotificationToggleChanged?(permissionToggle.isOn)
-        updatePermissionRequestVisibility(isToggleOn: permissionToggle.isOn, animated: true)
     }
 
     @objc
@@ -195,17 +197,17 @@ private extension NotificationSettingsView {
         onPermissionRequestViewTapped?()
     }
 
-    func updatePermissionRequestVisibility(isToggleOn: Bool, animated: Bool) {
+    func updatePermissionRequestContainerVisibility(shouldShow: Bool, animated: Bool) {
         /// 초기엔 애니메이션 없이 즉시 화면 로드
         if !animated {
-            if isToggleOn {
-                self.permissionRequestContainer.isHidden = true
-                self.permissionToggleContainerTopToRequestConstraint?.deactivate()
-                self.permissionToggleContainerTopToSafeAreaConstraint?.activate()
-            } else {
+            if shouldShow {
                 self.permissionToggleContainerTopToSafeAreaConstraint?.deactivate()
                 self.permissionToggleContainerTopToRequestConstraint?.activate()
                 self.permissionRequestContainer.isHidden = false
+            } else {
+                self.permissionRequestContainer.isHidden = true
+                self.permissionToggleContainerTopToRequestConstraint?.deactivate()
+                self.permissionToggleContainerTopToSafeAreaConstraint?.activate()
             }
             self.layoutIfNeeded()
             return
@@ -215,22 +217,22 @@ private extension NotificationSettingsView {
         /// 탭 하여 권한 안내 화면이 나오는 경우 애니메이션이 없으면 부자연스러우므로 애니메이션 적용
         isAnimating = true
 
-        if isToggleOn {
-            UIView.animate(withDuration: 0.3, animations: {
-                self.permissionRequestContainer.isHidden = true
-                self.permissionToggleContainerTopToRequestConstraint?.deactivate()
-                self.permissionToggleContainerTopToSafeAreaConstraint?.activate()
-                self.layoutIfNeeded()
-            }, completion: { _ in
-                self.isAnimating = false
-            })
-        } else {
+        if shouldShow {
             UIView.animate(withDuration: 0.3, animations: {
                 self.permissionToggleContainerTopToSafeAreaConstraint?.deactivate()
                 self.permissionToggleContainerTopToRequestConstraint?.activate()
                 self.layoutIfNeeded()
             }, completion: { _ in
                 self.permissionRequestContainer.isHidden = false
+                self.isAnimating = false
+            })
+        } else {
+            UIView.animate(withDuration: 0.3, animations: {
+                self.permissionRequestContainer.isHidden = true
+                self.permissionToggleContainerTopToRequestConstraint?.deactivate()
+                self.permissionToggleContainerTopToSafeAreaConstraint?.activate()
+                self.layoutIfNeeded()
+            }, completion: { _ in
                 self.isAnimating = false
             })
         }
