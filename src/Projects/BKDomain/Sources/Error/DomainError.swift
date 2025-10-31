@@ -7,4 +7,5 @@ public enum DomainError: Error, Equatable {
     case clientError
     case internalServerError
     case timeout
+    case unknown
 }

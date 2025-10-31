@@ -10,3 +10,20 @@ public enum AuthError: Error {
     case termsNotAccepted
     case unknown
 }
+
+public extension AuthError {
+    func toDomainError() -> DomainError {
+        switch self {
+        case .sdkError(message: let message):
+            return .clientError
+        case .serverError(message: let message):
+            return .internalServerError
+        case .missingToken:
+            return .unauthorized
+        case .termsNotAccepted:
+            return .unauthorized
+        case .unknown:
+            return .unknown
+        }
+    }
+}

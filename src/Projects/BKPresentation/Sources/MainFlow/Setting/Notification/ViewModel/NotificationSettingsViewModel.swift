@@ -92,7 +92,7 @@ final class NotificationSettingsViewModel: BaseViewModel {
                     Action.fetchNotificationSettingsSucceeded(userProfile.notificationEnabled)
                 }
                 .catch { error in
-                    Just(Action.errorOccurred(DomainError.unauthorized))
+                    Just(Action.errorOccurred(error.toDomainError()))
                 }
                 .eraseToAnyPublisher()
 
