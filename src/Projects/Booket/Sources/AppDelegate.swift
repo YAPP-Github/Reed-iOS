@@ -29,15 +29,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 #endif
         KakaoSDK.initSDK(appKey: kakaoAPIkey)
         FirebaseApp.configure()
-        
+
         GAManager.configureAnalytics()
         UNUserNotificationCenter.current().delegate = self
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
-            guard granted else { return }
-            DispatchQueue.main.async {
-                UIApplication.shared.registerForRemoteNotifications()
-            }
-        }
         Messaging.messaging().delegate = self
         
         return true

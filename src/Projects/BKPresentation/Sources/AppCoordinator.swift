@@ -6,6 +6,7 @@ import BKDesign
 import Combine
 import Foundation
 import UIKit
+import UserNotifications
 
 public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying, ScreenLoggable {
     public var screenName: String = GATracking.OnboardingAndAuth.splash
@@ -120,9 +121,10 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying,
         
         loginCoordinator.onFinish = { [weak self] in
             guard let self else { return }
-            
+
             self.navigationController.dismiss(animated: animated)
             AccessModeCenter.shared.mode.send(.member)
+            self.requestNotificationPermissionIfNeeded()
             self.checkAuthAndRoute()
             onFinishAuth?()
         }
@@ -210,11 +212,25 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying,
                 leftButtonAction: AppStoreLinker.openAppStore
             )
         )
-        
+
         let dialogViewController = BKDialogViewController(dialog: dialog)
         dialogViewController.isModalInPresentation = true
         DispatchQueue.main.async {
             self.navigationController.present(dialogViewController, animated: true)
+        }
+    }
+
+    private func requestNotificationPermissionIfNeeded() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            // 아직 권한을 요청하지 않았을 때만 요청
+            guard settings.authorizationStatus == .notDetermined else { return }
+
+            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
+                guard granted else { return }
+                DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            }
         }
     }
 }
