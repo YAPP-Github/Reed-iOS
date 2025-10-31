@@ -3,6 +3,7 @@
 import BKCore
 import Combine
 import UIKit
+import UserNotifications
 
 final class NotificationSettingsViewController: BaseViewController<NotificationSettingsView> {
     override var bkNavigationBarStyle: UINavigationController.BKNavigationBarStyle {
@@ -28,11 +29,13 @@ final class NotificationSettingsViewController: BaseViewController<NotificationS
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViewActions()
+        observeAppLifecycle()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.tabBarController?.tabBar.isHidden = true
+        checkNotificationAuthorization()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -56,6 +59,23 @@ final class NotificationSettingsViewController: BaseViewController<NotificationS
         )
     }
 
+    private func observeAppLifecycle() {
+        NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
+            .sink { [weak self] _ in
+                self?.checkNotificationAuthorization()
+            }
+            .store(in: &cancellable)
+    }
+
+    private func checkNotificationAuthorization() {
+        UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
+            DispatchQueue.main.async {
+                let isAuthorized = settings.authorizationStatus == .authorized
+                self?.viewModel.send(.systemNotificationAuthorizationChecked(isAuthorized))
+            }
+        }
+    }
+
     override func bindAction() {
         viewModel.send(.onAppear)
     }
@@ -63,12 +83,15 @@ final class NotificationSettingsViewController: BaseViewController<NotificationS
     override func bindState() {
         viewModel.statePublisher
             .receive(on: DispatchQueue.main)
-            .map { $0.notificationEnabled }
-            .sink { [weak self] notificationEnabled in
+            .sink { [weak self] state in
                 guard let self = self else { return }
                 // 초기 로드시에는 애니메이션 없이 즉시 설정
                 let shouldAnimate = !self.isInitialLoad
-                self.contentView.updateNotificationToggle(isEnabled: notificationEnabled, animated: shouldAnimate)
+                self.contentView.updateNotificationToggle(isEnabled: state.notificationEnabled, animated: shouldAnimate)
+                self.contentView.updatePermissionRequestVisibility(
+                    shouldShow: !state.systemNotificationAuthorized,
+                    animated: shouldAnimate
+                )
                 self.isInitialLoad = false
             }
             .store(in: &cancellable)

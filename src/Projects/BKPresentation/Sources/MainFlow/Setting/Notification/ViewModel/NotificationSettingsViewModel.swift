@@ -7,12 +7,14 @@ import Combine
 final class NotificationSettingsViewModel: BaseViewModel {
     struct State: Equatable {
         var notificationEnabled: Bool = false
+        var systemNotificationAuthorized: Bool = false
         var isLoading: Bool = false
         var error: DomainError? = nil
     }
 
     enum Action {
         case onAppear
+        case systemNotificationAuthorizationChecked(Bool)
         case fetchNotificationSettingsSucceeded(Bool)
         case notificationToggleTapped(Bool)
         case updateNotificationSettingsSucceeded(Bool)
@@ -54,10 +56,14 @@ final class NotificationSettingsViewModel: BaseViewModel {
         case .onAppear:
             effects.append(.fetchNotificationSettings)
 
+        case .systemNotificationAuthorizationChecked(let isAuthorized):
+            newState.systemNotificationAuthorized = isAuthorized
+
         case .fetchNotificationSettingsSucceeded(let isEnabled):
             newState.notificationEnabled = isEnabled
 
         case .notificationToggleTapped(let isEnabled):
+            newState.notificationEnabled = isEnabled
             newState.isLoading = true
             effects.append(.updateNotificationSettings(isEnabled))
 
@@ -68,6 +74,8 @@ final class NotificationSettingsViewModel: BaseViewModel {
         case .errorOccurred(let error):
             newState.isLoading = false
             newState.error = error
+            /// 에러 발생시 이전 상태로 롤백
+            effects.append(.fetchNotificationSettings)
 
         case .errorHandled:
             newState.error = nil
@@ -109,4 +117,3 @@ final class NotificationSettingsViewModel: BaseViewModel {
             .store(in: &cancellables)
     }
 }
-
