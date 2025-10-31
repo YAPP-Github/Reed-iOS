@@ -1,5 +1,6 @@
 // Copyright © 2025 Booket. All rights reserved
 
+#if DEBUG
 import BKCore
 import BKData
 import BKDesign
@@ -8,10 +9,8 @@ import BKNetwork
 import BKPresentation
 import BKStorage
 import KakaoSDKAuth
-#if DEBUG
 import Pulse
 import PulseUI
-#endif
 import SwiftUI
 import UIKit
 
@@ -136,3 +135,4 @@ extension DebugOptionViewController: UITableViewDelegate, UITableViewDataSource 
         selectedOption.performAction(on: self)
     }
 }
+#endif
