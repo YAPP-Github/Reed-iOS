@@ -62,17 +62,17 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         didReceiveRegistrationToken fcmToken: String?
     ) {
         guard let token = fcmToken else { return }
-        let storage = KeychainKeyValueStorage()
-        let pushTokenStore = KeychainPushTokenStore(storage: storage)
 
-        pushTokenStore.save(fcmToken: token)
+        KeychainPushTokenStore.shared.save(fcmToken: token)
             .sink(
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {
                         AppLogger.auth.error("Failed to save FCM token: \(error)")
                     }
                 },
-                receiveValue: { _ in }
+                receiveValue: { _ in
+                    AppLogger.auth.info("FCM token saved successfully")
+                }
             )
             .store(in: &cancellables)
     }

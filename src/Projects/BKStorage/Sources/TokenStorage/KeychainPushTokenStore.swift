@@ -6,6 +6,9 @@ import BKData
 public struct KeychainPushTokenStore: PushTokenStore {
     private let storage: KeyValueStorage
 
+    /// AppDelegate에서 DI 없이 사용할 수 있도록 shared instance 제공
+    public static let shared = KeychainPushTokenStore(storage: KeychainKeyValueStorage())
+
     public init(storage: KeyValueStorage) {
         self.storage = storage
     }
