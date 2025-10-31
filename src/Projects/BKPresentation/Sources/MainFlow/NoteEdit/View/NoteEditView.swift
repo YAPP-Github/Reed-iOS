@@ -251,10 +251,7 @@ final class NoteEditView: BaseView {
         
         if let review = recordInfo.review {
             appreciationTextView.setText(review)
-        } else {
-            
         }
-        
         // 감정 라벨은 selectedEmotion 바인딩에서만 설정
     }
     

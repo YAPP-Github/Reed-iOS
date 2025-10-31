@@ -44,7 +44,7 @@ final class AppreciationResultView: BaseView {
     )
     
     private let rootStackBackgroundView = UIView()
-    private lazy var rootStack: UIStackView = {
+    private let rootStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = LayoutConstants.rootStackSpacing
@@ -146,20 +146,13 @@ final class AppreciationResultView: BaseView {
         creationLabel.setText(text: creationDate.toKoreanDateString())
         
         if let review = appreciation, !review.isEmpty {
-            appreciationLabel.setText(text: review)
-            rootStack.spacing = LayoutConstants.rootStackSpacing
-            if !rootStack.arrangedSubviews.contains(appreciationLabel) {
-                rootStack.addArrangedSubview(appreciationLabel)
+                appreciationLabel.setText(text: review)
+                appreciationLabel.isHidden = false
+                rootStack.spacing = LayoutConstants.rootStackSpacing
+            } else {
+                appreciationLabel.isHidden = true
+                rootStack.spacing = 0
             }
-        } else {
-            rootStack.spacing = 0
-            if rootStack.arrangedSubviews.contains(appreciationLabel) {
-                rootStack.removeArrangedSubview(appreciationLabel)
-            }
-        }
-        
-        rootStack.setNeedsLayout()
-        rootStack.layoutIfNeeded()
     }
 }
 
