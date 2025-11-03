@@ -228,5 +228,25 @@ public struct DomainAssembly: Assembly {
             @Autowired var repository: BookRepository
             return DefaultDeleteBookUseCase(repository: repository)
         }
+
+        container.register(
+            type: SyncFCMTokenUseCase.self
+        ) { _ in
+            @Autowired var pushTokenRepository: PushTokenRepository
+            @Autowired var notificationRepository: NotificationRepository
+            return DefaultSyncFCMTokenUseCase(
+                pushTokenRepository: pushTokenRepository,
+                notificationRepository: notificationRepository
+            )
+        }
+
+        container.register(
+            type: UpdateNotificationSettingsUseCase.self
+        ) { _ in
+            @Autowired var notificationRepository: NotificationRepository
+            return DefaultUpdateNotificationSettingsUseCase(
+                notificationRepository: notificationRepository
+            )
+        }
     }
 }

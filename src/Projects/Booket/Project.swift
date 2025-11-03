@@ -30,7 +30,8 @@ let debugAppTarget = Target.target(
         .external(dependency: .PulseProxy),
         .external(dependency: .FirebaseCore),
         .external(dependency: .FirebaseCrashlytics),
-        .external(dependency: .FirebaseAnalytics)
+        .external(dependency: .FirebaseAnalytics),
+        .external(dependency: .FirebaseMessaging)
     ],
     settings: .settings(
         base: [
@@ -73,7 +74,9 @@ let releaseAppTarget = Target.target(
         .storage(),
         .domain(),
         .external(dependency: .FirebaseCore),
-        .external(dependency: .FirebaseCrashlytics)
+        .external(dependency: .FirebaseCrashlytics),
+        .external(dependency: .FirebaseAnalytics),
+        .external(dependency: .FirebaseMessaging)
     ],
     settings: .settings(
         base: [

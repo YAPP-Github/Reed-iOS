@@ -23,7 +23,18 @@ final class SettingCoordinator: Coordinator {
     }
 }
 
-extension SettingCoordinator: ErrorHandleable, WebPresenting, AuthenticationRequiredNotifying {
+extension SettingCoordinator {
+    func didTapNotificationSetting() {
+        let notificationCoordinator = NotificationSettingsCoordinator(
+            parentCoordinator: self,
+            navigationController: navigationController
+        )
+        addChildCoordinator(notificationCoordinator)
+        notificationCoordinator.start()
+    }
+}
+
+extension SettingCoordinator: ErrorHandleable, URLPresenting, AuthenticationRequiredNotifying {
     func notifyAuthenticationRequired(onFinish: (() -> Void)?) {
         (parentCoordinator as? AuthenticationRequiredNotifying)?.notifyAuthenticationRequired(onFinish: onFinish)
     }

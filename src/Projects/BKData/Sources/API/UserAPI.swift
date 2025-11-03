@@ -5,6 +5,8 @@ import Foundation
 enum UserAPI {
     case me
     case termsAgreement(termsAgreed: Bool)
+    case upsertFCMToken(fcmToken: String)
+    case upsertNotificationSettings(notificationEnabled: Bool)
 }
 
 extension UserAPI: RequestTarget {
@@ -18,6 +20,10 @@ extension UserAPI: RequestTarget {
             return ""
         case .termsAgreement:
             return "/terms-agreement"
+        case .upsertFCMToken:
+            return "/fcm-token"
+        case .upsertNotificationSettings:
+            return "/notification-settings"
         }
     }
     
@@ -25,14 +31,14 @@ extension UserAPI: RequestTarget {
         switch self {
         case .me:
             return .get
-        case .termsAgreement:
+        case .termsAgreement, .upsertFCMToken, .upsertNotificationSettings:
             return .put
         }
     }
     
     var headers: [String: String] {
         switch self {
-        case .termsAgreement:
+        case .termsAgreement, .upsertFCMToken, .upsertNotificationSettings:
             return [
                 "Content-Type": "application/json"
             ]
@@ -45,6 +51,10 @@ extension UserAPI: RequestTarget {
         switch self {
         case .termsAgreement(let termsAgreed):
             return TermsAgreementRequestDTO(termsAgreed: termsAgreed)
+        case .upsertFCMToken(let fcmToken):
+            return UpsertFCMTokenRequestDTO(fcmToken: fcmToken)
+        case .upsertNotificationSettings(let notificationEnabled):
+            return NotificationStatusRequestDTO(notificationEnabled: notificationEnabled)
         case .me:
             return nil
         }

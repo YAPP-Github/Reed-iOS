@@ -69,6 +69,8 @@ final class SettingViewController: BaseViewController<SettingView>, ScreenLoggab
                         self?.coordinator?.presentWeb(url: DocsType.terms.url)
                     case .license:
                         self?.coordinator?.presentWeb(url: DocsType.licenses.url)
+                    case .notification:
+                        self?.coordinator?.didTapNotificationSetting()
                     case .version:
                         AppStoreLinker.openAppStore()
                     }

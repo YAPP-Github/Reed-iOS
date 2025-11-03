@@ -3,19 +3,29 @@
 import SafariServices
 import UIKit
 
-protocol WebPresenting {
+protocol URLPresenting {
     var navigationController: UINavigationController { get }
 }
 
-extension WebPresenting {
+extension URLPresenting {
     func presentWeb(
-        url: URL?,
-        entersReaderIfAvailable: Bool = false
+        url: URL?
     ) {
         guard let url else { return }
         let safari = SFSafariViewController(url: url)
-        safari.configuration.entersReaderIfAvailable = entersReaderIfAvailable
         navigationController.present(safari, animated: true)
+    }
+    
+    func presentApp(
+        url: URL?
+    ) {
+        guard let url else { return }
+        
+        if url.scheme?.lowercased() == "https" {
+            presentWeb(url: url)
+        } else if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url)
+        }
     }
 }
 

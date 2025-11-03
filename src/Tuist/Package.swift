@@ -16,7 +16,8 @@
             "FirebaseCore" : .staticLibrary,
             "FirebaseAnalytics" : .staticLibrary,
             "FirebaseCrashlytics" : .staticLibrary,
-            "FirebaseRemoteConfig" : .staticLibrary
+            "FirebaseRemoteConfig" : .staticLibrary,
+            "FirebaseMessaging": .staticLibrary
         ]
     )
 #endif

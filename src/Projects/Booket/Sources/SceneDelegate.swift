@@ -59,13 +59,15 @@ private extension SceneDelegate {
         @Autowired var onboardingCheckUseCase: OnboardingCheckUseCase
         @Autowired var markOnboardingSeenUseCase: MarkOnboardingSeenUseCase
         @Autowired var appVersionUseCase: AppVersionUseCase
-        
+        @Autowired var syncFCMTokenUseCase: SyncFCMTokenUseCase
+
         self.coordinator = AppCoordinator(
             navigationController: navigationController,
             authStateUseCase: authStateUseCase,
             onboardingCheckUseCase: onboardingCheckUseCase,
             markOnboardingSeenUseCase: markOnboardingSeenUseCase,
-            appVersionUseCase: appVersionUseCase
+            appVersionUseCase: appVersionUseCase,
+            syncFCMTokenUseCase: syncFCMTokenUseCase
         )
         coordinator?.start()
     }

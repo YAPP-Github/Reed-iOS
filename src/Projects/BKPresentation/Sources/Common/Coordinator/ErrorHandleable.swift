@@ -15,7 +15,7 @@ extension ErrorHandleable where Self: Coordinator & AuthenticationRequiredNotify
             } else {
                 presentGuestAuthErrorAlert()
             }
-        case .internalServerError, .clientError:
+        case .internalServerError, .clientError, .unknown:
             presentServerErrorAlert()
         case .timeout:
             presentTimeoutAlert()
