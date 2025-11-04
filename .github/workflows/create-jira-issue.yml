@@ -98,7 +98,7 @@ jobs:
             echo "⚠️ Jira key already in title. Skipping update."
           else
             echo "skip=false" >> $GITHUB_OUTPUT
-            echo "new_title=[$jira_key] $title" >> $GITHUB_OUTPUT
+            echo "new_title=[$jira_key/$title" >> $GITHUB_OUTPUT
             echo "✅ Will update title."
           fi
 
