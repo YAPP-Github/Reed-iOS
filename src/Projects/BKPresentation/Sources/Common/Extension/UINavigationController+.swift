@@ -267,9 +267,8 @@ private extension UINavigationController {
         
         let backImage = BKImage.Icon.chevronLeft
             .withRenderingMode(.alwaysTemplate)
-            .imageWithOffset(x: -4, y: 2) ?? BKImage.Icon.chevronLeft
             .withAlignmentRectInsets(
-                UIEdgeInsets(top: 0, left: -16, bottom: 0, right: 0)
+                UIEdgeInsets(top: 0, left: -8, bottom: 0, right: 0)
             )
         appearance.setBackIndicatorImage(backImage, transitionMaskImage: backImage)
     }
