@@ -1,4 +1,4 @@
-name: Close Jira issue
+name: Close Jira Issue
 
 on:
   issues:
@@ -8,7 +8,6 @@ on:
 jobs:
   close-issue:
     runs-on: ubuntu-latest
-
     steps:
       - name: Login to Jira
         uses: atlassian/gajira-login@v3
@@ -20,22 +19,90 @@ jobs:
       - name: Extract Jira issue key from GitHub issue title
         id: extract-key
         run: |
-          ISSUE_TITLE="${{ github.event.issue.title }}"
-          JIRA_KEY=$(echo "$ISSUE_TITLE" | grep -oE '[A-Z]+-[0-9]+' || true)
-          echo "JIRA_KEY=$JIRA_KEY" >> $GITHUB_ENV
+          ISSUE_TITLE=$(cat <<'EOF'
+          ${{ github.event.issue.title }}
+          EOF
+          )
+          
+          echo "📋 Issue Title: $ISSUE_TITLE"
+          
+          # 대괄호 안의 Jira 키 우선 추출 (예: [BOOK-123] 작업명)
+          JIRA_KEY=$(echo "$ISSUE_TITLE" | grep -oP '(?<=\[)[A-Z]+-\d+(?=\])' | head -1)
+          
+          # 없으면 일반 패턴으로 추출
+          if [ -z "$JIRA_KEY" ]; then
+            JIRA_KEY=$(echo "$ISSUE_TITLE" | grep -oP '\b[A-Z]+-\d+\b' | head -1)
+          fi
+          
+          if [ -z "$JIRA_KEY" ]; then
+            echo "⚠️ No Jira key found in issue title"
+            echo "JIRA_KEY=" >> $GITHUB_ENV
+            echo "found=false" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Found Jira key: $JIRA_KEY"
+            echo "JIRA_KEY=$JIRA_KEY" >> $GITHUB_ENV
+            echo "found=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Stop if no Jira key
+        if: steps.extract-key.outputs.found == 'false'
+        run: |
+          echo "⚠️ No Jira key found. Skipping Jira transition."
+          exit 0
 
       - name: Get available transitions
-        if: ${{ env.JIRA_KEY != '' }}
+        if: steps.extract-key.outputs.found == 'true'
+        id: transitions
+        continue-on-error: true
         run: |
-          curl -u ${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }} \
+          echo "🔍 Checking available transitions for ${{ env.JIRA_KEY }}"
+          
+          RESPONSE=$(curl -s -u ${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }} \
             -X GET \
             -H "Content-Type: application/json" \
-            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ env.JIRA_KEY }}/transitions" \
-            | jq '.transitions[] | {id, name, to: .to.name}'
-            
+            "${{ secrets.JIRA_BASE_URL }}/rest/api/3/issue/${{ env.JIRA_KEY }}/transitions")
+          
+          echo "$RESPONSE" | jq '.transitions[] | {id, name, to: .to.name}'
+          
+          # 개발 완료 transition이 있는지 확인
+          HAS_TRANSITION=$(echo "$RESPONSE" | jq -r '.transitions[] | select(.name == "개발 완료") | .id')
+          
+          if [ -n "$HAS_TRANSITION" ]; then
+            echo "transition_available=true" >> $GITHUB_OUTPUT
+            echo "✅ '개발 완료' transition is available (ID: $HAS_TRANSITION)"
+          else
+            echo "transition_available=false" >> $GITHUB_OUTPUT
+            echo "⚠️ '개발 완료' transition is not available"
+            echo "Available transitions:"
+            echo "$RESPONSE" | jq -r '.transitions[] | .name'
+          fi
+
       - name: Close Jira issue
-        if: ${{ env.JIRA_KEY != '' }}
+        if: |
+          steps.extract-key.outputs.found == 'true' &&
+          steps.transitions.outputs.transition_available == 'true'
         uses: atlassian/gajira-transition@v3
         with:
           issue: ${{ env.JIRA_KEY }}
           transition: 개발 완료
+
+      - name: Add comment to GitHub issue
+        if: |
+          steps.extract-key.outputs.found == 'true' &&
+          steps.transitions.outputs.transition_available == 'true'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: 'create-comment'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ✅ **Jira Issue Closed:** [${{ env.JIRA_KEY }}](${{ secrets.JIRA_BASE_URL }}/browse/${{ env.JIRA_KEY }})
+            Status transitioned to: **개발 완료**
+
+      - name: Log transition failure
+        if: |
+          steps.extract-key.outputs.found == 'true' &&
+          steps.transitions.outputs.transition_available == 'false'
+        run: |
+          echo "❌ Failed to transition ${{ env.JIRA_KEY }} to '개발 완료'"
+          echo "The issue might already be in that state or the transition is not available."
