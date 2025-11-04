@@ -37,12 +37,14 @@ final class NoteEditView: BaseView {
     
     private let sentenceTextView = BKTextView(
         labelText: "문장 기록",
-        placeholder: "기록하고 싶은 문장을 작성해보세요"
+        placeholder: "기록하고 싶은 문장을 작성해보세요",
+        fontStyle: .body2(weight: .medium)
     )
     
     private let appreciationTextView = BKTextView(
         labelText: "감상평",
-        placeholder: "문장에 대한 감상을 남겨주세요"
+        placeholder: "문장에 대한 감상을 남겨주세요",
+        fontStyle: .body2(weight: .medium)
     )
     
     private let emotionStatusView: UIStackView = {
