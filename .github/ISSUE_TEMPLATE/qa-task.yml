@@ -1,0 +1,41 @@
+name: QA Task
+description: QA용 이슈 템플릿입니다.(기존 JIRA의 이슈와 연동됩니다)
+title: "qa] "
+labels: ["🛠️ qa"]
+body:
+    - type: input
+      id: parentKey
+      attributes:
+          label: '🎟️ 작업 (Ticket Number)'
+          description: '연동할 작업의 Ticket Number를 기입해주세요'
+          placeholder: 'BOOK-00'
+      validations:
+          required: true
+
+    - type: input
+      id: description
+      attributes:
+          label: "🛠️ qa 설명"
+          description: "어떤 qa 항목에 대한 수정사항인지 명확히 작성해주세요"
+      validations:
+          required: true
+
+    - type: textarea
+      id: tasks
+      attributes:
+          label: "🔧 수정할 작업 목록"
+          description: "수정해야 할 항목들을 체크리스트로 작성해주세요"
+          value: |
+              - [ ] ..
+      validations:
+          required: true
+
+    - type: input
+      id: links
+      attributes:
+          label: "🔗 참고 링크"
+          description: "관련 문서, 스크린샷, 로그 등이 있다면 첨부해주세요 (선택)"
+          placeholder: "https://..."
+      validations:
+          required: false
+
