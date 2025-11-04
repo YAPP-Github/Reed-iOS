@@ -33,12 +33,14 @@ public final class BKSearchTextField: BKBaseTextField {
     public override init(
         frame: CGRect = .zero,
         placeholder: String = "",
-        type: BKBaseTextField.TextFieldType = .normal
+        type: BKBaseTextField.TextFieldType = .normal,
+        fontStyle: BKTextStyle = .body2(weight: .medium)
     ) {
         super.init(
             frame: frame,
             placeholder: placeholder,
-            type: type
+            type: type,
+            fontStyle: fontStyle
         )
         setup()
         configure()
