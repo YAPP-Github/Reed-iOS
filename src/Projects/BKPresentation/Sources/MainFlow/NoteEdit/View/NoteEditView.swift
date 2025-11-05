@@ -9,6 +9,9 @@ import UIKit
 enum NoteEditViewEvent {
     case emotionStatusTapped
     case saveButtonTapped
+    case pageDidChange(String)
+    case sentenceDidChange(String)
+    case appreciationDidChange(String)
 }
 
 final class NoteEditView: BaseView {
@@ -110,6 +113,26 @@ final class NoteEditView: BaseView {
         emotionStatusView.isUserInteractionEnabled = true
         
         // BKTextFieldView와 BKTextView는 자체적으로 탭을 처리하므로 별도 제스처 불필요
+        pageField.textDidChangePublisher
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.eventPublisher.send(.pageDidChange(self.pageField.text))
+            }
+            .store(in: &cancellables)
+        
+        sentenceTextView.textDidChangePublisher
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.eventPublisher.send(.sentenceDidChange(self.sentenceTextView.text))
+            }
+            .store(in: &cancellables)
+        
+        appreciationTextView.textDidChangePublisher
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.eventPublisher.send(.appreciationDidChange(self.appreciationTextView.text))
+            }
+            .store(in: &cancellables)
         
         // 전체 뷰에 탭 제스처 추가 (키보드 dismiss용)
         let dismissTapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
@@ -156,6 +179,7 @@ final class NoteEditView: BaseView {
             target: self,
             selector: #selector(pageFieldDidBeginEditing)
         )
+        
     }
     
     @objc private func sentenceTextViewDidBeginEditing(_ notification: Notification) {
@@ -268,6 +292,10 @@ final class NoteEditView: BaseView {
     
     func updateEmotionLabel(_ text: String) {
         emotionLabel.setText(text: text)
+    }
+    
+    public func setSaveButtonEnabled(_ isEnabled: Bool) {
+        saveButton.isDisabled = !isEnabled
     }
     
     func getCurrentFormData() -> (page: Int?, sentence: String, appreciation: String) {

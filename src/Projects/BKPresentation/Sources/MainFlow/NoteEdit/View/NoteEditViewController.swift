@@ -42,6 +42,7 @@ final class NoteEditViewController: BaseViewController<NoteEditView>, ScreenLogg
         )
         navigationItem.leftBarButtonItem = backButton
         
+        contentView.setSaveButtonEnabled(false)
         viewModel.send(.onAppear)
     }
     
@@ -121,16 +122,31 @@ final class NoteEditViewController: BaseViewController<NoteEditView>, ScreenLogg
             }
             .store(in: &cancellables)
         
+        viewModel.statePublisher
+            .map { $0.isDiff }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isDiff in
+                self?.contentView.setSaveButtonEnabled(isDiff)
+            }
+            .store(in: &cancellables)
     }
     
     override func bindAction() {
         contentView.eventPublisher
             .sink { [weak self] event in
+                guard let self = self else { return }
                 switch event {
                 case .emotionStatusTapped:
-                    self?.presentEmotionEdit()
+                    self.presentEmotionEdit()
                 case .saveButtonTapped:
-                    self?.handleSaveButtonTapped()
+                    self.handleSaveButtonTapped()
+                case .pageDidChange(let text):
+                    self.viewModel.send(.pageDidChange(text))
+                case .sentenceDidChange(let text):
+                    self.viewModel.send(.sentenceDidChange(text))
+                case .appreciationDidChange(let text):
+                    self.viewModel.send(.appreciationDidChange(text))
                 }
             }
             .store(in: &cancellables)
@@ -153,8 +169,7 @@ private extension NoteEditViewController {
     }
     
     func handleSaveButtonTapped() {
-        let formData = contentView.getCurrentFormData()
-        viewModel.send(.saveButtonTapped(formData: formData))
+        viewModel.send(.saveButtonTapped)
     }
     
     func presentBookMoreMenu() {
