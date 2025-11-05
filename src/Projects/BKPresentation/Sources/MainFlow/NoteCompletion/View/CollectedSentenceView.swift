@@ -27,7 +27,7 @@ final class CollectedSentenceView: BaseView {
     )
     
     private let pageLabel = BKLabel(
-        fontStyle: .label1(weight: .medium),
+        fontStyle: .italic,
         color: .bkContentColor(.brand),
         alignment: .right
     )
@@ -78,7 +78,8 @@ final class CollectedSentenceView: BaseView {
         sentence: String,
         page: Int
     ) {
-        collectedSentenceLabel.setText(text: sentence)
+        let displayedText = "\"\(sentence)\""
+        collectedSentenceLabel.setText(text: displayedText)
         pageLabel.setText(text: "\(page)p")
     }
 }
