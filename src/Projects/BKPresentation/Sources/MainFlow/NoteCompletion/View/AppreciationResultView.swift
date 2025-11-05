@@ -13,10 +13,10 @@ enum EmotionIcon: String {
     
     var icon: UIImage {
         switch self {
-        case .warmth: return BKImage.Graphics.warm
-        case .joy: return BKImage.Graphics.joy
-        case .sadness: return BKImage.Graphics.sad
-        case .insight: return BKImage.Graphics.insight
+        case .warmth: return BKImage.Graphics.warmCircle
+        case .joy: return BKImage.Graphics.joyCircle
+        case .sadness: return BKImage.Graphics.sadCircle
+        case .insight: return BKImage.Graphics.insightCircle
         }
     }
     
