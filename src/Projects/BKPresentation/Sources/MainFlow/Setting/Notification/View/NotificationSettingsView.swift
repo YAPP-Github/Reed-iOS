@@ -246,7 +246,7 @@ private extension NotificationSettingsView {
         static let permissionRequestViewHorizontalInset = BKInset.inset5
         static let commonHorizontalInset = BKInset.inset5
         static let toggleEmptySpacing = BKSpacing.spacing4
-        static let toggleSpacingWithRequest = BKSpacing.spacing2
+        static let toggleSpacingWithRequest = BKSpacing.spacing4
         static let permissionToggleLabelPadding = BKSpacing.spacing4
         static let permissionRequestLabelPadding = BKSpacing.spacing6
     }

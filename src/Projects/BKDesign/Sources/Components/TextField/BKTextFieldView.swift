@@ -5,12 +5,13 @@ import UIKit
 
 public final class BKTextFieldView: UIView {
     private let titleLabel = BKLabel2()
-    private let textField = BKBaseTextField()
+    private let textField: BKBaseTextField
     private let helpMessageLabel = BKLabel(type: .help)
     
     private var labelText: String
     private var placeholder: String
     private var helpMessage: String
+    private let fontStyle: BKTextStyle
     
     private var isError: Bool = false {
         didSet {
@@ -48,12 +49,15 @@ public final class BKTextFieldView: UIView {
         labelText: String = "",
         placeholder: String = "",
         helpMessage: String = "",
-        isError: Bool = false
+        isError: Bool = false,
+        fontStyle: BKTextStyle = .body2(weight: .medium)
     ) {
         self.labelText = labelText
         self.placeholder = placeholder
         self.helpMessage = helpMessage
         self.isError = isError
+        self.fontStyle = fontStyle
+        self.textField = BKBaseTextField(fontStyle: fontStyle)
         super.init(frame: frame)
         setup()
         layout()

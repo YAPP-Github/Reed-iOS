@@ -200,6 +200,12 @@ private extension NoteView {
                 .store(in: &cancellables)
         }
         
+        if pageControl.currentPage >= pageViews.count - 1 {
+            nextButton.primaryButton?.title = "기록 완료"
+        } else {
+            nextButton.primaryButton?.title = "다음"
+        }
+        
         updateNextButtonEnabled()
     }
     

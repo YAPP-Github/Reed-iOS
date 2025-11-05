@@ -13,7 +13,7 @@ final class SentenceAppreciationView: BaseView {
     private let textDidChangeSubject = PassthroughSubject<Void, Never>()
     private let containerView = UIView()
     private let titleLabel = BKLabel(
-        text: "문장에 대한 감상을 남겨주세요",
+        text: "떠오르는 생각이 있다면 자유롭게 작성해 주세요.",
         fontStyle: .heading1(weight: .bold)
     )
     

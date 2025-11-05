@@ -16,7 +16,6 @@ public final class BKTextView: UIView {
         textView.layer.borderColor = UIColor.clear.cgColor
         textView.backgroundColor = .bkBaseColor(.secondary)
         textView.isScrollEnabled = true
-        textView.font = BKTextStyle.body2(weight: .regular).uiFont
         textView.textColor = .bkContentColor(.primary)
         textView.textContainerInset = UIEdgeInsets(
             top: LayoutConstants.contentTitleInset,
@@ -28,10 +27,7 @@ public final class BKTextView: UIView {
         return textView
     }()
     
-    private let placeholderLabel = BKLabel(
-        fontStyle: .body2(weight: .regular),
-        color: .bkContentColor(.tertiary)
-    )
+    private let placeholderLabel = BKLabel(color: .bkContentColor(.tertiary))
     
     private let errorMessageLabel = BKLabel(type: .error)
 
@@ -48,6 +44,7 @@ public final class BKTextView: UIView {
     }
     
     private let textViewMinHeight: CGFloat
+    private let fontStyle: BKTextStyle
 
     private let stackView: UIStackView = {
         let stackView = UIStackView()
@@ -70,11 +67,13 @@ public final class BKTextView: UIView {
         frame: CGRect = .zero,
         labelText: String? = nil,
         placeholder: String = "",
-        minHeight: CGFloat = 140
+        minHeight: CGFloat = 140,
+        fontStyle: BKTextStyle = .body2(weight: .regular)
     ) {
         self.labelText = labelText
         self.placeholderText = placeholder
         self.textViewMinHeight = minHeight
+        self.fontStyle = fontStyle
         super.init(frame: frame)
         setup()
         layoutViews()
@@ -138,6 +137,10 @@ public final class BKTextView: UIView {
 
 private extension BKTextView {
     func setup() {
+        textView.font = fontStyle.uiFont
+        applyTypingAttributes()
+        
+        placeholderLabel.setFontStyle(style: fontStyle)
         placeholderLabel.setText(text: placeholderText)
         placeholderLabel.isUserInteractionEnabled = false
         
@@ -149,6 +152,19 @@ private extension BKTextView {
 
         stackView.addArrangedSubview(textView)
         addSubviews(titleLabel, stackView)
+    }
+    
+    func applyTypingAttributes() {
+        guard let font = fontStyle.uiFont else { return }
+        
+        let paragraphStyle = fontStyle.paragraphStyle
+        paragraphStyle.alignment = textView.textAlignment
+        
+        textView.typingAttributes = [
+            .font: font,
+            .foregroundColor: UIColor.bkContentColor(.primary),
+            .paragraphStyle: paragraphStyle
+        ]
     }
     
     func layoutViews() {

@@ -29,8 +29,8 @@ public class BKBaseTextField: UITextField {
         }
     }
     
-    private let textFont = BKTextStyle.body2(weight: .medium).uiFont
-    private let placeholderFont = BKTextStyle.body2(weight: .regular).uiFont
+    private let textFont: UIFont?
+    private let placeholderFont: UIFont?
     let clearButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(BKImage.Icon.xCircle, for: .normal)
@@ -40,12 +40,18 @@ public class BKBaseTextField: UITextField {
     
     var onReturn: ((String) -> Void)?
     
+    private let fontStyle: BKTextStyle
+    
     public init(
         frame: CGRect = .zero,
         placeholder: String = "",
-        type: TextFieldType = .normal
+        type: TextFieldType = .normal,
+        fontStyle: BKTextStyle = .body2(weight: .medium)
     ) {
         self.textFieldType = type
+        self.fontStyle = fontStyle
+        self.textFont = fontStyle.uiFont
+        self.placeholderFont = BKTextStyle.body2(weight: .regular).uiFont
         super.init(frame: frame)
         self.placeholder = placeholder
         configure()
@@ -136,11 +142,33 @@ private extension BKBaseTextField {
         returnKeyType = .done
         layer.cornerRadius = BKRadius.small
         backgroundColor = .bkBaseColor(.secondary)
-        font = BKTextStyle.body2(weight: .medium).uiFont
+        font = textFont
         textColor = .bkContentColor(.primary)
         textAlignment = .natural
+        
+        applyTypingAttributes()
+        
         applyClearButtonStyle()
         applyPlaceholderStyle()
+    }
+
+    func applyTypingAttributes() {
+        guard let font = textFont else { return }
+        
+        let paragraphStyle = fontStyle.paragraphStyle
+        paragraphStyle.alignment = textAlignment
+        
+        typingAttributes = [
+            .font: font,
+            .foregroundColor: UIColor.bkContentColor(.primary),
+            .paragraphStyle: paragraphStyle
+        ]
+        
+        defaultTextAttributes = [
+            .font: font,
+            .foregroundColor: UIColor.bkContentColor(.primary),
+            .paragraphStyle: paragraphStyle
+        ]
     }
     
     func applyClearButtonStyle() {
