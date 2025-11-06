@@ -79,6 +79,9 @@ final class NoteEditViewModel: BaseViewModel {
         
         switch action {
         case .onAppear:
+            guard state.initialRecordInfo == nil else {
+                break
+            }
             newState.isLoading = true
             newState.isDiff = false
             effects.append(.fetchRecordDetail(recordId))
