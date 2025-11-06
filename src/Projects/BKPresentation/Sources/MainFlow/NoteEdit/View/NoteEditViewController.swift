@@ -42,7 +42,6 @@ final class NoteEditViewController: BaseViewController<NoteEditView>, ScreenLogg
         )
         navigationItem.leftBarButtonItem = backButton
         
-        contentView.setSaveButtonEnabled(false)
         viewModel.send(.onAppear)
     }
     
