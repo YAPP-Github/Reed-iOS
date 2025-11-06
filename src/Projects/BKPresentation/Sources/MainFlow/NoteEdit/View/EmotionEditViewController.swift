@@ -16,30 +16,41 @@ final class EmotionEditViewController: BaseViewController<EmotionEditView> {
     weak var coordinator: NoteEditCoordinator?
     private var cancellables = Set<AnyCancellable>()
     
-    private let currentEmotion: Emotion?
+    private let initialEmotion: Emotion?
+    @Published private var selectedEmotion: Emotion?
     private let completion: (Emotion) -> Void
     
     init(currentEmotion: Emotion?, completion: @escaping (Emotion) -> Void) {
-        self.currentEmotion = currentEmotion
+        self.initialEmotion = currentEmotion
         self.completion = completion
+        self._selectedEmotion = .init(initialValue: currentEmotion)
         super.init()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        // 현재 선택된 감정이 있으면 초기 설정
-        if let emotion = currentEmotion {
+        if let emotion = initialEmotion {
             contentView.setSelectedEmotion(emotion)
         }
+        contentView.setEditButtonEnabled(false)
     }
     
     override func bindAction() {
-        contentView.editButtonTappedPublisher
-            .compactMap { [weak self] in self?.contentView.selectedEmotion }
-            .sink { [weak self] selectedEmotion in
-                self?.completion(selectedEmotion)
-                self?.navigationController?.popViewController(animated: true)
+        contentView.eventPublisher
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                switch event {
+                case .emotionDidChange(let newEmotion):
+                    self.selectedEmotion = newEmotion
+                    let isDiff = (newEmotion != self.initialEmotion)
+                    self.contentView.setEditButtonEnabled(isDiff)
+                case .editButtonTapped:
+                    if let emotion = self.selectedEmotion {
+                        self.completion(emotion)
+                        self.navigationController?.popViewController(animated: true)
+                    }
+                }
             }
             .store(in: &cancellables)
     }
