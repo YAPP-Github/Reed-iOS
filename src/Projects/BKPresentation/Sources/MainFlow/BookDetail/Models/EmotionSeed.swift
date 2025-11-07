@@ -8,8 +8,8 @@ import UIKit
 enum EmotionSeed: String, CaseIterable {
     case warmth = "따뜻함"
     case joy = "즐거움"
-    case insight = "깨달음"
     case sad = "슬픔"
+    case insight = "깨달음"
     
     var image: UIImage {
         switch self {
