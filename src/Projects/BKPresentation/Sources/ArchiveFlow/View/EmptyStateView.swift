@@ -69,7 +69,7 @@ private extension EmptyStateView {
         static let guestTitle = "아직 등록된 책이 없어요"
         static let guestSubtitle = "로그인 후 나만의 서재를 채워보세요"
         static let memberTitle = "아직 등록된 책이 없어요"
-        static let memberSubtitle = "검색해서 책을 등록해보세요"
+        static let memberSubtitle = "도서 등록 후 나만의 아카이브를 만들어보세요"
         static let loginButtonTitle = "로그인하기"
     }
     
