@@ -130,7 +130,12 @@ extension SentenceCardViewController {
         
         if let popoverController = activityViewController.popoverPresentationController {
             popoverController.sourceView = self.view
-            popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+            popoverController.sourceRect = CGRect(
+                x: self.view.bounds.midX,
+                y: self.view.bounds.midY,
+                width: 0,
+                height: 0
+            )
             popoverController.permittedArrowDirections = []
         }
         

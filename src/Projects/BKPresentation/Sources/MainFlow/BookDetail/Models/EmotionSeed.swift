@@ -20,6 +20,15 @@ enum EmotionSeed: String, CaseIterable {
         }
     }
     
+    var circleImage: UIImage {
+        switch self {
+        case .warmth: return BKImage.Graphics.warmCircle
+        case .joy: return BKImage.Graphics.joyCircle
+        case .sad: return BKImage.Graphics.sadCircle
+        case .insight: return BKImage.Graphics.insightCircle
+        }
+    }
+    
     var color: UIColor {
         switch self {
         case .warmth: return .bkEmotionColor(.warmth)

@@ -91,11 +91,8 @@ final class BookDetailViewCell: UICollectionViewCell {
         
         let displayedNote = "\"\(item.note)\""
         noteLabel.setText(text: displayedNote)
-        emotionIcon.image = emotion.image
-        emotionIcon.contentMode = .scaleAspectFill
-        emotionIcon.layer.cornerRadius = LayoutConstants.imageCornerRadius
-        emotionIcon.clipsToBounds = true
-        emotionIcon.backgroundColor = .bkBaseColor(.primary)
+        emotionIcon.image = emotion.circleImage
+        emotionIcon.contentMode = .scaleAspectFit
         emotionLabel.setText(text: "#\(emotion.rawValue)")
         creationLabel.setText(text: item.createdAt.toKoreanDotDateString())
         pageLabel.setText(text: "\(item.page)p")
