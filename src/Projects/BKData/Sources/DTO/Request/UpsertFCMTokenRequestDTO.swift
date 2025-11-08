@@ -4,4 +4,5 @@ import Foundation
 
 struct UpsertFCMTokenRequestDTO: Encodable {
     let fcmToken: String
+    let deviceId: String
 }

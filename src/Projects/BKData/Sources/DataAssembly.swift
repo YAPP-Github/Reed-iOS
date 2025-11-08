@@ -134,7 +134,11 @@ public struct DataAssembly: Assembly {
             type: NotificationRepository.self
         ) { _ in
             @Autowired(name: "OAuth") var networkProvider: NetworkProvider
-            return DefaultNotificationRepository(networkProvider: networkProvider)
+            @Autowired var deviceIDProvider: DeviceIDProvider
+            return DefaultNotificationRepository(
+                networkProvider: networkProvider,
+                deviceIDProvider: deviceIDProvider
+            )
         }
 
         container.register(

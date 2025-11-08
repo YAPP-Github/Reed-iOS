@@ -5,7 +5,7 @@ import Foundation
 enum UserAPI {
     case me
     case termsAgreement(termsAgreed: Bool)
-    case upsertFCMToken(fcmToken: String)
+    case upsertFCMToken(fcmToken: String, deviceId: String)
     case upsertNotificationSettings(notificationEnabled: Bool)
 }
 
@@ -51,8 +51,8 @@ extension UserAPI: RequestTarget {
         switch self {
         case .termsAgreement(let termsAgreed):
             return TermsAgreementRequestDTO(termsAgreed: termsAgreed)
-        case .upsertFCMToken(let fcmToken):
-            return UpsertFCMTokenRequestDTO(fcmToken: fcmToken)
+        case .upsertFCMToken(let fcmToken, let deviceId):
+            return UpsertFCMTokenRequestDTO(fcmToken: fcmToken, deviceId: deviceId)
         case .upsertNotificationSettings(let notificationEnabled):
             return NotificationStatusRequestDTO(notificationEnabled: notificationEnabled)
         case .me:
