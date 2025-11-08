@@ -5,4 +5,5 @@ public enum StorageKeys {
     public static let refreshTokenKey = "refreshToken"
     public static let fcmTokenKey = "fcmToken"
     public static let isSyncNeededKey = "isSyncNeeded"
+    public static let deviceIDKey = "deviceID"
 }
