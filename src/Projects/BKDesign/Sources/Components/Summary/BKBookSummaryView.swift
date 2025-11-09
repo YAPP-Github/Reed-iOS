@@ -41,6 +41,24 @@ public enum BKBookSummaryViewStyle {
     var showsExtraLabel: Bool { self == .big }
     var extraLabelTopOffset: CGFloat { showsExtraLabel ? BKInset.inset05 : .zero }
     var titleLabelNumberOfLines: Int { showsExtraLabel ? 2 : 1 }
+    
+    var thumbnailBorderWidth: CGFloat {
+        switch self {
+        case .regular, .big, .record, .compact:
+            return 1.0
+        case .alreadyEnroll:
+            return 0.0
+        }
+    }
+    
+    var thumbnailBorderColor: UIColor {
+        switch self {
+        case .regular, .big, .record, .compact:
+            return .bkBorderColor(.primary)
+        case .alreadyEnroll:
+            return .clear
+        }
+    }
 }
 
 public class BKBookSummaryView: UIView {
@@ -251,6 +269,8 @@ public class BKBookSummaryView: UIView {
         publisherLabel.setText(text: publisher)
         thumbnail.clipsToBounds = true
         thumbnail.layer.cornerRadius = LayoutConstants.imageRadius
+        thumbnail.layer.borderWidth = style.thumbnailBorderWidth
+        thumbnail.layer.borderColor = style.thumbnailBorderColor.cgColor
         
         if let imageURL = image {
             thumbnail.kf.setImage(with: imageURL)

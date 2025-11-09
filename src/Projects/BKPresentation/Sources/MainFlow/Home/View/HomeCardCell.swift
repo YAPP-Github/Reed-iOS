@@ -99,6 +99,9 @@ final class HomeCardCell: UICollectionViewCell {
         thumbnail.clipsToBounds = true
         thumbnail.layer.masksToBounds = true
         thumbnail.layer.cornerRadius = BKRadius.xsmall
+        
+        thumbnail.layer.borderWidth = 1.0
+        thumbnail.layer.borderColor = UIColor.bkBorderColor(.primary).cgColor
     }
     
     func setupView() {
