@@ -291,7 +291,7 @@ jobs:
         with:
           actions: 'update-issue'
           token: ${{ secrets.PAT_TOKEN }}
-          title: '[${{ steps.create.outputs.issue }}] ${{ github.event.issue.title }}'
+          title: '[${{ steps.create.outputs.issue }}/${{ github.event.issue.title }}'
 
       - name: Add Jira issue link comment
         uses: actions-cool/issues-helper@v3
