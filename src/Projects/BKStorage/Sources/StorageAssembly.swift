@@ -59,5 +59,24 @@ public struct StorageAssembly: Assembly {
                 storage: keyValueStorage
             )
         }
+        
+        container.register(
+            type: DeviceIDProvider.self,
+            scope: .singleton
+        ) { _ in
+            @Autowired(name: "Keychain") var keyValueStorage: KeyValueStorage
+            return KeychainDeviceIDProvider(
+                storage: keyValueStorage
+            )
+        }
+        
+        container.register(
+            type: DeviceIDStore.self
+        ) { _ in
+            @Autowired(name: "Keychain") var keyValueStorage: KeyValueStorage
+            return KeychainDeviceIDStore(
+                storage: keyValueStorage
+            )
+        }
     }
 }

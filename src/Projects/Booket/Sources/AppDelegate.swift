@@ -34,6 +34,21 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
         Messaging.messaging().delegate = self
         
+        // 앱 실행 시 DeviceID 생성 (없으면)
+        // 키체인에 저장되므로 앱 삭제 후 재설치해도 유지됨
+        KeychainDeviceIDStore.shared.getOrCreate()
+            .sink(
+                receiveCompletion: { completion in
+                    if case .failure(let error) = completion {
+                        AppLogger.auth.error("Failed to get or create device ID: \(error)")
+                    }
+                },
+                receiveValue: { deviceID in
+                    AppLogger.auth.info("Device ID ready: \(deviceID)")
+                }
+            )
+            .store(in: &cancellables)
+        
         return true
     }
     

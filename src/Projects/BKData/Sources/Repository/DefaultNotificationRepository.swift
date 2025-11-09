@@ -6,16 +6,27 @@ import Combine
 
 public struct DefaultNotificationRepository: NotificationRepository {
     private let networkProvider: NetworkProvider
-    
-    public init(networkProvider: NetworkProvider) {
+    private let deviceIDProvider: DeviceIDProvider
+
+    public init(
+        networkProvider: NetworkProvider,
+        deviceIDProvider: DeviceIDProvider
+    ) {
         self.networkProvider = networkProvider
+        self.deviceIDProvider = deviceIDProvider
     }
     
     public func upsertFCMToken(
         fcmToken: String
     ) -> AnyPublisher<Void, DomainError> {
-        networkProvider.request(
-            target: UserAPI.upsertFCMToken(fcmToken: fcmToken),
+        guard let deviceID = deviceIDProvider.deviceID else {
+            Log.error("Device ID not available", logger: AppLogger.storage)
+            return Fail(error: DomainError.unknown)
+                .eraseToAnyPublisher()
+        }
+
+        return networkProvider.request(
+            target: UserAPI.upsertFCMToken(fcmToken: fcmToken, deviceId: deviceID),
             type: UserProfileResponseDTO.self
         )
         .debugError(logger: AppLogger.network)
