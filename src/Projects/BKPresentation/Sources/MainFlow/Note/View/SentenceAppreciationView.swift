@@ -13,14 +13,14 @@ final class SentenceAppreciationView: BaseView {
     private let textDidChangeSubject = PassthroughSubject<Void, Never>()
     private let containerView = UIView()
     private let titleLabel = BKLabel(
-        text: "떠오르는 생각이 있다면 자유롭게 작성해 주세요.",
+        text: "문장에 대한 감상을 남겨주세요",
         fontStyle: .heading1(weight: .bold)
     )
     
     private let optionBadge = BadgeView(title: "선택")
     
     private let subtitleLabel = BKLabel(
-        text: "감상평 가이드로 쉽게 남길 수 있어요",
+        text: "떠오르는 생각이 있다면 자유롭게 작성해 주세요.",
         fontStyle: .label1(weight: .medium),
         color: .bkContentColor(.tertiary)
     )
