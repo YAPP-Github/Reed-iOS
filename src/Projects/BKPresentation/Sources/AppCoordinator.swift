@@ -19,6 +19,7 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying,
     private let onboardingCheckUseCase: OnboardingCheckUseCase
     private let markOnboardingSeenUseCase: MarkOnboardingSeenUseCase
     private let appVersionUseCase: AppVersionUseCase
+    private let fetchRemoteAppVersionUseCase: FetchRemoteAppVersionUseCase
     private let syncFCMTokenUseCase: SyncFCMTokenUseCase
     private var cancellable: Set<AnyCancellable> = []
 
@@ -28,6 +29,7 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying,
         onboardingCheckUseCase: OnboardingCheckUseCase,
         markOnboardingSeenUseCase: MarkOnboardingSeenUseCase,
         appVersionUseCase: AppVersionUseCase,
+        fetchRemoteAppVersionUseCase: FetchRemoteAppVersionUseCase,
         syncFCMTokenUseCase: SyncFCMTokenUseCase
     ) {
         self.navigationController = navigationController
@@ -35,6 +37,7 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying,
         self.onboardingCheckUseCase = onboardingCheckUseCase
         self.markOnboardingSeenUseCase = markOnboardingSeenUseCase
         self.appVersionUseCase = appVersionUseCase
+        self.fetchRemoteAppVersionUseCase = fetchRemoteAppVersionUseCase
         self.syncFCMTokenUseCase = syncFCMTokenUseCase
     }
     
@@ -67,25 +70,35 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying,
     private func checkAppUpdate() {
         Publishers.Zip(
             appVersionUseCase.execute().setFailureType(to: Error.self),
-            appVersionUseCase.executeRecentVersion()
+            fetchRemoteAppVersionUseCase.execute()
         )
         .receive(on: DispatchQueue.main)
         .sink(receiveCompletion: { [weak self] completion in
             if case .failure = completion {
                 self?.proceedWithAppFlow()
             }
-        }, receiveValue: { [weak self] currentVersionString, latestVersionString in
+        }, receiveValue: { [weak self] currentVersionString, remoteVersions in
             guard let self = self,
                   let currentVersion = Version(currentVersionString),
-                  let latestVersion = Version(latestVersionString)
+                  let minimumVersion = Version(remoteVersions.minimumRequiredVersion),
+                  let latestVersion = Version(remoteVersions.latestVersion)
             else {
                 self?.proceedWithAppFlow()
                 return
             }
             
-            if currentVersion.isMajorOrMinorUpdateRequired(from: latestVersion) {
-                self.presentUpdateSheet()
-            } else {
+            Log.debug("currentVersionString: \(currentVersionString)", logger: AppLogger.ui)
+            Log.debug("minimumRequiredVersion: \(remoteVersions.minimumRequiredVersion)", logger: AppLogger.ui)
+            Log.debug("latestVersion: \(remoteVersions.latestVersion)", logger: AppLogger.ui)
+            
+            if currentVersion < minimumVersion {
+                self.presentUpdateSheet() // 강업
+            }
+            else if currentVersion < latestVersion {
+                self.presentUpdateSheet(isForced: false) // 권장
+                self.proceedWithAppFlow()
+            }
+            else {
                 self.proceedWithAppFlow()
             }
         })
@@ -203,16 +216,34 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying,
             .store(in: &cancellable)
     }
     
-    private func presentUpdateSheet() {
-        let dialog = BKDialog(
-            title: "최신 버전이 출시되었습니다",
-            subtitle: "최적의 사용 환경을 위해 업데이트해주세요.",
-            config: .init(
-                leftButtonTitle: "업데이트 하기",
-                leftButtonAction: AppStoreLinker.openAppStore
+    private func presentUpdateSheet(isForced: Bool = true) {
+        var dialog: BKDialog?
+        
+        if isForced {
+            dialog = BKDialog(
+                title: "최신 버전이 출시되었습니다",
+                subtitle: "최적의 사용 환경을 위해 업데이트해주세요.",
+                config: .init(
+                    leftButtonTitle: "업데이트 하기",
+                    leftButtonAction: AppStoreLinker.openAppStore
+                )
             )
-        )
-
+        } else {
+            dialog = BKDialog(
+                title: "최신 버전이 출시되었습니다",
+                subtitle: "최적의 사용 환경을 위해 업데이트해주세요.",
+                config: .init(
+                    leftButtonTitle: "업데이트 하기",
+                    leftButtonAction: AppStoreLinker.openAppStore,
+                    rightButtonTitle: "나중에 하기",
+                    rightButtonAction: { [weak self] in
+                        self?.navigationController.dismiss(animated: true)
+                    }
+                )
+            )
+        }
+        
+        guard let dialog else { return }
         let dialogViewController = BKDialogViewController(dialog: dialog)
         dialogViewController.isModalInPresentation = true
         DispatchQueue.main.async {
