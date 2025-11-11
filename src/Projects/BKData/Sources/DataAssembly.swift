@@ -137,9 +137,8 @@ public struct DataAssembly: Assembly {
                 let remoteConfig = RemoteConfig.remoteConfig()
                 let settings = RemoteConfigSettings()
 #if DEBUG
-                settings.minimumFetchInterval = 0
+    settings.minimumFetchInterval = 0
 #endif
-                settings.minimumFetchInterval = 10
                 remoteConfig.configSettings = settings
                 return DefaultRemoteConfigRepository(remoteConfig: remoteConfig)
             }
