@@ -70,7 +70,9 @@ public struct DomainAssembly: Assembly {
             return DefaultAppVersionUseCase(repository: repository)
         }
         
-        container.register(type: FetchRemoteAppVersionUseCase.self) { _ in
+        container.register(
+            type: FetchRemoteAppVersionUseCase.self
+        ) { _ in
             @Autowired var repository: RemoteConfigRepository
             return DefaultFetchRemoteAppVersionUseCase(repository: repository)
         }
