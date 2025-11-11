@@ -31,7 +31,8 @@ let debugAppTarget = Target.target(
         .external(dependency: .FirebaseCore),
         .external(dependency: .FirebaseCrashlytics),
         .external(dependency: .FirebaseAnalytics),
-        .external(dependency: .FirebaseMessaging)
+        .external(dependency: .FirebaseMessaging),
+        .external(dependency: .FirebaseRemoteConfig)
     ],
     settings: .settings(
         base: [
@@ -76,7 +77,8 @@ let releaseAppTarget = Target.target(
         .external(dependency: .FirebaseCore),
         .external(dependency: .FirebaseCrashlytics),
         .external(dependency: .FirebaseAnalytics),
-        .external(dependency: .FirebaseMessaging)
+        .external(dependency: .FirebaseMessaging),
+        .external(dependency: .FirebaseRemoteConfig)
     ],
     settings: .settings(
         base: [
