@@ -96,7 +96,6 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying,
             }
             else if currentVersion < latestVersion {
                 self.presentUpdateSheet(isForced: false) // 권장
-                self.proceedWithAppFlow()
             }
             else {
                 self.proceedWithAppFlow()
@@ -229,6 +228,7 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying,
                 )
             )
         } else {
+            // TODO(dyk) : 디자인 파트와 논의 후 subtitle 수정하기
             dialog = BKDialog(
                 title: "최신 버전이 출시되었습니다",
                 subtitle: "최적의 사용 환경을 위해 업데이트해주세요.",
@@ -237,7 +237,10 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying,
                     leftButtonAction: AppStoreLinker.openAppStore,
                     rightButtonTitle: "나중에 하기",
                     rightButtonAction: { [weak self] in
-                        self?.navigationController.dismiss(animated: true)
+                        guard let self else { return }
+                        self.navigationController.dismiss(animated: true) {
+                            self.proceedWithAppFlow()
+                        }
                     }
                 )
             )
@@ -246,9 +249,7 @@ public final class AppCoordinator: Coordinator, AuthenticationRequiredNotifying,
         guard let dialog else { return }
         let dialogViewController = BKDialogViewController(dialog: dialog)
         dialogViewController.isModalInPresentation = true
-        DispatchQueue.main.async {
-            self.navigationController.present(dialogViewController, animated: true)
-        }
+        navigationController.present(dialogViewController, animated: true)
     }
 
     private func requestNotificationPermissionIfNeeded() {
