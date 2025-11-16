@@ -59,6 +59,7 @@ private extension SceneDelegate {
         @Autowired var onboardingCheckUseCase: OnboardingCheckUseCase
         @Autowired var markOnboardingSeenUseCase: MarkOnboardingSeenUseCase
         @Autowired var appVersionUseCase: AppVersionUseCase
+        @Autowired var fetchRemoteAppVersionUseCase: FetchRemoteAppVersionUseCase
         @Autowired var syncFCMTokenUseCase: SyncFCMTokenUseCase
 
         self.coordinator = AppCoordinator(
@@ -67,6 +68,7 @@ private extension SceneDelegate {
             onboardingCheckUseCase: onboardingCheckUseCase,
             markOnboardingSeenUseCase: markOnboardingSeenUseCase,
             appVersionUseCase: appVersionUseCase,
+            fetchRemoteAppVersionUseCase: fetchRemoteAppVersionUseCase,
             syncFCMTokenUseCase: syncFCMTokenUseCase
         )
         coordinator?.start()

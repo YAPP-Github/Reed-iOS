@@ -3,6 +3,7 @@
 import BKCore
 import BKDomain
 import Foundation
+import FirebaseRemoteConfig
 
 public struct DataAssembly: Assembly {
     public init() {}
@@ -129,6 +130,19 @@ public struct DataAssembly: Assembly {
             @Autowired var networkProvider: NetworkProvider
             return DefaultAppStoreRepository(networkProvider: networkProvider)
         }
+        
+        container.register(
+            type: RemoteConfigRepository.self,
+            scope: .singleton) { _ in
+                let remoteConfig = RemoteConfig.remoteConfig()
+                let settings = RemoteConfigSettings()
+#if DEBUG
+    settings.minimumFetchInterval = 0
+#endif
+                remoteConfig.configSettings = settings
+                return DefaultRemoteConfigRepository(remoteConfig: remoteConfig)
+            }
+
 
         container.register(
             type: NotificationRepository.self

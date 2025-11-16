@@ -71,6 +71,13 @@ public struct DomainAssembly: Assembly {
         }
         
         container.register(
+            type: FetchRemoteAppVersionUseCase.self
+        ) { _ in
+            @Autowired var repository: RemoteConfigRepository
+            return DefaultFetchRemoteAppVersionUseCase(repository: repository)
+        }
+        
+        container.register(
             type: SearchBookUseCase.self
         ) { _ in
             @Autowired var repository: BookRepository

@@ -17,7 +17,8 @@ let project = Project.project(
                 .domain(),
                 .external(dependency: .KakaoSDKCommon),
                 .external(dependency: .KakaoSDKAuth),
-                .external(dependency: .KakaoSDKUser)
+                .external(dependency: .KakaoSDKUser),
+                .external(dependency: .FirebaseRemoteConfig)
             ]
         ),
         Target.target(
