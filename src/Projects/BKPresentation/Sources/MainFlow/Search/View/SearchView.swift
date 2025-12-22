@@ -82,6 +82,10 @@ final class SearchView: BaseView {
         searchBar.text = text
     }
     
+    func updateEmptyView(with view: UIView?) {
+        collectionView.backgroundView = view
+    }
+    
     func applySnapshot(
         with state: SearchViewModel.SearchState,
         count: Int = 0
@@ -101,13 +105,7 @@ final class SearchView: BaseView {
             
         case .result(let state):
             let isEmpty = state.books.isEmpty && state.bookInfos.isEmpty
-            if isEmpty {
-                header.layoutIfNeeded()
-                let headerHeight = header.bounds.height
-                let offset = -(headerHeight / 2.0)
-                collectionView.backgroundView = makeEmptyLabel(state.placeholder, verticalOffset: offset)
-                searchBar.setClearButtonMode(.whileEditing)
-            } else {
+            if !isEmpty {
                 collectionView.backgroundView = nil
                 snapshot.appendSections([.result])
                 // Book과 BookInfo 모두 처리
