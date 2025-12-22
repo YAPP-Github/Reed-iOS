@@ -114,6 +114,7 @@ final class SearchViewModel: BaseViewModel {
         case errorHandled
         case retryTapped
         case lastRetryTapped
+        case emptyViewButtonTapped
     }
     
     enum SideEffect {
@@ -317,6 +318,13 @@ final class SearchViewModel: BaseViewModel {
             
         case .errorHandled:
             newState.error = nil
+            
+        case .emptyViewButtonTapped:
+            if searchViewType == .myLibrarySearch {
+                print("내 서재 검색 결과 없음 -> 전체 검색으로 이동")
+            } else {
+                print("검색 결과 없음 -> 도서 등록 요청")
+            }
         }
         
         return (newState, effects)
