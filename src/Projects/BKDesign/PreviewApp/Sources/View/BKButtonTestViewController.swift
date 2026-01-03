@@ -1,4 +1,4 @@
-// Copyright © 2025 Booket. All rights reserved
+// Copyright © 2026 Booket. All rights reserved
 
 import BKDesign
 import SnapKit
@@ -52,6 +52,9 @@ public final class BKButtonTestViewController: UIViewController {
         setupButtons(for: .medium)
         setupButtons(for: .small)
         setupButtons(for: .rounded)
+        
+        addSectionSeparator()
+        setupTextButtons()
     }
     
     private func setupButtons(for size: BKButtonSize) {
@@ -64,6 +67,39 @@ public final class BKButtonTestViewController: UIViewController {
         addIconButton("Apple 로그인", style: .primary, size: size, left: BKImage.Icon.apple)
         addIconButton("카카오 로그인", style: .primary, size: size, right: BKImage.Icon.kakao)
         addIconButton("양쪽 아이콘", style: .primary, size: size, left: BKImage.Icon.apple, right: BKImage.Icon.kakao)
+    }
+    
+    // MARK: - Text Button Tests
+    
+    private func setupTextButtons() {
+        addSectionHeader("Text Buttons")
+        
+        addTextButton("텍스트 버튼1", size: .small)
+        addTextButton("텍스트 버튼2", size: .medium)
+        addTextButton("텍스트 버튼3", size: .large)
+        addTextButton("아주 긴 내용의 텍스트 버튼을 만들어봅시다", size: .large)
+        addDisabledTextButton("비활성화 텍스트", size: .small)
+    }
+    
+    private func addTextButton(_ title: String, size: BKButtonSize) {
+        let button = BKTextButton(title: "[\(size.label)] \(title)", size: size)
+        containerView.addArrangedSubview(wrapForLeftAlign(button))
+    }
+    
+    private func addDisabledTextButton(_ title: String, size: BKButtonSize) {
+        let button = BKTextButton(title: "[\(size.label)] \(title)", size: size)
+        button.isDisabled = true
+        containerView.addArrangedSubview(wrapForLeftAlign(button))
+    }
+    
+    /// 텍스트 버튼은 intrinsic size를 사용하므로 왼쪽 정렬 래퍼 필요
+    private func wrapForLeftAlign(_ view: UIView) -> UIView {
+        let wrapper = UIView()
+        wrapper.addSubview(view)
+        view.snp.makeConstraints {
+            $0.leading.verticalEdges.equalToSuperview()
+        }
+        return wrapper
     }
     
     // MARK: - Button Builders
@@ -95,41 +131,26 @@ public final class BKButtonTestViewController: UIViewController {
         containerView.addArrangedSubview(button)
     }
     
-    private func setupIndependentButtons() {
-        let sampleView = UIView()
-        scrollView.addSubview(sampleView)
-        sampleView.snp.makeConstraints {
-            $0.top.equalTo(containerView.snp.bottom).offset(40)
-            $0.centerX.equalToSuperview()
-            $0.bottom.lessThanOrEqualToSuperview()
-        }
-
-        let buttons: [BKButton] = [
-            .primary(title: "[Free] Apple 로그인", size: .large),
-            .secondary(title: "[Free] Secondary", size: .large),
-            .tertiary(title: "[Free] Tertiary", size: .large),
-            .primary(title: "[Free] Apple 로그인", size: .medium),
-            .secondary(title: "[Free] Secondary", size: .small),
-            .tertiary(title: "[Free] Tertiary", size: .rounded)
-        ]
-
-        buttons[0].leftIcon = BKImage.Icon.apple
-        buttons[2].rightIcon = BKImage.Icon.kakao
-
-        var last: UIView?
-        for button in buttons {
-            sampleView.addSubview(button)
-            button.snp.makeConstraints {
-                $0.centerX.equalToSuperview()
-                $0.top.equalTo(last?.snp.bottom ?? sampleView.snp.top).offset(16)
-            }
-            last = button
-        }
+    // MARK: - Section Helpers
+    
+    private func addSectionHeader(_ title: String) {
+        let label = UILabel()
+        label.text = title
+        label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.textColor = .darkGray
+        containerView.addArrangedSubview(label)
     }
-
+    
+    private func addSectionSeparator() {
+        let separator = UIView()
+        separator.backgroundColor = .systemGray4
+        separator.snp.makeConstraints { $0.height.equalTo(1) }
+        containerView.addArrangedSubview(separator)
+        containerView.setCustomSpacing(24, after: separator)
+    }
 }
 
-
+// MARK: - BKButtonSize Extension
 public extension BKButtonSize {
     var label: String {
         switch self {
