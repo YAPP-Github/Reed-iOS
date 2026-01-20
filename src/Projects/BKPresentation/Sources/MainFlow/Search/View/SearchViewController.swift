@@ -247,30 +247,6 @@ final class SearchViewController: BaseViewController<SearchView>, ScreenLoggable
                 )
             }
             .store(in: &cancellable)
-        
-        viewModel.statePublisher
-            .receive(on: DispatchQueue.main)
-            .map { state -> (isEmpty: Bool, viewType: SearchViewType) in
-                if case .result(let resultState) = state.searchState {
-                    let isEmpty = resultState.books.isEmpty && resultState.bookInfos.isEmpty
-                    return (isEmpty, state.viewType ?? .defaultSearch)
-                }
-                return (false, state.viewType ?? .defaultSearch)
-            }
-            .removeDuplicates { prev, curr in
-                return prev.isEmpty == curr.isEmpty && prev.viewType == curr.viewType
-            }
-            .sink { [weak self] (isEmpty, viewType) in
-                guard let self = self else { return }
-                
-                if isEmpty {
-                    let emptyView = self.makeEmptyView(for: viewType)
-                    self.contentView.updateEmptyView(with: emptyView)
-                } else {
-                    self.contentView.updateEmptyView(with: nil)
-                }
-            }
-            .store(in: &cancellable)
     }
 }
 
@@ -351,37 +327,5 @@ private extension SearchViewController {
         )
         
         sheet.show(from: self, animated: true)
-    }
-}
-
-private extension SearchViewController {
-    // 뷰 타입에 따라 내용을 다르게 설정하여 SearchEmptyView 반환
-    func makeEmptyView(for type: SearchViewType) -> UIView {
-        let emptyView = SearchEmptyView()
-        
-        switch type {
-        case .defaultSearch:
-            emptyView.setContent(
-                title: "검색어와 일치하는 도서가 없습니다.",
-                description: "찾으시는 도서가 없다면 직접 등록해보세요.",
-                buttonTitle: "도서 등록 요청하기"
-            )
-            emptyView.onActionButtonTapped = { [weak self] in
-                // 뷰모델로 액션 전달
-                self?.viewModel.send(.emptyViewButtonTapped)
-            }
-            
-        case .myLibrarySearch:
-            emptyView.setContent(
-                title: "내 서재에 해당 도서가 없습니다.",
-                description: nil, // 설명 없음
-                buttonTitle: nil
-            )
-            emptyView.onActionButtonTapped = { [weak self] in
-                self?.viewModel.send(.emptyViewButtonTapped)
-            }
-        }
-        
-        return emptyView
     }
 }
