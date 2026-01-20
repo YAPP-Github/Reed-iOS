@@ -6,7 +6,7 @@ import UIKit
 import SnapKit
 
 final class EmptyStateView: BaseView {
-    var onTapLogin: (() -> Void)?
+    var onTapActionButton: (() -> Void)?
     
     private var cancellables = Set<AnyCancellable>()
     private let titleLabel = BKLabel(
@@ -23,13 +23,13 @@ final class EmptyStateView: BaseView {
         alignment: .center
     )
     
-    private let loginButton: BKButton = {
+    private let actionButton: BKButton = {
         let button = BKButton(style: .secondary, size: .small)
         return button
     }()
     
     private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [titleLabel, descriptionLabel, loginButton])
+        let stackView = UIStackView(arrangedSubviews: [titleLabel, descriptionLabel, actionButton])
         stackView.axis = .vertical
         stackView.alignment = .center
         stackView.spacing = 8
@@ -50,8 +50,8 @@ final class EmptyStateView: BaseView {
     }
     
     override func configure() {
-        loginButton.title = Constants.loginButtonTitle
-        loginButton.addTarget(self, action: #selector(tapLogin), for: .touchUpInside)
+        actionButton.isHidden = true
+        actionButton.addTarget(self, action: #selector(tapActionButton), for: .touchUpInside)
         
         AccessModeCenter.shared.mode
             .receive(on: DispatchQueue.main)
@@ -71,6 +71,7 @@ private extension EmptyStateView {
         static let memberTitle = "아직 등록된 책이 없어요"
         static let memberSubtitle = "도서 등록 후 나만의 아카이브를 만들어보세요"
         static let loginButtonTitle = "로그인하기"
+        static let requestButtonTitle = "문의하기"
     }
     
     func apply(mode: AppAccessMode) {
@@ -78,15 +79,15 @@ private extension EmptyStateView {
         case .guest:
             titleLabel.setText(text: Constants.guestTitle)
             descriptionLabel.setText(text: Constants.guestSubtitle)
-            loginButton.isHidden = false
+            actionButton.title = Constants.requestButtonTitle
         case .member:
             titleLabel.setText(text: Constants.memberTitle)
             descriptionLabel.setText(text: Constants.memberSubtitle)
-            loginButton.isHidden = true
+            actionButton.title = Constants.loginButtonTitle
         }
     }
     
-    @objc func tapLogin() {
-        onTapLogin?()
+    @objc func tapActionButton() {
+        onTapActionButton?()
     }
 }
