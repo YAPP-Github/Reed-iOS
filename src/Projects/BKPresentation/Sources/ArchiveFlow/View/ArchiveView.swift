@@ -73,7 +73,7 @@ final class ArchiveView: BaseView, UIGestureRecognizerDelegate {
         setupLayout()
         updateEmptyState()
         
-        emptyStateView.onTapLogin = { [weak self] in
+        emptyStateView.onTapActionButton = { [weak self] in
             self?.eventPublisher.send(.loginButtonTapped)
         }
         
