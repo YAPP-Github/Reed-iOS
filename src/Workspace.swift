@@ -6,5 +6,5 @@ let workspace = Workspace(
     projects: BKModule.allCases.map {
         .relativeToRoot("Projects/\($0.rawValue)")
     },
-    fileHeaderTemplate: "Copyright © 2025 Booket. All rights reserved"
+    fileHeaderTemplate: "Copyright © 2026 Booket. All rights reserved"
 )
