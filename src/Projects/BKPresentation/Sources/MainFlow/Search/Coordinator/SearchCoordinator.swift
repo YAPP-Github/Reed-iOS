@@ -1,5 +1,9 @@
 // Copyright © 2025 Booket. All rights reserved
 
+import BKCore
+import BKDesign
+import BKDomain
+import Combine
 import UIKit
 
 final class SearchCoordinator: Coordinator {
@@ -8,6 +12,9 @@ final class SearchCoordinator: Coordinator {
     var navigationController: UINavigationController
     
     private let searchViewType: SearchViewType
+    private var cancellables = Set<AnyCancellable>()
+    
+    @Autowired var openExternalLinkUseCase: OpenExternalLinkUseCase
     
     init(
         parentCoordinator: Coordinator?,
@@ -56,5 +63,23 @@ extension SearchCoordinator {
         )
         addChildCoordinator(bookDetailCoordinator)
         bookDetailCoordinator.start()
+    }
+    
+    func showRequestPage() {
+        let webURL = URLConstants.kakaoChatURL
+        let appScheme = URLConstants.kakaoAppScheme
+        
+        Log.debug("외부 링크 오픈 시도 - Web: \(webURL), App: \(appScheme)", logger: AppLogger.ui)
+        
+        openExternalLinkUseCase.execute(urlString: webURL, appScheme: appScheme)
+            .receive(on: DispatchQueue.main)
+            .sink { success in
+                if success {
+                    Log.debug("외부 링크 오픈 성공", logger: AppLogger.ui)
+                } else {
+                    Log.error("외부 링크 오픈 실패 (URL 스킴 확인 필요)", logger: AppLogger.ui)
+                }
+            }
+            .store(in: &cancellables)
     }
 }
