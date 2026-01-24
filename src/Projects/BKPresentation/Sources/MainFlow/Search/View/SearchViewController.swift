@@ -11,6 +11,8 @@ enum SearchViewEvent: Equatable {
     case deleteRecentQuery(String)
     case upsertBook(String)
     case goToBookDetail(isbn: String, userBookId: String)
+    case goToLogin
+    case goToRequestPage
 }
 
 final class SearchViewController: BaseViewController<SearchView>, ScreenLoggable {
@@ -67,6 +69,21 @@ final class SearchViewController: BaseViewController<SearchView>, ScreenLoggable
             .filter { $0 == .loadNextPage }
             .sink { [weak self] _ in
                 self?.viewModel.send(.loadNextPage)
+            }
+            .store(in: &cancellable)
+        
+        contentView.eventPublisher
+            .filter { $0 == .goToLogin }
+            .sink { [weak self] _ in
+                print("LOG: 게스트 모드 - 로그인 화면으로 이동")
+                self?.coordinator?.notifyAuthenticationRequired { }
+            }
+            .store(in: &cancellable)
+        
+        contentView.eventPublisher
+            .filter { $0 == .goToRequestPage }
+            .sink { [weak self] _ in
+                print("LOG: 멤버 모드 - 문의하기 페이지로 이동")
             }
             .store(in: &cancellable)
         
