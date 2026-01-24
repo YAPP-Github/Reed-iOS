@@ -8,6 +8,10 @@ import SnapKit
 final class EmptyStateView: BaseView {
     var onTapActionButton: (() -> Void)?
     
+    private var memberCustomTitle: String?
+    private var memberCustomDescription: String?
+    private var memberCustomActionTitle: String?
+    
     private var cancellables = Set<AnyCancellable>()
     private let titleLabel = BKLabel(
         text: "",
@@ -50,18 +54,28 @@ final class EmptyStateView: BaseView {
     }
     
     override func configure() {
-        actionButton.isHidden = true
         actionButton.addTarget(self, action: #selector(tapActionButton), for: .touchUpInside)
         
         AccessModeCenter.shared.mode
             .receive(on: DispatchQueue.main)
             .sink { [weak self] mode in
-                self?.apply(mode: mode)
+                self?.updateUI(for: mode)
             }
             .store(in: &cancellables)
         
-        apply(mode: AccessModeCenter.shared.mode.value)
+        updateUI(for: AccessModeCenter.shared.mode.value)
     }
+    
+    public func setContent(title: String, description: String, actionTitle: String? = nil) {
+        self.memberCustomTitle = title
+        self.memberCustomDescription = description
+        self.memberCustomActionTitle = actionTitle
+        
+        if AccessModeCenter.shared.mode.value == .member {
+            updateUI(for: .member)
+        }
+    }
+
 }
 
 private extension EmptyStateView {
@@ -71,19 +85,29 @@ private extension EmptyStateView {
         static let memberTitle = "아직 등록된 책이 없어요"
         static let memberSubtitle = "도서 등록 후 나만의 아카이브를 만들어보세요"
         static let loginButtonTitle = "로그인하기"
-        static let requestButtonTitle = "문의하기"
     }
     
-    func apply(mode: AppAccessMode) {
+    private func updateUI(for mode: AppAccessMode) {
         switch mode {
         case .guest:
             titleLabel.setText(text: Constants.guestTitle)
             descriptionLabel.setText(text: Constants.guestSubtitle)
-            actionButton.title = Constants.requestButtonTitle
-        case .member:
-            titleLabel.setText(text: Constants.memberTitle)
-            descriptionLabel.setText(text: Constants.memberSubtitle)
             actionButton.title = Constants.loginButtonTitle
+            actionButton.isHidden = false
+            
+        case .member:
+            let title = memberCustomTitle ?? Constants.memberTitle
+            let desc = memberCustomDescription ?? Constants.memberSubtitle
+            
+            titleLabel.setText(text: title)
+            descriptionLabel.setText(text: desc)
+            
+            if let actionTitle = memberCustomActionTitle {
+                actionButton.title = actionTitle
+                actionButton.isHidden = false
+            } else {
+                actionButton.isHidden = true
+            }
         }
     }
     
