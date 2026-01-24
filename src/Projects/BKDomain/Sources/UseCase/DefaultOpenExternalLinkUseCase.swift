@@ -10,7 +10,11 @@ public struct DefaultOpenExternalLinkUseCase: OpenExternalLinkUseCase {
         self.repository = repository
     }
     
-    public func execute(url: String) -> AnyPublisher<Bool, Never> {
-        repository.open(url)
+    public func execute(urlString: String, appScheme: String?) -> AnyPublisher<Bool, Never> {
+        if let appScheme = appScheme, repository.canOpen(appScheme) {
+            return repository.open(appScheme)
+        }
+        
+        return repository.open(urlString)
     }
 }
