@@ -165,5 +165,9 @@ public struct DataAssembly: Assembly {
                 pushTokenStore: pushTokenStore
             )
         }
+        
+        container.register(type: ExternalLinkRepository.self) { _ in
+            return DefaultExternalLinkRepository()
+        }
     }
 }
