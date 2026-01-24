@@ -26,6 +26,7 @@ final class SearchView: BaseView {
     
     private let divider = BKDivider(type: .medium)
     private let header = SearchSectionHeaderView()
+    private let emptyView = EmptyStateView()
     
     private lazy var collectionView: UICollectionView = {
         return setupCollectionView()
@@ -38,12 +39,22 @@ final class SearchView: BaseView {
     private var layoutMode = CollectionLayoutMode.beforeSearch
     
     override func setupView() {
-        addSubviews(searchBar, divider, header, collectionView)
+        addSubviews(searchBar, divider, header, collectionView, emptyView)
     }
     
     override func configure() {
         searchBar.setOnReturn { [weak self] text in
             self?.eventPublisher.send(.search(text))
+        }
+        
+        emptyView.onTapActionButton = { [weak self] in
+            let currentMode = AccessModeCenter.shared.mode.value
+            
+            if currentMode == .guest {
+                self?.eventPublisher.send(.goToLogin)
+            } else {
+                self?.eventPublisher.send(.goToRequestPage)
+            }
         }
     }
     
@@ -72,6 +83,12 @@ final class SearchView: BaseView {
                 .offset(LayoutConstants.headerOffset)
             $0.leading.trailing.bottom.equalToSuperview()
         }
+        
+        emptyView.snp.makeConstraints {
+            $0.top.equalTo(header.snp.bottom)
+                .offset(LayoutConstants.headerOffset)
+            $0.leading.trailing.bottom.equalToSuperview()
+        }
     }
     
     func setSearchBarPlaceholder(with placeholder: String) {
@@ -90,6 +107,9 @@ final class SearchView: BaseView {
         
         switch state {
         case .recent(let state):
+            emptyView.isHidden = true
+            collectionView.isHidden = false
+            
             if state.queries.isEmpty {
                 collectionView.backgroundView = makeEmptyLabel(state.placeholder)
             } else {
@@ -102,12 +122,15 @@ final class SearchView: BaseView {
         case .result(let state):
             let isEmpty = state.books.isEmpty && state.bookInfos.isEmpty
             if isEmpty {
-                header.layoutIfNeeded()
-                let headerHeight = header.bounds.height
-                let offset = -(headerHeight / 2.0)
-                collectionView.backgroundView = makeEmptyLabel(state.placeholder, verticalOffset: offset)
+                updateEmptyState(
+                    isHidden: false,
+                    title: "아직 등록된 책이 없어요",
+                    description: "카카오톡 채널로 문의를 남겨주세요",
+                    buttontitle: "문의하기"
+                )
                 searchBar.setClearButtonMode(.whileEditing)
             } else {
+                collectionView.isHidden = false
                 collectionView.backgroundView = nil
                 snapshot.appendSections([.result])
                 // Book과 BookInfo 모두 처리
@@ -277,7 +300,18 @@ private extension SearchView {
         return container
     }
     
-    @objc func searchButtonTapped() {
+    private func updateEmptyState(isHidden: Bool, title: String = "", description: String = "", buttontitle: String = "") {
+        emptyView.isHidden = isHidden
+        collectionView.isHidden = !isHidden
+        
+        if !isHidden {
+            emptyView.setContent(title: title, description: description, actionTitle: buttontitle)
+            bringSubviewToFront(emptyView)
+        }
+    }
+    
+    @objc
+    func searchButtonTapped() {
         guard let text = searchBar.text, !text.isEmpty else { return }
         eventPublisher.send(.search(text))
     }
