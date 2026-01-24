@@ -83,7 +83,9 @@ final class SearchViewController: BaseViewController<SearchView>, ScreenLoggable
         contentView.eventPublisher
             .filter { $0 == .goToRequestPage }
             .sink { [weak self] _ in
-                print("LOG: 멤버 모드 - 문의하기 페이지로 이동")
+                self?.viewModel.send(.requestPageTapped)
+                
+                self?.coordinator?.showRequestPage()
             }
             .store(in: &cancellable)
         

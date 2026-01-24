@@ -70,7 +70,6 @@ enum SearchViewType: String {
     }
 }
 
-
 final class SearchViewModel: BaseViewModel {
     enum SearchState: Equatable {
         case recent(RecentState)
@@ -114,6 +113,7 @@ final class SearchViewModel: BaseViewModel {
         case errorHandled
         case retryTapped
         case lastRetryTapped
+        case requestPageTapped
     }
     
     enum SideEffect {
@@ -317,6 +317,9 @@ final class SearchViewModel: BaseViewModel {
             
         case .errorHandled:
             newState.error = nil
+        
+        case .requestPageTapped:
+            Log.debug("문의하기 버튼 클릭 액션 수신", logger: AppLogger.viewModel)
         }
         
         return (newState, effects)
