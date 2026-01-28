@@ -126,7 +126,7 @@ final class SearchView: BaseView {
                     isHidden: false,
                     title: "아직 등록된 책이 없어요",
                     description: "카카오톡 채널로 문의를 남겨주세요",
-                    buttontitle: "문의하기"
+                    buttonTitle: "문의하기"
                 )
                 searchBar.setClearButtonMode(.whileEditing)
             } else {
@@ -296,16 +296,21 @@ private extension SearchView {
             $0.centerX.equalToSuperview()
             $0.centerY.equalToSuperview().offset(verticalOffset)
         }
-
+        
         return container
     }
     
-    private func updateEmptyState(isHidden: Bool, title: String = "", description: String = "", buttontitle: String = "") {
+    private func updateEmptyState(
+        isHidden: Bool,
+        title: String = "",
+        description: String = "",
+        buttonTitle: String = ""
+    ) {
         emptyView.isHidden = isHidden
         collectionView.isHidden = !isHidden
         
         if !isHidden {
-            emptyView.setContent(title: title, description: description, actionTitle: buttontitle)
+            emptyView.setContent(title: title, description: description, actionTitle: buttonTitle)
             bringSubviewToFront(emptyView)
         }
     }
