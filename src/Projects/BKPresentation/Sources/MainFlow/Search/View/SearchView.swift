@@ -130,7 +130,7 @@ final class SearchView: BaseView {
                 )
                 searchBar.setClearButtonMode(.whileEditing)
             } else {
-                collectionView.isHidden = false
+                updateEmptyState(isHidden: true)
                 collectionView.backgroundView = nil
                 snapshot.appendSections([.result])
                 // Book과 BookInfo 모두 처리
