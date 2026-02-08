@@ -38,6 +38,15 @@ final class BookDetailView: BaseView {
         stackView.spacing = LayoutConstants.buttonGroupSpacing
         stackView.distribution = .fill
         stackView.alignment = .fill
+        
+        stackView.isLayoutMarginsRelativeArrangement = true
+        stackView.layoutMargins = UIEdgeInsets(
+            top: LayoutConstants.buttonGroupHSpacing,
+            left: 0,
+            bottom: LayoutConstants.buttonGroupHSpacing,
+            right: 0
+        )
+        
         return stackView
     }()
 
@@ -142,7 +151,6 @@ final class BookDetailView: BaseView {
 
         seedReportView.snp.makeConstraints {
             $0.top.equalTo(buttonGroup.snp.bottom)
-                .offset(LayoutConstants.seedReportViewTopInset)
             $0.horizontalEdges.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
             seedReportZeroHeight = $0.height.equalTo(0).priority(.low).constraint
@@ -366,8 +374,8 @@ private extension BookDetailView {
         static let summaryViewTopInset = BKInset.inset2
         static let summaryViewHeight: CGFloat = 98
         static let buttonGroupSpacing = BKSpacing.spacing2
-        static let buttonGroupTopInset = BKInset.inset8
-        static let seedReportViewTopInset = BKInset.inset8
+        static let buttonGroupHSpacing = BKSpacing.spacing4
+        static let buttonGroupTopInset = BKSpacing.spacing1
         static let dividerVerticalOffset = BKInset.inset6
         static let collectionViewTopOffset = BKInset.inset4
         static let collectionViewCellMaxHeight: CGFloat = 180
