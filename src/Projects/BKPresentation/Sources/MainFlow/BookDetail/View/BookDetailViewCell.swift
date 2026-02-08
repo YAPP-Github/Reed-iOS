@@ -1,6 +1,7 @@
 // Copyright © 2025 Booket. All rights reserved
 
 import BKDesign
+import BKCore
 import SnapKit
 import UIKit
 
@@ -20,9 +21,8 @@ final class BookDetailViewCell: UICollectionViewCell {
         return stackView
     }()
     
-    private let emotionIcon = UIImageView()
-    private let emotionLabel = BKLabel2(
-        fontStyle: .body1(weight: .semiBold),
+    private let pageLabel = BKLabel2(
+        fontStyle: .italic,
         color: .bkContentColor(.brand)
     )
     
@@ -31,8 +31,8 @@ final class BookDetailViewCell: UICollectionViewCell {
         color: .bkContentColor(.tertiary)
     )
     
-    private let pageLabel = BKLabel2(
-        fontStyle: .italic,
+    private let emotionTagLabel = BKLabel2(
+        fontStyle: .label1(weight: .medium),
         color: .bkContentColor(.tertiary)
     )
     
@@ -56,14 +56,6 @@ final class BookDetailViewCell: UICollectionViewCell {
         return stackView
     }()
     
-    private let emotionStack: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = LayoutConstants.emotionStackSpacing
-        stackView.alignment = .center
-        return stackView
-    }()
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -78,10 +70,9 @@ final class BookDetailViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         noteLabel.setText(text: "")
-        emotionIcon.image = nil
-        emotionLabel.setText(text: "")
-        creationLabel.setText(text: "")
         pageLabel.setText(text: "")
+        creationLabel.setText(text: "")
+        emotionTagLabel.setText(text: "")
     }
     
     func configure(
@@ -91,11 +82,9 @@ final class BookDetailViewCell: UICollectionViewCell {
         
         let displayedNote = "\"\(item.note)\""
         noteLabel.setText(text: displayedNote)
-        emotionIcon.image = emotion.circleImage
-        emotionIcon.contentMode = .scaleAspectFit
-        emotionLabel.setText(text: "#\(emotion.rawValue)")
+        pageLabel.setText(text: item.page.toPageString)
         creationLabel.setText(text: item.createdAt.toKoreanDotDateString())
-        pageLabel.setText(text: "\(item.page)p")
+        emotionTagLabel.setText(text: "#\(emotion.rawValue)")
     }
     
     func applyMoreButtonGesture(
@@ -113,9 +102,8 @@ final class BookDetailViewCell: UICollectionViewCell {
 private extension BookDetailViewCell {
     func setupViews() {
         contentView.addSubviews(upperStack, noteLabel, lowerStack)
-        [emotionStack, moreButton].forEach(upperStack.addArrangedSubview)
-        [creationLabel, pageLabel].forEach(lowerStack.addArrangedSubview)
-        [emotionIcon, emotionLabel].forEach(emotionStack.addArrangedSubview)
+        [pageLabel, moreButton].forEach(upperStack.addArrangedSubview)
+        [emotionTagLabel, creationLabel].forEach(lowerStack.addArrangedSubview)
     }
     
     func configure() {
@@ -151,16 +139,13 @@ private extension BookDetailViewCell {
                 .offset(LayoutConstants.lowerLabelTopInset)
             $0.horizontalEdges.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
+            $0.height.equalTo(LayoutConstants.lowerLabelHeight)
             $0.bottom.equalToSuperview()
                 .inset(LayoutConstants.bottomInset)
         }
         
         moreButton.snp.makeConstraints {
             $0.size.equalTo(LayoutConstants.moreButtonSize)
-        }
-        
-        emotionIcon.snp.makeConstraints {
-            $0.size.equalTo(LayoutConstants.emotionImageSize)
         }
     }
     
@@ -171,17 +156,14 @@ private extension BookDetailViewCell {
 
 private extension BookDetailViewCell {
     enum LayoutConstants {
-        static let emotionStackSpacing = BKSpacing.spacing2
-        static let noteLabelTopInset = BKInset.inset3
-        static let lowerLabelTopInset = BKInset.inset2
+        static let noteLabelTopInset = BKInset.inset4
+        static let lowerLabelTopInset = BKInset.inset3
         static let horizontalInset = BKInset.inset5
-        static let contentSpacing = BKSpacing.spacing4
         static let topInset = BKInset.inset5
         static let bottomInset = BKInset.inset4
         static let cornerRadius = BKRadius.medium
-        static let emotionImageSize: CGSize = CGSize(width: 32, height: 32)
+        static let lowerLabelHeight = 22
         static let moreButtonSize: CGSize = CGSize(width: 20, height: 20)
-        static let imageCornerRadius: CGFloat = 20
     }
     
     enum Constants {
