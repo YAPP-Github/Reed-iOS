@@ -9,7 +9,7 @@ final class BookDetailViewHeader: BaseView {
     
     private let titleLabel = BKLabel(
         fontStyle: .headline2(weight: .semiBold),
-        highlightColor: .bkContentColor(.brand)
+        highlightColor: .bkContentColor(.tertiary)
     )
     
     private let sortButtonStack: UIStackView = {
