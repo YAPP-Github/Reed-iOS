@@ -14,7 +14,7 @@ struct BookDetailItem: Hashable {
     /// 감정
     let emotion: EmotionSeed?
     let createdAt: Date
-    let page: Int
+    let page: Int?
     let bookTitle: String
     
     static func from(recordInfo: RecordInfo) -> Self {
