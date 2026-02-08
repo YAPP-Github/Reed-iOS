@@ -129,22 +129,24 @@ public enum BKSemanticColor {
         case joy
         case insight
         case sadness
+        case etc
 
         public func resolve(for mode: BKColorMode) -> UIColor {
             switch mode {
             case .light:
                 switch self {
-                case .warmth: return UIColor(hex: "#E3931B")
-                case .joy: return UIColor(hex: "#EE6B33")
-                case .insight: return UIColor(hex: "#9A55E4")
-                case .sadness: return UIColor(hex: "#2872E9")
+                case .warmth: return BKAtomicColor.Yellow.y700.color
+                case .joy: return BKAtomicColor.Orange.o400.color
+                case .insight: return BKAtomicColor.Violet.v500.color
+                case .sadness: return BKAtomicColor.Blue.b500.color
+                case .etc: return .bkContentColor(.secondary)
                 }
             // case .dark:
                 // switch self { /* dark mode colors */ }
             }
         }
     }
-
+    
     public enum EmotionBase {
         case warmth
         case joy
@@ -159,6 +161,29 @@ public enum BKSemanticColor {
                 case .joy: return UIColor(hex: "#FFEBE3")
                 case .insight: return UIColor(hex: "#F3E8FF")
                 case .sadness: return UIColor(hex: "#E1ECFF")
+                }
+            // case .dark:
+                // switch self { /* dark mode colors */ }
+            }
+        }
+    }
+    
+    public enum EmotionGraphTint {
+        case warmth
+        case joy
+        case insight
+        case sadness
+        case etc
+
+        public func resolve(for mode: BKColorMode) -> UIColor {
+            switch mode {
+            case .light:
+                switch self {
+                case .warmth: return BKAtomicColor.Yellow.y300.color
+                case .joy: return BKAtomicColor.Orange.o300.color
+                case .insight: return BKAtomicColor.Violet.v300.color
+                case .sadness: return BKAtomicColor.Blue.b300.color
+                case .etc: return BKAtomicColor.Neutral.n300.color
                 }
             // case .dark:
                 // switch self { /* dark mode colors */ }
