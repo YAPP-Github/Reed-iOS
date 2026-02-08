@@ -47,6 +47,15 @@ enum EmotionSeed: String, CaseIterable {
         }
     }
     
+    var graphTintColor: UIColor {
+        switch self {
+        case .warmth: return .bkEmotionGraphTintColor(.warmth)
+        case .joy: return .bkEmotionGraphTintColor(.joy)
+        case .insight: return .bkEmotionGraphTintColor(.insight)
+        case .sad: return .bkEmotionGraphTintColor(.sadness)
+        }
+    }
+    
     static func from(emotion: Emotion) -> Self {
         switch emotion {
         case .joy: return .joy

@@ -89,16 +89,50 @@ public enum BKAtomicColor {
     
     // Blue Palette
     public enum Blue: String {
-        case b50 = "#e3f4ff"
-        case b100 = "#bbe2ff"
-        case b200 = "#8dd0ff"
-        case b300 = "#56bdff"
-        case b400 = "#1dadff"
-        case b500 = "#009eff"
-        case b600 = "#008fff"
-        case b700 = "#007bff"
-        case b800 = "#1269ec"
-        case b900 = "#1f47cd"
+        case b50 = "#EBF3FF"
+        case b100 = "#C0D8FF"
+        case b200 = "#94BDFF"
+        case b300 = "#68A3FF"
+        case b400 = "#3C88FF"
+        case b500 = "#2A74E9"
+        case b600 = "#195CC7"
+        case b700 = "#0B47A5"
+        case b800 = "#013383"
+        case b900 = "#002661"
+        
+        public var color: UIColor {
+            return UIColor(hex: self.rawValue)
+        }
+    }
+    
+    public enum Orange: String {
+        case o50 = "#FFF1EB"
+        case o100 = "#FFD2BE"
+        case o200 = "#FFB392"
+        case o300 = "#FF9365"
+        case o400 = "#EF6D35"
+        case o500 = "#CD5622"
+        case o600 = "#AB4114"
+        case o700 = "#892F08"
+        case o800 = "#672001"
+        case o900 = "#451500"
+        
+        public var color: UIColor {
+            return UIColor(hex: self.rawValue)
+        }
+    }
+    
+    public enum Violet: String {
+        case v50 = "#F7F0FF"
+        case v100 = "#E6CEFF"
+        case v200 = "#D4ADFF"
+        case v300 = "#C38CFF"
+        case v400 = "#B26AFF"
+        case v500 = "#9A55E4"
+        case v600 = "#7F40C2"
+        case v700 = "#652EA0"
+        case v800 = "#4C1E7E"
+        case v900 = "#36125C"
         
         public var color: UIColor {
             return UIColor(hex: self.rawValue)

@@ -127,6 +127,19 @@ public extension UIColor {
         }
     }
     
+    static func bkEmotionGraphTintColor(
+        _ semanticColor: BKSemanticColor.EmotionGraphTint
+    ) -> UIColor {
+        return UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark:
+                return semanticColor.resolve(for: .light)
+            default:
+                return semanticColor.resolve(for: .light)
+            }
+        }
+    }
+    
     static func bkShadowColor(
         _ semanticColor: BKSemanticColor.Shadow
     ) -> UIColor {
