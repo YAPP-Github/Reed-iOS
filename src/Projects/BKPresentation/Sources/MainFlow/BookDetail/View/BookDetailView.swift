@@ -376,7 +376,7 @@ private extension BookDetailView {
         static let buttonGroupSpacing = BKSpacing.spacing2
         static let buttonGroupHSpacing = BKSpacing.spacing4
         static let buttonGroupTopInset = BKSpacing.spacing1
-        static let dividerVerticalOffset = BKInset.inset6
+        static let dividerVerticalOffset = BKInset.inset8
         static let collectionViewTopOffset = BKInset.inset4
         static let collectionViewCellMaxHeight: CGFloat = 180
         static let collectionViewCellSpacing = BKSpacing.spacing3
