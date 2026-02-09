@@ -16,7 +16,7 @@ enum APIConfig {
     
     static let baseV2URL: String = {
         guard let value = bundle.object(forInfoDictionaryKey: "BASE_API_V2_URL") as? String else {
-            fatalError("Can't load environment: BKData.BASE_API_URL")
+            fatalError("Can't load environment: BKData.BASE_API_V2_URL")
         }
         return value
     }()
