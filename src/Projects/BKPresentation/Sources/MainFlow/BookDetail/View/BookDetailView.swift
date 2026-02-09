@@ -239,7 +239,8 @@ final class BookDetailView: BaseView {
     }
     
     func applySeedReport(with seeds: [Seed]) {
-        seedReportView.applyReport(with: seeds)
+        seedReportView.setEmotionHeader(with: Emotion.joy)
+        seedReportView.applyGraph(with: seeds)
     }
     
     func applySort(option: SortOption) {
