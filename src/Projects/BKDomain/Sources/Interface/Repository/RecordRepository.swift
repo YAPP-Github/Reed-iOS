@@ -13,7 +13,7 @@ public protocol RecordRepository {
         bookId: String,
         sortType: LibrarySortType,
         page: Int
-    ) -> AnyPublisher<(infos: [RecordInfo], hasMore: Bool, totalCount: Int), DomainError>
+    ) -> AnyPublisher<RecordFetchResult, DomainError>
     
     func findBy(
         id recordId: String
