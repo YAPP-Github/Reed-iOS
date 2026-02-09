@@ -144,9 +144,6 @@ final class SeedReportView: BaseView {
         labelsStackView.arrangedSubviews.forEach {
             $0.removeFromSuperview()
         }
-        print(seeds)
-        let seedDictionary = Dictionary(uniqueKeysWithValues: seeds.map { ($0.name, $0) })
-        print(seedDictionary)
         
         EmotionSeed.allCases.forEach { emotionCase in
             seeds.forEach { seed in
