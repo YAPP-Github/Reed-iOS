@@ -14,7 +14,12 @@ enum RecordAPI {
 
 extension RecordAPI: RequestTarget {
     var baseURL: String {
-        return "\(APIConfig.baseURL)/reading-records"
+        switch self {
+        case .fetch, .seed:
+            return "\(APIConfig.baseV2URL)/reading-records"
+        default:
+            return "\(APIConfig.baseURL)/reading-records"
+        }
     }
 
     var path: String {
