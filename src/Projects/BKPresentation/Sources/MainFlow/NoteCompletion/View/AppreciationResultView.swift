@@ -30,6 +30,8 @@ enum EmotionIcon: String {
             return .sadness
         case .insight:
             return .insight
+        default:
+            return .warmth
         }
     }
 }

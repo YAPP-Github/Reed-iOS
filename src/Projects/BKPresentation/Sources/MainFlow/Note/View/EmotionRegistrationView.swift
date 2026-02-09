@@ -23,6 +23,8 @@ extension Emotion {
             imageView.image = BKImage.Graphics.sadEmotion
         case .insight:
             imageView.image = BKImage.Graphics.insightEmotion
+        default:
+            imageView.image = BKImage.Graphics.warmEmotion
         }
         
         imageView.layer.cornerRadius = 12
@@ -154,6 +156,8 @@ private extension EmotionRegistrationView {
             imageView.image = BKImage.Graphics.sadEmotion
         case .insight:
             imageView.image = BKImage.Graphics.insightEmotion
+        default:
+            imageView.image = BKImage.Graphics.warmEmotion
         }
 
         imageView.layer.cornerRadius = 12
