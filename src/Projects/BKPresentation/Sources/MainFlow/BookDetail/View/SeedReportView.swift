@@ -6,189 +6,189 @@ import SnapKit
 import UIKit
 
 final class SeedReportView: BaseView {
-    private let titleLabel = BKLabel(
-        text: "내가 모은 씨앗",
-        fontStyle: .body2(weight: .medium),
-        color: .bkContentColor(.secondary)
-    )
+    // MARK: - Properties
+    private var isExpanded = false
     
-    private var emotionReport: UIStackView = {
+    // MARK: - UI Components
+    private let containerStackView: UIStackView = {
         let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.distribution = .equalSpacing
+        stackView.axis = .vertical
+        stackView.spacing = 16
         stackView.alignment = .fill
         return stackView
     }()
     
+    private let headerView = UIView()
+    private let emotionImageView = UIImageView()
+    
     private let reportLabel = BKLabel2(
-        fontStyle: .label2(weight: .regular),
+        fontStyle: .label1(weight: .medium),
         color: .bkContentColor(.secondary),
         highlightColor: .bkContentColor(.brand),
-        highlightFont: BKTextStyle.label2(weight: .semiBold).uiFont
+        highlightFont: BKTextStyle.label1(weight: .semiBold).uiFont
     )
     
-    private let reportContainer = UIView()
+    private let foldButton: UIImageView = {
+        let imageView = UIImageView(
+            image: BKImage.Icon.chevronDown
+                .withRenderingMode(.alwaysTemplate)
+        )
+        imageView.tintColor = .bkContentColor(.tertiary)
+        imageView.isUserInteractionEnabled = true
+        return imageView
+    }()
+    
+    private let divider = BKDivider(type: .small)
+    
+    private let expandedView: UIView = {
+        let view = UIView()
+        view.isHidden = true
+        view.alpha = 0
+        return view
+    }()
+    
+    private let graphView = SeedGraphView()
+    
+    private let labelsStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.distribution = .fillEqually
+        stackView.alignment = .fill
+        stackView.spacing = 4
+        return stackView
+    }()
     
     override func setupView() {
-        addSubviews(titleLabel, emotionReport, reportContainer)
-        reportContainer.addSubview(reportLabel)
+        addSubview(containerStackView)
+        
+        headerView.addSubviews(emotionImageView, reportLabel, foldButton)
+        [headerView, expandedView].forEach(containerStackView.addArrangedSubview)
+        expandedView.addSubviews(divider, graphView, labelsStackView)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleExpansion))
+        foldButton.addGestureRecognizer(tapGesture)
     }
     
     override func configure() {
         layer.cornerRadius = LayoutConstants.cornerRadius
         clipsToBounds = true
         backgroundColor = .bkBaseColor(.secondary)
-        reportContainer.backgroundColor = .bkBaseColor(.primary)
-        reportContainer.layer.borderWidth = LayoutConstants.reportContainerBorderWidth
-        reportContainer.layer.cornerRadius = LayoutConstants.reportContainerCornerRadius
-        reportContainer.layer.borderColor = UIColor.bkBorderColor(.primary).cgColor
-        reportContainer.clipsToBounds = true
+        
+        emotionImageView.image = BKImage.Graphics.warmCircle
+        reportLabel.setText(text: "테스트용 텍스트입니다.")
     }
     
     override func setupLayout() {
-        titleLabel.snp.makeConstraints {
-            $0.top.trailing.leading.equalToSuperview()
-                .inset(LayoutConstants.contentInset)
+        containerStackView.snp.makeConstraints {
+            $0.edges.equalToSuperview().inset(LayoutConstants.contentInset)
         }
         
-        emotionReport.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom)
-                .offset(LayoutConstants.contentSpacing)
-            $0.height.equalTo(LayoutConstants.emotionReportHeight)
-            $0.leading.trailing.equalToSuperview()
-                .inset(LayoutConstants.contentInset * 2)
+        headerView.snp.makeConstraints {
+            $0.height.equalTo(LayoutConstants.emotionStackHeight)
         }
         
-        reportContainer.snp.makeConstraints {
-            $0.top.equalTo(emotionReport.snp.bottom)
-                .offset(LayoutConstants.contentSpacing)
-            $0.leading.trailing.bottom.equalToSuperview()
-                .inset(LayoutConstants.contentInset)
-            $0.height.equalTo(42)
+        emotionImageView.snp.makeConstraints {
+            $0.leading.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.size.equalTo(
+                CGSize(
+                    width: LayoutConstants.emotionStackHeight,
+                    height: LayoutConstants.emotionStackHeight
+                )
+            )
         }
         
         reportLabel.snp.makeConstraints {
-            $0.center.equalToSuperview()
+            $0.leading
+                .equalTo(emotionImageView.snp.trailing)
+                .offset(LayoutConstants.labelLeadingInset)
+            $0.centerY.equalToSuperview()
+        }
+        
+        foldButton.snp.makeConstraints {
+            $0.trailing.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.size.equalTo(LayoutConstants.iconSize)
+        }
+        
+        divider.snp.makeConstraints {
+            $0.top.horizontalEdges.equalToSuperview()
+        }
+        
+        graphView.snp.makeConstraints {
+            $0.top.equalTo(divider.snp.bottom).offset(LayoutConstants.graphTopOffset)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(LayoutConstants.graphHeight)
+        }
+        
+        labelsStackView.snp.makeConstraints {
+            $0.top.equalTo(graphView.snp.bottom).offset(LayoutConstants.labelsTopOffset)
+            $0.height.equalTo(72)
+            $0.horizontalEdges.equalToSuperview()
+            $0.bottom.equalToSuperview()
         }
     }
     
-    func applyReport(with seeds: [Seed]) {
-        var counts: [EmotionSeed: Int] = [:]
-        for s in seeds {
-            if let key = EmotionSeed.from(seed: s) {
-                counts[key, default: 0] += s.count
+    func setEmotionHeader(with emotion: Emotion) {
+        let emotion = EmotionSeed.from(emotion: emotion)
+        let emotionText = "\'\(emotion.rawValue)\'"
+        emotionImageView.image = emotion.circleImage
+        reportLabel.highlightColor = emotion.color
+        reportLabel.setText(text: "\(emotionText) 감정을 많이 느꼈어요")
+        reportLabel.highlightedWord = emotionText
+    }
+    
+    func applyGraph(with seeds: [Seed]) {
+        graphView.applyGraph(with: seeds)
+        
+        labelsStackView.arrangedSubviews.forEach {
+            $0.removeFromSuperview()
+        }
+        print(seeds)
+        let seedDictionary = Dictionary(uniqueKeysWithValues: seeds.map { ($0.name, $0) })
+        print(seedDictionary)
+        
+        EmotionSeed.allCases.forEach { emotionCase in
+            seeds.forEach { seed in
+                if seed.name == emotionCase.rawValue && seed.count >= 1 {
+                    let itemView = SeedItemView()
+                    itemView.configure(with: seed)
+                    labelsStackView.addArrangedSubview(itemView)
+                }
             }
         }
-        applyReportCore(counts: counts)
+        
+        self.setNeedsLayout()
+        self.layoutIfNeeded()
     }
 }
 
 private extension SeedReportView {
-    func applyReportCore(counts: [EmotionSeed: Int]) {
-        emotionReport.arrangedSubviews.forEach {
-            emotionReport.removeArrangedSubview($0)
-            $0.removeFromSuperview()
-        }
-
-        for seed in EmotionSeed.allCases {
-            let count = counts[seed] ?? 0
-            emotionReport.addArrangedSubview(makeInnerView(with: seed, count: count))
-        }
-
-        let (summary, highlightedWord) = generateEmotionSummary(from: counts)
-        reportLabel.setText(text: summary)
-        reportLabel.highlightedWord = highlightedWord
-    }
-    
-    func generateEmotionSummary(
-        from counts: [EmotionSeed: Int]
-    ) -> (String, String) {
-        let sorted = EmotionSeed.allCases
-            .map { ($0, counts[$0] ?? 0) }
-            .sorted { $0.1 > $1.1 }
+    @objc private func toggleExpansion() {
+        isExpanded.toggle()
         
-        guard let maxCount = sorted.first?.1, maxCount > 0 else {
-            return ("감정 데이터가 부족해요.", "")
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut]) {
+            self.expandedView.isHidden = !self.isExpanded
+            self.expandedView.alpha = self.isExpanded ? 1 : 0
+            
+            let angle: CGFloat = self.isExpanded ? .pi : 0
+            self.foldButton.transform = CGAffineTransform(rotationAngle: angle)
+            
+            self.layoutIfNeeded()
         }
-        
-        let top = sorted.filter { $0.1 == maxCount }.map { $0.0 }
-        if top.count >= 3 {
-            return ("이 책에서 여러 감정이 고르게 담겼어요", "여러 감정이 고르게 담겼어요")
-        } else {
-            let names = top.map { $0.rawValue }.joined(separator: ", ")
-            return ("이 책에서 \(names) 감정을 많이 느꼈어요", names)
-        }
-    }
-    
-    func makeInnerView(
-        with emotion: EmotionSeed,
-        count: Int
-    ) -> UIView {
-        let containerView = UIView()
-        let imageView = UIImageView(image: emotion.image)
-        let labelContainer = UIView()
-        let emotionLabel = BKLabel(
-            text: emotion.rawValue,
-            fontStyle: .label2(weight: .semiBold),
-            color: emotion.color
-        )
-        labelContainer.backgroundColor = emotion.baseColor
-        labelContainer.layer.cornerRadius = LayoutConstants.labelContainerCornerRadius
-        labelContainer.clipsToBounds = true
-        let countLabel = BKLabel(
-            text: "\(count)",
-            fontStyle: .label2(weight: .regular),
-            color: .bkContentColor(.secondary)
-        )
-        
-        containerView.addSubviews(imageView, labelContainer, countLabel)
-        labelContainer.addSubview(emotionLabel)
-        
-        imageView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
-            $0.size.equalTo(LayoutConstants.imageSize)
-        }
-        
-        labelContainer.snp.makeConstraints {
-            $0.top.equalTo(imageView.snp.bottom)
-                .offset(LayoutConstants.labelContainerOffset)
-            $0.height.equalTo(LayoutConstants.labelContainerHeight)
-            $0.centerX.equalToSuperview()
-        }
-        
-        emotionLabel.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview()
-                .inset(LayoutConstants.emotionLabelHorizontalInset)
-            $0.verticalEdges.equalToSuperview()
-                .inset(LayoutConstants.emotionLabelVerticalInset)
-        }
-        
-        countLabel.snp.makeConstraints {
-            $0.top.equalTo(labelContainer.snp.bottom)
-                .offset(LayoutConstants.countLabelOffset)
-            $0.centerX.equalToSuperview()
-            $0.bottom.equalToSuperview()
-        }
-        
-        return containerView
     }
 }
 
 private extension SeedReportView {
     enum LayoutConstants {
         static let contentInset = BKInset.inset4
-        static let contentSpacing = BKSpacing.spacing5
         static let cornerRadius = BKRadius.medium
-        static let reportLabelVerticalInset = BKInset.inset3
-        static let reportContainerBorderWidth = BKBorder.border1
-        static let reportContainerCornerRadius = BKRadius.small
-        static let labelContainerHeight: CGFloat = 24
-        static let labelContainerCornerRadius: CGFloat = labelContainerHeight / 2
-        static let imageSize: CGSize = CGSize(width: 50, height: 50)
-        static let labelContainerOffset = BKInset.inset2
-        static let countLabelOffset = BKInset.inset1
-        static let emotionLabelHorizontalInset = BKInset.inset2
-        static let emotionLabelVerticalInset = BKInset.inset1
-        static let emotionReportHeight: CGFloat = 106
+        static let emotionStackHeight = 36
+        static let labelLeadingInset = BKSpacing.spacing2
+        static let iconSize: CGSize = CGSize(width: 24, height: 24)
+        
+        static let graphHeight: CGFloat = 12
+        static let graphTopOffset: CGFloat = BKSpacing.spacing5
+        static let labelsTopOffset: CGFloat = BKSpacing.spacing4
     }
 }
