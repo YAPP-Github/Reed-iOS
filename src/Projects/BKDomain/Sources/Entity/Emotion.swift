@@ -5,4 +5,5 @@ public enum Emotion: String, CaseIterable, Decodable {
     case joy = "즐거움"
     case sad = "슬픔"
     case insight = "깨달음"
+    case etc = "기타"
 }

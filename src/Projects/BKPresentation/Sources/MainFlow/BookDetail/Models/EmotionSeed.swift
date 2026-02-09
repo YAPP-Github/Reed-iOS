@@ -10,6 +10,7 @@ enum EmotionSeed: String, CaseIterable {
     case joy = "즐거움"
     case sad = "슬픔"
     case insight = "깨달음"
+    case etc = "기타"
     
     var image: UIImage {
         switch self {
@@ -17,6 +18,7 @@ enum EmotionSeed: String, CaseIterable {
         case .joy: return BKImage.Graphics.joy
         case .insight: return BKImage.Graphics.insight
         case .sad: return BKImage.Graphics.sad
+        case .etc: return BKImage.Graphics.sad
         }
     }
     
@@ -26,6 +28,7 @@ enum EmotionSeed: String, CaseIterable {
         case .joy: return BKImage.Graphics.joyCircle
         case .sad: return BKImage.Graphics.sadCircle
         case .insight: return BKImage.Graphics.insightCircle
+        case .etc: return BKImage.Graphics.insightCircle
         }
     }
     
@@ -35,6 +38,7 @@ enum EmotionSeed: String, CaseIterable {
         case .joy: return .bkEmotionColor(.joy)
         case .insight: return .bkEmotionColor(.insight)
         case .sad: return .bkEmotionColor(.sadness)
+        case .etc: return .bkEmotionColor(.etc)
         }
     }
     
@@ -44,6 +48,7 @@ enum EmotionSeed: String, CaseIterable {
         case .joy: return .bkEmotionBaseColor(.joy)
         case .insight: return .bkEmotionBaseColor(.insight)
         case .sad: return .bkEmotionBaseColor(.sadness)
+        case .etc: return .bkEmotionColor(.etc)
         }
     }
     
@@ -53,6 +58,7 @@ enum EmotionSeed: String, CaseIterable {
         case .joy: return .bkEmotionGraphTintColor(.joy)
         case .insight: return .bkEmotionGraphTintColor(.insight)
         case .sad: return .bkEmotionGraphTintColor(.sadness)
+        case .etc: return .bkEmotionGraphTintColor(.etc)
         }
     }
     
@@ -62,6 +68,7 @@ enum EmotionSeed: String, CaseIterable {
         case .sad: return .sad
         case .insight: return .insight
         case .warmth: return .warmth
+        case .etc: return .etc
         }
     }
     
@@ -71,6 +78,7 @@ enum EmotionSeed: String, CaseIterable {
         case "joy", "즐거움":   return .joy
         case "sad", "슬픔":     return .sad
         case "insight", "깨달음": return .insight
+        case "etc", "기타": return .etc
         default: return nil
         }
     }
@@ -86,6 +94,7 @@ enum EmotionSeed: String, CaseIterable {
         case .joy: return BKImage.Graphics.joyCard
         case .insight: return BKImage.Graphics.insightCard
         case .sad: return BKImage.Graphics.sadCard
+        case .etc: return BKImage.Graphics.sadCard
         }
     }
     
@@ -96,6 +105,7 @@ enum EmotionSeed: String, CaseIterable {
         case .joy: return UIColor(hex: "FFF7F5")
         case .insight: return UIColor(hex: "FBF8FF")
         case .sad: return UIColor(hex: "F4F8FF")
+        case .etc: return UIColor(hex: "F4F8FF")
         }
     }
 }
