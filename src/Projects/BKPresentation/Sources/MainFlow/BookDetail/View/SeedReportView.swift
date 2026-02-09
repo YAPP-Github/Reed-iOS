@@ -134,7 +134,7 @@ final class SeedReportView: BaseView {
         let emotionText = "\'\(emotion.rawValue)\'"
         emotionImageView.image = emotion.circleImage
         reportLabel.highlightColor = emotion.color
-        reportLabel.setText(text: "\(emotionText) 감정을 많이 느꼈어요")
+        reportLabel.setText(text: "\(emotionText) \(emotion.descriptionText)")
         reportLabel.highlightedWord = emotionText
     }
     

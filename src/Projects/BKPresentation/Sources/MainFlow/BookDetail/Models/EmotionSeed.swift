@@ -108,4 +108,13 @@ enum EmotionSeed: String, CaseIterable {
         case .etc: return UIColor(hex: "F4F8FF")
         }
     }
+    
+    var descriptionText: String {
+        switch self {
+        case .etc:
+            return "감정으로 문장만 기록했어요"
+        default:
+            return "감정을 많이 느꼈어요"
+        }
+    }
 }
