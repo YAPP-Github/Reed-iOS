@@ -238,8 +238,11 @@ final class BookDetailView: BaseView {
         }
     }
     
+    func applySeedHeader(with mainEmotion: Emotion) {
+        seedReportView.setEmotionHeader(with: mainEmotion)
+    }
+    
     func applySeedReport(with seeds: [Seed]) {
-        seedReportView.setEmotionHeader(with: Emotion.joy)
         seedReportView.applyGraph(with: seeds)
     }
     
