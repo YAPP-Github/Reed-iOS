@@ -3,7 +3,8 @@
 import BKDomain
 
 struct FetchRecordResponseDTO: Decodable {
-    let readingRecords: [DetailRecordResponseDTO]
+    let readingRecords: [DetailRecordV2ResponseDTO]
     let lastPage: Bool
     let totalResults: Int
+    let representativeEmotion: PrimaryEmotionResponseDTO?
 }
