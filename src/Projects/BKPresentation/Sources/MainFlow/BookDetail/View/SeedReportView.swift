@@ -73,9 +73,6 @@ final class SeedReportView: BaseView {
         layer.cornerRadius = LayoutConstants.cornerRadius
         clipsToBounds = true
         backgroundColor = .bkBaseColor(.secondary)
-        
-        emotionImageView.image = BKImage.Graphics.warmCircle
-        reportLabel.setText(text: "테스트용 텍스트입니다.")
     }
     
     override func setupLayout() {
