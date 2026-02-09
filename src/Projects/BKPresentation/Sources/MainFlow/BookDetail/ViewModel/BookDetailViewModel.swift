@@ -10,6 +10,7 @@ final class BookDetailViewModel: BaseViewModel {
         var items: [BookDetailItem] = []
         var currentBook: Book?
         var sortOption: SortOption = .pageDescending
+        var mainEmotion: Emotion?
         var seeds = [Seed]()
         var isAddNoteTriggered = false
         var isStatusButtonTriggered = false
@@ -40,7 +41,12 @@ final class BookDetailViewModel: BaseViewModel {
         case cellTapHandled
         case upsert(isbn: String, status: BookRegistrationStatus)
         case upsertSuccessed(Book)
-        case fetchRecordsSuccessed(items: [BookDetailItem], hasMore: Bool, totalResult: Int)
+        case fetchRecordsSuccessed(
+            items: [BookDetailItem],
+            hasMore: Bool,
+            totalResult: Int,
+            mainEmotion: Emotion?
+        )
         case fetchSeedStatsSuccessed([Seed])
         case fetchBookDetailSuccessed(Book)
         case errorOccured(DomainError)
@@ -134,11 +140,12 @@ final class BookDetailViewModel: BaseViewModel {
         case .fetchBookDetailSuccessed(let book):
             newState.currentBook = book
             
-        case .fetchRecordsSuccessed(let items, let hasMore, let totalResults):
+        case .fetchRecordsSuccessed(let items, let hasMore, let totalResults, let mainEmotion):
             newState.items = items
             newState.nextPage = 1
             newState.hasMore = hasMore
             newState.totalResults = totalResults
+            newState.mainEmotion = mainEmotion
             
         case .fetchSeedStatsSuccessed(let seeds):
             newState.seeds = seeds
@@ -246,7 +253,8 @@ final class BookDetailViewModel: BaseViewModel {
                     return page == 0 ? Action.fetchRecordsSuccessed(
                         items: items,
                         hasMore: $0.hasMore,
-                        totalResult: $0.totalCount
+                        totalResult: $0.totalCount,
+                        mainEmotion: $0.mainEmotion
                     ) : Action.appendRecordsSuccessed(
                         items: items,
                         hasMore: $0.hasMore

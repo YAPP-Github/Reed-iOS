@@ -215,6 +215,15 @@ final class BookDetailViewController: BaseViewController<BookDetailView>, Screen
             .store(in: &cancellable)
         
         viewModel.statePublisher
+            .receive(on: DispatchQueue.main)
+            .compactMap { $0.mainEmotion }
+            .removeDuplicates()
+            .sink { [weak self] in
+                self?.contentView.applySeedHeader(with: $0)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.statePublisher
             .map { $0.deleteCompleted }
             .removeDuplicates()
             .filter { $0 }
