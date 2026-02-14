@@ -31,26 +31,4 @@ public enum PrimaryEmotion: String, CaseIterable, Codable {
         case .other: return "네 가지 감정으로 표현하기 어려울 때"
         }
     }
-
-    /// Emotion으로 변환
-    public func toEmotion() -> Emotion {
-        switch self {
-        case .warmth: return .warmth
-        case .joy: return .joy
-        case .sadness: return .sad
-        case .insight: return .insight
-        case .other: return .other
-        }
-    }
-
-    /// Emotion에서 변환
-    public static func from(emotion: Emotion) -> PrimaryEmotion {
-        switch emotion {
-        case .warmth: return .warmth
-        case .joy: return .joy
-        case .sad: return .sadness
-        case .insight: return .insight
-        case .other: return .other
-        }
-    }
 }
