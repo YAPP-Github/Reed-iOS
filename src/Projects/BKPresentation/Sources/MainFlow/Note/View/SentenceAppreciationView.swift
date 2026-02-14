@@ -144,13 +144,11 @@ extension SentenceAppreciationView: RegistrationFormProvidable, FormInputNotifia
     }
 
     func registrationForm() -> RegistrationForm? {
-        let trimmedSentence = appreciationTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        return .appreciation(SentenceAppreciationForm(
-            appreciation: trimmedSentence
-        ))
+        // NOTE: Step3(SentenceAppreciationView)는 Phase 4에서 제거 예정
+        // 메모 기능이 Step1으로 통합되었으므로 nil 반환
+        return nil
     }
-    
+
 }
 
 private extension SentenceAppreciationView {

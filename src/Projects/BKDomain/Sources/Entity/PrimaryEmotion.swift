@@ -42,4 +42,15 @@ public enum PrimaryEmotion: String, CaseIterable, Codable {
         case .other: return .other
         }
     }
+
+    /// Emotion에서 변환
+    public static func from(emotion: Emotion) -> PrimaryEmotion {
+        switch emotion {
+        case .warmth: return .warmth
+        case .joy: return .joy
+        case .sad: return .sadness
+        case .insight: return .insight
+        case .other: return .other
+        }
+    }
 }
