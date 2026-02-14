@@ -62,13 +62,13 @@ enum EmotionSeed: String, CaseIterable {
         }
     }
     
-    static func from(emotion: Emotion) -> Self {
+    static func from(emotion: Emotion) -> Self? {
         switch emotion {
         case .joy: return .joy
         case .sad: return .sad
         case .insight: return .insight
         case .warmth: return .warmth
-        case .etc: return .etc
+        case .other: return .etc
         }
     }
     
@@ -94,7 +94,7 @@ enum EmotionSeed: String, CaseIterable {
         case .joy: return BKImage.Graphics.joyCard
         case .insight: return BKImage.Graphics.insightCard
         case .sad: return BKImage.Graphics.sadCard
-        case .etc: return BKImage.Graphics.sadCard
+        case .etc: return BKImage.Graphics.etcCard
         }
     }
     

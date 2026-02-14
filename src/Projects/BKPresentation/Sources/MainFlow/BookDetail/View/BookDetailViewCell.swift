@@ -7,12 +7,12 @@ import UIKit
 
 final class BookDetailViewCell: UICollectionViewCell {
     static let reuseIdentifier: String = "BookDetailViewCell"
-    
+
     private let noteLabel = BKLabel(
         fontStyle: .body2(weight: .medium),
         color: .bkContentColor(.secondary)
     )
-    
+
     private let lowerStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -20,22 +20,22 @@ final class BookDetailViewCell: UICollectionViewCell {
         stackView.distribution = .equalSpacing
         return stackView
     }()
-    
+
     private let pageLabel = BKLabel2(
         fontStyle: .italic,
         color: .bkContentColor(.brand)
     )
-    
+
     private let creationLabel = BKLabel2(
         fontStyle: .label1(weight: .medium),
         color: .bkContentColor(.tertiary)
     )
-    
+
     private let emotionTagLabel = BKLabel2(
         fontStyle: .label1(weight: .medium),
         color: .bkContentColor(.tertiary)
     )
-    
+
     private let moreButton: UIImageView = {
         let imageView = UIImageView(
             image: BKImage.Icon.moreVertical
@@ -45,9 +45,9 @@ final class BookDetailViewCell: UICollectionViewCell {
         imageView.isUserInteractionEnabled = true
         return imageView
     }()
-    
+
     private var moreButtonAction: (() -> Void)?
-    
+
     private let upperStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -55,18 +55,18 @@ final class BookDetailViewCell: UICollectionViewCell {
         stackView.distribution = .equalSpacing
         return stackView
     }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
         configure()
         setupLayout()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func prepareForReuse() {
         super.prepareForReuse()
         noteLabel.setText(text: "")
@@ -74,19 +74,23 @@ final class BookDetailViewCell: UICollectionViewCell {
         creationLabel.setText(text: "")
         emotionTagLabel.setText(text: "")
     }
-    
+
     func configure(
         with item: BookDetailItem
     ) {
-        let emotion = item.emotion ?? .joy
-        
+        let emotion = item.primaryEmotion
+
         let displayedNote = "\"\(item.note)\""
         noteLabel.setText(text: displayedNote)
-        pageLabel.setText(text: item.page.toPageString)
+        emotionTagLabel.setText(text: "#\(emotion.displayName)")
         creationLabel.setText(text: item.createdAt.toKoreanDotDateString())
-        emotionTagLabel.setText(text: "#\(emotion.rawValue)")
+        if let page = item.page {
+            pageLabel.setText(text: "\(page)p")
+        } else {
+            pageLabel.setText(text: "-p")
+        }
     }
-    
+
     func applyMoreButtonGesture(
         action: @escaping () -> Void
     ) {
@@ -105,7 +109,7 @@ private extension BookDetailViewCell {
         [pageLabel, moreButton].forEach(upperStack.addArrangedSubview)
         [emotionTagLabel, creationLabel].forEach(lowerStack.addArrangedSubview)
     }
-    
+
     func configure() {
         noteLabel.numberOfLines = Constants.noteMaxNumberOfLines
         noteLabel.lineBreakMode = .byTruncatingTail
@@ -113,27 +117,27 @@ private extension BookDetailViewCell {
         layer.cornerRadius = LayoutConstants.cornerRadius
         clipsToBounds = true
     }
-    
+
     func setupLayout() {
         contentView.snp.makeConstraints {
             $0.edges.equalToSuperview()
             $0.width.equalTo(UIScreen.main.bounds.width - LayoutConstants.horizontalInset * 2)
         }
-        
+
         upperStack.snp.makeConstraints {
             $0.top.equalToSuperview()
                 .inset(LayoutConstants.topInset)
             $0.horizontalEdges.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
         }
-        
+
         noteLabel.snp.makeConstraints {
             $0.top.equalTo(upperStack.snp.bottom)
                 .offset(LayoutConstants.noteLabelTopInset)
             $0.horizontalEdges.equalToSuperview()
                 .inset(LayoutConstants.horizontalInset)
         }
-        
+
         lowerStack.snp.makeConstraints {
             $0.top.equalTo(noteLabel.snp.bottom)
                 .offset(LayoutConstants.lowerLabelTopInset)
@@ -143,12 +147,12 @@ private extension BookDetailViewCell {
             $0.bottom.equalToSuperview()
                 .inset(LayoutConstants.bottomInset)
         }
-        
+
         moreButton.snp.makeConstraints {
             $0.size.equalTo(LayoutConstants.moreButtonSize)
         }
     }
-    
+
     @objc func handleMoreButtonTapped() {
         moreButtonAction?()
     }
@@ -165,7 +169,7 @@ private extension BookDetailViewCell {
         static let lowerLabelHeight = 22
         static let moreButtonSize: CGSize = CGSize(width: 20, height: 20)
     }
-    
+
     enum Constants {
         static let noteMaxNumberOfLines: Int = 4
     }

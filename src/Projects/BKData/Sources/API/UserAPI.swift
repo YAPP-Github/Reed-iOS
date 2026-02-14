@@ -11,7 +11,7 @@ enum UserAPI {
 
 extension UserAPI: RequestTarget {
     var baseURL: String {
-        return "\(APIConfig.baseURL)/users/me"
+        return "\(APIConfig.baseURLv1)/users/me"
     }
     
     var path: String {

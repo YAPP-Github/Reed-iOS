@@ -76,11 +76,15 @@ final class CollectedSentenceView: BaseView {
     
     func apply(
         sentence: String,
-        page: Int
+        page: Int?
     ) {
         let displayedText = "\"\(sentence)\""
         collectedSentenceLabel.setText(text: displayedText)
-        pageLabel.setText(text: "\(page)p")
+        if let page = page {
+            pageLabel.setText(text: "\(page)p")
+        } else {
+            pageLabel.isHidden = true
+        }
     }
 }
 

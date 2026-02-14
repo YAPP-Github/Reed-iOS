@@ -14,12 +14,7 @@ enum RecordAPI {
 
 extension RecordAPI: RequestTarget {
     var baseURL: String {
-        switch self {
-        case .fetch, .seed:
-            return "\(APIConfig.baseV2URL)/reading-records"
-        default:
-            return "\(APIConfig.baseURL)/reading-records"
-        }
+        return "\(APIConfig.baseURLv2)/reading-records"
     }
 
     var path: String {
@@ -46,7 +41,7 @@ extension RecordAPI: RequestTarget {
         case .fetch, .detail, .seed:
             return .get
         case .patch:
-            return .patch
+            return .put  // V2 API uses PUT instead of PATCH
         case .delete:
             return .delete
         }

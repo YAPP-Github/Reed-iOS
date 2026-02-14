@@ -14,7 +14,7 @@ enum BookAPI {
 
 extension BookAPI: RequestTarget {
     var baseURL: String {
-        return "\(APIConfig.baseURL)/books"
+        return "\(APIConfig.baseURLv1)/books"
     }
     
     var path: String {

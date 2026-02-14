@@ -20,9 +20,11 @@ public final class BKChip: UIView {
         }
     }
     
+    // swiftlint:disable empty_count
     public var count: Int = 0 {
         didSet {
             countLabel.setText(text: "\(count)")
+            countLabel.isHidden = (count == 0)
         }
     }
     
@@ -50,16 +52,18 @@ public final class BKChip: UIView {
         updateAppearance()
     }
     
+    // swiftlint:disable empty_count
     private func setupViews() {
         titleLabel.setText(text: title)
         countLabel.setText(text: "\(count)")
         countLabel.setFontStyle(style: .label1(weight: .semiBold))
-        
+        countLabel.isHidden = (count == 0)
+
         backgroundColor = .bkBaseColor(.primary)
-        
+
         labelContainer.addSubviews(titleLabel, countLabel)
         addSubviews(labelContainer)
-        
+
         layer.borderWidth = 1
         layer.borderColor = UIColor.bkBorderColor(.primary).cgColor
     }
@@ -67,18 +71,21 @@ public final class BKChip: UIView {
     private func setupLayout() {
         titleLabel.snp.makeConstraints {
             $0.leading.top.bottom.equalToSuperview()
+            if count == 0 {
+                $0.trailing.equalToSuperview()
+            }
         }
-        
+
         countLabel.snp.makeConstraints {
             $0.leading.equalTo(titleLabel.snp.trailing).offset(BKSpacing.spacing1)
-            $0.trailing.top.bottom.equalToSuperview()
+            $0.trailing.equalToSuperview()
             $0.centerY.equalTo(titleLabel)
         }
-        
+
         labelContainer.snp.makeConstraints {
             $0.center.equalToSuperview()
         }
-        
+
         self.snp.makeConstraints {
             $0.width.equalTo(labelContainer.snp.width).offset(BKSpacing.spacing3 * 2)
             $0.height.equalTo(36)

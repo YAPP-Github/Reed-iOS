@@ -115,8 +115,8 @@ final class SentenceCardView: BaseView {
     public func configure(_ data: BookDetailItem) {
         sentenceLabel.setText(text: data.note)
         titleLabel.setText(text: data.bookTitle.withCornerBrackets())
-        if let emotion = data.emotion {
-            emotionBackgroundImageView.image = emotion.cardImage
+        if data.primaryEmotion != .other {
+            emotionBackgroundImageView.image = data.primaryEmotion.cardImage
         } else {
             emotionBackgroundImageView.backgroundColor = .bkBaseColor(.secondary)
         }
