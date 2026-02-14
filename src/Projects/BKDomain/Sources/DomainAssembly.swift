@@ -262,10 +262,5 @@ public struct DomainAssembly: Assembly {
             @Autowired var repository: EmotionRepository
             return DefaultFetchDetailEmotionsUseCase(repository: repository)
         }
-
-        container.register(type: OpenExternalLinkUseCase.self) { _ in
-            @Autowired var repository: ExternalLinkRepository
-            return DefaultOpenExternalLinkUseCase(repository: repository)
-        }
     }
 }
