@@ -10,8 +10,6 @@
 	<string>$(BASE_API_URL)</string>
 	<key>BASE_API_V2_URL</key>
 	<string>$(BASE_API_V2_URL)</string>
-	<key>LSApplicationCategoryType</key>
-	<string></string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>

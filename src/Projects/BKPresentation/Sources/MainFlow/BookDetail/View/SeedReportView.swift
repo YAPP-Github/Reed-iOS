@@ -142,13 +142,13 @@ final class SeedReportView: BaseView {
             $0.removeFromSuperview()
         }
         
+        let seedDict = Dictionary(seeds.map { ($0.name, $0) }, uniquingKeysWith: { first, last in last })
+        
         EmotionSeed.allCases.forEach { emotionCase in
-            seeds.forEach { seed in
-                if seed.name == emotionCase.rawValue && seed.count >= 1 {
-                    let itemView = SeedItemView()
-                    itemView.configure(with: seed)
-                    labelsStackView.addArrangedSubview(itemView)
-                }
+            if let seed = seedDict[emotionCase.rawValue], seed.count >= 1 {
+                let itemView = SeedItemView()
+                itemView.configure(with: seed)
+                labelsStackView.addArrangedSubview(itemView)
             }
         }
         
