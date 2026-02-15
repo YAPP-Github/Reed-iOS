@@ -39,7 +39,6 @@ extension DetailRecordResponseDTO {
     }
 }
 
-// api-v2
 public struct DetailRecordV2ResponseDTO: Decodable {
     public let id: String
     public let userBookId: String

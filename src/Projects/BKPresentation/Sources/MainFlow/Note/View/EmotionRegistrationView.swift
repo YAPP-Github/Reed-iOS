@@ -371,7 +371,6 @@ final class EmotionRegistrationView: BaseView {
             rowView.addGestureRecognizer(tapGesture)
             rowView.tag = emotion.hashValue
 
-            // Set up chip removal callback
             rowView.onDetailEmotionRemoved = { [weak self] detailEmotion in
                 self?.removeDetailEmotion(detailEmotion)
             }
