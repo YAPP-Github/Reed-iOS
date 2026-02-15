@@ -166,10 +166,6 @@ public struct DataAssembly: Assembly {
             )
         }
 
-        container.register(type: ExternalLinkRepository.self) { _ in
-            return DefaultExternalLinkRepository()
-        }
-
         container.register(
             type: EmotionRepository.self,
             scope: .singleton

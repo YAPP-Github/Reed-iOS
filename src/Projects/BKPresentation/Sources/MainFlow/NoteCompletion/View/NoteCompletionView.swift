@@ -44,7 +44,8 @@ final class NoteCompletionView: BaseView {
         )
         
         appreciationResultView.apply(
-            emotion: EmotionIcon.from(emotion: recordInfo.emotionTags.first ?? .joy),
+            emotion: recordInfo.primaryEmotion,
+            detailEmotions: recordInfo.detailEmotions,
             creationDate: recordInfo.createdAt,
             appreciation: recordInfo.review ?? ""
         )
