@@ -47,11 +47,14 @@ public final class DefaultRecordRepository: RecordRepository {
         .mapError { $0.toDomainError() }
         .debugError(logger: AppLogger.network)
         .map {
-            RecordFetchResult(
+            let emotion: Emotion? = $0.representativeEmotion.flatMap {
+                Emotion(rawValue: $0.displayName)
+            }
+            return RecordFetchResult(
                 infos: $0.readingRecords.map { $0.toRecordInfo() },
                 hasMore: !$0.lastPage,
                 totalCount: $0.totalResults,
-                mainEmotion: $0.representativeEmotion?.displayName
+                mainEmotion: emotion
             )
         }
         .eraseToAnyPublisher()

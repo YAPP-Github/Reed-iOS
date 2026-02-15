@@ -78,10 +78,19 @@ public enum BKImage {
         public static let joyCard = BKDesignAsset.recordcardJoy.image
         public static let sadCard = BKDesignAsset.recordcardSad.image
         public static let warmCard = BKDesignAsset.recordcardWarm.image
+        public static let etcCard = BKDesignAsset.recordcardEtc.image
         public static let warmCircle = BKDesignAsset.warmCircle.image
         public static let joyCircle = BKDesignAsset.joyCircle.image
         public static let sadCircle = BKDesignAsset.sadCircle.image
         public static let insightCircle = BKDesignAsset.insightCircle.image
+        
+        public enum Note {
+            public static let joy = BKDesignAsset.noteJoy.image
+            public static let sad = BKDesignAsset.noteSad.image
+            public static let warm = BKDesignAsset.noteWarm.image
+            public static let insight = BKDesignAsset.noteInsight.image
+            public static let `default` = BKDesignAsset.noteDefault.image
+        }
     }
     
     public enum Logos {

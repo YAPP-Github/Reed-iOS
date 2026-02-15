@@ -255,7 +255,14 @@ public struct DomainAssembly: Assembly {
                 notificationRepository: notificationRepository
             )
         }
-        
+
+        container.register(
+            type: FetchDetailEmotionsUseCase.self
+        ) { _ in
+            @Autowired var repository: EmotionRepository
+            return DefaultFetchDetailEmotionsUseCase(repository: repository)
+        }
+
         container.register(type: OpenExternalLinkUseCase.self) { _ in
             @Autowired var repository: ExternalLinkRepository
             return DefaultOpenExternalLinkUseCase(repository: repository)

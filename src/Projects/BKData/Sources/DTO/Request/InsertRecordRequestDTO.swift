@@ -4,29 +4,33 @@ import BKDomain
 import Foundation
 
 struct InsertRecordRequestDTO: Encodable {
-    let pageNumber: Int
+    let pageNumber: Int?
     let quote: String
     let review: String?
-    let emotionTags: [String]
-    
+    let primaryEmotion: String
+    let detailEmotionTagIds: [String]
+
     init(
-        pageNumber: Int,
+        pageNumber: Int?,
         quote: String,
         review: String?,
-        emotionTags: [String]
+        primaryEmotion: String,
+        detailEmotionTagIds: [String]
     ) {
         self.pageNumber = pageNumber
         self.quote = quote
         self.review = review
-        self.emotionTags = emotionTags
+        self.primaryEmotion = primaryEmotion
+        self.detailEmotionTagIds = detailEmotionTagIds
     }
-    
+
     init(data: RecordVO) {
         self.init(
             pageNumber: data.pageNumber,
             quote: data.quote,
-            review: data.review,
-            emotionTags: data.emotionTags
+            review: data.memo,
+            primaryEmotion: data.primaryEmotion.rawValue,
+            detailEmotionTagIds: data.detailEmotionIds
         )
     }
 }

@@ -16,7 +16,7 @@ public enum AuthAPI {
 
 extension AuthAPI: RequestTarget {
     public var baseURL: String {
-        return "\(APIConfig.baseURL)/auth"
+        return "\(APIConfig.baseURLv1)/auth"
     }
     
     public var path: String {

@@ -165,9 +165,17 @@ public struct DataAssembly: Assembly {
                 pushTokenStore: pushTokenStore
             )
         }
-        
+
         container.register(type: ExternalLinkRepository.self) { _ in
             return DefaultExternalLinkRepository()
+        }
+
+        container.register(
+            type: EmotionRepository.self,
+            scope: .singleton
+        ) { _ in
+            @Autowired(name: "OAuth") var networkProvider: NetworkProvider
+            return DefaultEmotionRepository(networkProvider: networkProvider)
         }
     }
 }

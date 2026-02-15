@@ -19,16 +19,7 @@ enum SortOption: String, CaseIterable {
         case .newest:
             return { $0.createdAt > $1.createdAt }
         case .pageDescending:
-            return {
-                let p0 = $0.page ?? Int.max
-                let p1 = $1.page ?? Int.max
-                
-                if p0 == p1 {
-                    return $0.createdAt > $1.createdAt
-                }
-                
-                return p0 > p1
-            }
+            return { ($0.page ?? 0) > ($1.page ?? 0) }
         }
     }
 }
