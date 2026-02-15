@@ -114,6 +114,7 @@ private extension OnboardingView {
         imageView.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(imageView.snp.width).multipliedBy(274.0 / 375.0)
         }
         
         labelStack.snp.makeConstraints {
@@ -169,13 +170,13 @@ private extension OnboardingView {
         updateButtonTitle(for: next)
         updatePage(to: next)
     }
-
+    
     func updateButtonTitle(for page: Int) {
         let isLast = (page == pageControl.numberOfPages - 1)
         let title = isLast ? "시작하기" : "다음"
         nextButton.primaryButton?.title = title
     }
-
+    
     func updatePage(to index: Int) {
         pageControl.currentPage = index
         pageControlChanged(pageControl)
@@ -195,20 +196,20 @@ extension OnboardingView: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         syncPageWithScroll()
     }
-
+    
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         syncPageWithScroll()
     }
-
+    
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         syncPageWithScroll()
     }
 }
- 
+
 private extension OnboardingView {
     enum LayoutConstants {
         static let labelStackSpacing = BKSpacing.spacing3
-        static let labelStackTopOffset = BKSpacing.spacing7
+        static let labelStackTopOffset = BKSpacing.spacing8
         static let labelStackHorizontalInset = BKInset.inset5
     }
     
@@ -229,26 +230,26 @@ private extension OnboardingView {
             OnboardingPage(
                 image: BKImage.Graphics.onboarding2,
                 title: """
-                어떻게 쓸지 막막할땐, 
-                감상평 가이드가 도와드려요
-                """,
-                description: """
-                감정과 생각을 이끌어주는 
-                문장들이 기록을 자연스럽게 도와줘요
-                """,
-                titleHighlightWord: "감상평 가이드"
-            ),
-            OnboardingPage(
-                image: BKImage.Graphics.onboarding3,
-                title: """
-                독서 중 느낀 감정은
-                씨앗으로 남겨보세요
+                독서 중 느낀 감정을
+                자세히 남겨 보세요
                 """,
                 description: """
                 책마다 쌓인 감정들은
                 나만의 독서 흔적이 됩니다
                 """,
-                titleHighlightWord: "씨앗"
+                titleHighlightWord: "감정"
+            ),
+            OnboardingPage(
+                image: BKImage.Graphics.onboarding3,
+                title: """
+                기록한 문장을
+                카드로 공유해 보세요
+                """,
+                description: """
+                감정 캐릭터와 함께
+                이미지로 저장하고 공유할 수 있어요
+                """,
+                titleHighlightWord: "공유"
             )
         ]
     }
