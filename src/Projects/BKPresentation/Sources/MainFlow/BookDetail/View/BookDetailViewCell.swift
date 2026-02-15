@@ -84,11 +84,7 @@ final class BookDetailViewCell: UICollectionViewCell {
         noteLabel.setText(text: displayedNote)
         emotionTagLabel.setText(text: "#\(emotion.displayName)")
         creationLabel.setText(text: item.createdAt.toKoreanDotDateString())
-        if let page = item.page {
-            pageLabel.setText(text: "\(page)p")
-        } else {
-            pageLabel.setText(text: "-p")
-        }
+        pageLabel.setText(text: item.page.toPageString)
     }
 
     func applyMoreButtonGesture(

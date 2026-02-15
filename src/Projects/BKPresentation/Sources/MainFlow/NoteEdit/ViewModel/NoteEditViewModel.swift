@@ -8,42 +8,59 @@ import Foundation
 final class NoteEditViewModel: BaseViewModel {
     struct State {
         var recordInfo: RecordInfo?
-        var selectedEmotion: Emotion?
+        var selectedPrimaryEmotion: PrimaryEmotion?
+        var selectedDetailEmotions: [DetailEmotion] = []
         var isLoading: Bool = false
         var error: DomainError?
-        var shouldPresentEmotionEdit: (emotion: Emotion?, timestamp: Date)?
+        var shouldPresentEmotionEdit: (emotion: PrimaryEmotion?, timestamp: Date)?
         var saveCompleted: Bool = false
         var deleteCompleted: Bool = false
-        
-        var currentFormData: (page: String, sentence: String, appreciation: String) = ("", "", "")
-        
+
+        var currentFormData: (page: String, sentence: String, memo: String) = ("", "", "")
+
         var initialRecordInfo: RecordInfo?
-        var initialSelectedEmotion: Emotion?
+        var initialSelectedPrimaryEmotion: PrimaryEmotion?
+        var initialSelectedDetailEmotions: [DetailEmotion] = []
         var isDiff: Bool = false // 변경 내용이 있는지 추적
+
+        // Detail emotion sheet 관련 상태
+        var detailEmotions: [DetailEmotion] = []
+        var isLoadingEmotions: Bool = false
+
+        // NoteEditViewController에서 사용하는 별칭 (backward compatibility)
+        var selectedEmotion: PrimaryEmotion? {
+            selectedPrimaryEmotion
+        }
     }
-    
+
     enum Action {
         case onAppear
         case fetchRecordDetailSuccessed(RecordInfo)
         case errorOccured(DomainError)
         case errorHandled
         case presentEmotionEdit
-        case emotionSelected(Emotion)
-        
+        case emotionSelected(PrimaryEmotion)
+
         case saveButtonTapped
         case patchRecordSuccessed(RecordInfo)
         case deleteButtonTapped
         case deleteRecordSuccessed
-        
+
         case pageDidChange(String)
         case sentenceDidChange(String)
-        case appreciationDidChange(String)
+        case memoDidChange(String)
+
+        // Detail emotion sheet
+        case fetchDetailEmotions(PrimaryEmotion)
+        case detailEmotionsFetched([DetailEmotion])
+        case detailEmotionsSelected([DetailEmotion])
     }
-    
+
     enum SideEffect {
         case fetchRecordDetail(String)
         case patchRecord(String, NoteForm)
         case deleteRecord(String)
+        case fetchDetailEmotions(PrimaryEmotion)
     }
     
     @Published private var state: State
@@ -53,6 +70,7 @@ final class NoteEditViewModel: BaseViewModel {
     @Autowired private var fetchRecordDetailUseCase: FetchRecordDetailUseCase
     @Autowired private var patchRecordUseCase: PatchRecordUseCase
     @Autowired private var deleteRecordUseCase: DeleteRecordUseCase
+    @Autowired private var fetchDetailEmotionsUseCase: FetchDetailEmotionsUseCase
     
     private let recordId: String
     
@@ -89,18 +107,19 @@ final class NoteEditViewModel: BaseViewModel {
         case .fetchRecordDetailSuccessed(let recordInfo):
             newState.recordInfo = recordInfo
             newState.initialRecordInfo = recordInfo
-            
+
             newState.currentFormData = (
-                page: "\(recordInfo.pageNumber)",
+                page: recordInfo.pageNumber.map { "\($0)" } ?? "",
                 sentence: recordInfo.quote,
-                appreciation: recordInfo.review ?? ""
+                memo: recordInfo.review ?? ""
             )
-            
+
             // 사용자가 이미 감정을 선택했다면 덮어쓰지 않음
-            if newState.selectedEmotion == nil {
-                let initialEmotion = recordInfo.emotionTags.first
-                newState.selectedEmotion = initialEmotion
-                newState.initialSelectedEmotion = initialEmotion
+            if newState.selectedPrimaryEmotion == nil {
+                newState.selectedPrimaryEmotion = recordInfo.primaryEmotion
+                newState.initialSelectedPrimaryEmotion = recordInfo.primaryEmotion
+                newState.selectedDetailEmotions = recordInfo.detailEmotions
+                newState.initialSelectedDetailEmotions = recordInfo.detailEmotions
             }
             newState.isLoading = false
             newState.isDiff = false
@@ -113,31 +132,36 @@ final class NoteEditViewModel: BaseViewModel {
             newState.error = nil
             
         case .presentEmotionEdit:
-            newState.shouldPresentEmotionEdit = (emotion: state.selectedEmotion, timestamp: Date())
-            
+            newState.shouldPresentEmotionEdit = (emotion: state.selectedPrimaryEmotion, timestamp: Date())
+
         case .emotionSelected(let emotion):
-            newState.selectedEmotion = emotion
+            newState.selectedPrimaryEmotion = emotion
+            // 감정이 변경되면 세부감정 초기화
+            newState.selectedDetailEmotions = []
             newState.isDiff = checkForDiff(state: newState)
             
         case .saveButtonTapped:
-            guard let selectedEmotion = state.selectedEmotion,
-                  let page = Int(state.currentFormData.page),
+            guard let selectedPrimaryEmotion = state.selectedPrimaryEmotion,
                   !state.currentFormData.sentence.isEmpty else {
                 break
             }
-            
-            // 감상평이 비어있으면 nil, 아니면 텍스트 전달
-            let appreciation = state.currentFormData.appreciation.isEmpty
+
+            // 페이지가 비어있으면 nil
+            let page = Int(state.currentFormData.page)
+
+            // 메모가 비어있으면 nil, 아니면 텍스트 전달
+            let memo = state.currentFormData.memo.isEmpty
             ? nil
-            : state.currentFormData.appreciation
-            
+            : state.currentFormData.memo
+
             let noteForm = NoteForm(
                 page: page,
                 sentence: state.currentFormData.sentence,
-                emotion: selectedEmotion,
-                appreciation: appreciation
+                memo: memo,
+                primaryEmotion: selectedPrimaryEmotion,
+                detailEmotions: state.selectedDetailEmotions
             )
-            
+
             newState.isLoading = true
             effects.append(.patchRecord(recordId, noteForm))
             
@@ -145,9 +169,9 @@ final class NoteEditViewModel: BaseViewModel {
             newState.recordInfo = recordInfo
             newState.initialRecordInfo = recordInfo
             newState.currentFormData = (
-                page: "\(recordInfo.pageNumber)",
+                page: recordInfo.pageNumber.map { "\($0)" } ?? "",
                 sentence: recordInfo.quote,
-                appreciation: recordInfo.review ?? ""
+                memo: recordInfo.review ?? ""
             )
             newState.isLoading = false
             newState.saveCompleted = true
@@ -169,11 +193,23 @@ final class NoteEditViewModel: BaseViewModel {
             newState.currentFormData.sentence = text
             newState.isDiff = checkForDiff(state: newState)
             
-        case .appreciationDidChange(let text):
-            newState.currentFormData.appreciation = text
+        case .memoDidChange(let text):
+            newState.currentFormData.memo = text
+            newState.isDiff = checkForDiff(state: newState)
+
+        case .fetchDetailEmotions(let emotion):
+            newState.isLoadingEmotions = true
+            effects.append(.fetchDetailEmotions(emotion))
+
+        case .detailEmotionsFetched(let emotions):
+            newState.detailEmotions = emotions
+            newState.isLoadingEmotions = false
+
+        case .detailEmotionsSelected(let emotions):
+            newState.selectedDetailEmotions = emotions
             newState.isDiff = checkForDiff(state: newState)
         }
-        
+
         return (newState, effects)
     }
     
@@ -199,6 +235,12 @@ final class NoteEditViewModel: BaseViewModel {
                 .map { _ in Action.deleteRecordSuccessed }
                 .catch { Just(Action.errorOccured($0)) }
                 .eraseToAnyPublisher()
+
+        case .fetchDetailEmotions(let emotion):
+            return fetchDetailEmotionsUseCase.execute(for: emotion)
+                .map { Action.detailEmotionsFetched($0) }
+                .catch { Just(Action.errorOccured($0)) }
+                .eraseToAnyPublisher()
         }
     }
     
@@ -215,14 +257,15 @@ final class NoteEditViewModel: BaseViewModel {
         guard let initialInfo = state.initialRecordInfo else {
             return false
         }
-        
-        let pageDiff = state.currentFormData.page != "\(initialInfo.pageNumber)"
+
+        let pageDiff = state.currentFormData.page != (initialInfo.pageNumber.map { "\($0)" } ?? "")
         let sentenceDiff = state.currentFormData.sentence != initialInfo.quote
-        let appreciationDiff = state.currentFormData.appreciation != (initialInfo.review ?? "")
-        
-        let emotionDiff = state.selectedEmotion != state.initialSelectedEmotion
-        
-        return pageDiff || sentenceDiff || appreciationDiff || emotionDiff
+        let memoDiff = state.currentFormData.memo != (initialInfo.review ?? "")
+
+        let emotionDiff = state.selectedPrimaryEmotion != state.initialSelectedPrimaryEmotion
+        let detailEmotionDiff = state.selectedDetailEmotions != state.initialSelectedDetailEmotions
+
+        return pageDiff || sentenceDiff || memoDiff || emotionDiff || detailEmotionDiff
     }
 }
 

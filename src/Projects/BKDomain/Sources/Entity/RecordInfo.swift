@@ -46,9 +46,4 @@ public struct RecordInfo: Decodable, Equatable {
         self.bookCoverImageUrl = bookCoverImageUrl
         self.author = author
     }
-
-    /// 이전 API와의 호환성을 위한 computed property
-    public var emotionTags: [Emotion] {
-        [primaryEmotion.toEmotion()]
-    }
 }

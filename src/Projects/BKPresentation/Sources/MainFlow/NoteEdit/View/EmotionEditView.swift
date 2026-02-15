@@ -8,7 +8,8 @@ import SnapKit
 
 enum EmotionEditViewEvent {
     case editButtonTapped
-    case emotionDidChange(Emotion?)
+    case emotionDidChange(PrimaryEmotion?)
+    case emotionSelected(PrimaryEmotion)  // 감정 탭 시 (바텀시트 표시용)
 }
 
 final class EmotionEditView: BaseView {
@@ -20,10 +21,10 @@ final class EmotionEditView: BaseView {
     let eventPublisher = PassthroughSubject<EmotionEditViewEvent, Never>()
     private var cancellables = Set<AnyCancellable>()
     
-    private var currentSelectedEmotion: Emotion? {
+    private var currentSelectedPrimaryEmotion: PrimaryEmotion? {
         guard let form = emotionRegistrationView.registrationForm(),
               case .emotion(let emotionForm) = form else { return nil }
-        return emotionForm.emotion
+        return emotionForm.primaryEmotion
     }
     
     override func setupView() {
@@ -35,12 +36,17 @@ final class EmotionEditView: BaseView {
     override func configure() {
         editButton.title = "수정하기"
         editButton.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
-        
+
+        // 감정 탭 이벤트 전달 (바텀시트 표시용)
+        emotionRegistrationView.onEmotionSelected = { [weak self] emotion in
+            self?.eventPublisher.send(.emotionSelected(emotion))
+        }
+
         emotionRegistrationView.inputChangedPublisher
             .sink { [weak self] _ in
                 guard let self = self else { return }
-    
-                let newEmotion = self.currentSelectedEmotion
+
+                let newEmotion = self.currentSelectedPrimaryEmotion
                 self.eventPublisher.send(.emotionDidChange(newEmotion))
             }
             .store(in: &cancellables)
@@ -72,16 +78,30 @@ final class EmotionEditView: BaseView {
         }
     }
     
-    func setSelectedEmotion(_ emotion: Emotion) {
-        emotionRegistrationView.setSelectedEmotion(emotion)
+    func setSelectedPrimaryEmotion(_ emotion: PrimaryEmotion) {
+        emotionRegistrationView.setSelectedPrimaryEmotion(emotion)
     }
-    
+
     @objc private func editButtonTapped() {
         eventPublisher.send(.editButtonTapped)
     }
-    
+
     func setEditButtonEnabled(_ isEnabled: Bool) {
         editButton.isDisabled = !isEnabled
+    }
+
+    // MARK: - Detail Emotions
+
+    func setDetailEmotions(_ detailEmotions: [DetailEmotion]) {
+        emotionRegistrationView.setDetailEmotions(detailEmotions)
+    }
+
+    func getSelectedDetailEmotions() -> [DetailEmotion] {
+        return emotionRegistrationView.getSelectedDetailEmotions()
+    }
+
+    func setLoadingEmotions(_ isLoading: Bool) {
+        emotionRegistrationView.setLoadingEmotions(isLoading)
     }
 }
 

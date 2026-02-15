@@ -37,9 +37,14 @@ extension NoteEditCoordinator: AuthenticationRequiredNotifying, ErrorHandleable 
 }
 
 extension NoteEditCoordinator {
-    func didTapEmotionEdit(currentEmotion: Emotion?, completion: @escaping (Emotion) -> Void) {
+    func didTapEmotionEdit(
+        currentEmotion: PrimaryEmotion?,
+        currentDetailEmotions: [DetailEmotion],
+        completion: @escaping (PrimaryEmotion, [DetailEmotion]) -> Void
+    ) {
         let emotionEditViewController = EmotionEditViewController(
             currentEmotion: currentEmotion,
+            currentDetailEmotions: currentDetailEmotions,
             completion: completion
         )
         emotionEditViewController.coordinator = self

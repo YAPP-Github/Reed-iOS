@@ -8,34 +8,6 @@ struct NoteForm: Equatable {
     let memo: String?
     let primaryEmotion: PrimaryEmotion
     let detailEmotions: [DetailEmotion]
-
-    /// 이전 API 호환성 생성자
-    init(
-        page: Int?,
-        sentence: String,
-        emotion: Emotion,
-        appreciation: String?
-    ) {
-        self.page = page
-        self.sentence = sentence
-        self.memo = appreciation
-        self.primaryEmotion = PrimaryEmotion.from(emotion: emotion)
-        self.detailEmotions = []
-    }
-
-    init(
-        page: Int?,
-        sentence: String,
-        memo: String?,
-        primaryEmotion: PrimaryEmotion,
-        detailEmotions: [DetailEmotion]
-    ) {
-        self.page = page
-        self.sentence = sentence
-        self.memo = memo
-        self.primaryEmotion = primaryEmotion
-        self.detailEmotions = detailEmotions
-    }
 }
 
 extension NoteForm {

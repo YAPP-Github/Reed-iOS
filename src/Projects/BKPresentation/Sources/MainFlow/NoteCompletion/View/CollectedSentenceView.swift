@@ -80,11 +80,7 @@ final class CollectedSentenceView: BaseView {
     ) {
         let displayedText = "\"\(sentence)\""
         collectedSentenceLabel.setText(text: displayedText)
-        if let page {
-            pageLabel.setText(text: "\(page)p")
-        } else {
-            pageLabel.setText(text: "-p")
-        }
+        pageLabel.setText(text: page.toPageString)
     }
 }
 

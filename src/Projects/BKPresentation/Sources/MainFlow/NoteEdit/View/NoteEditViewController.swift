@@ -25,6 +25,10 @@ final class NoteEditViewController: BaseViewController<NoteEditView>, ScreenLogg
     weak var coordinator: NoteEditCoordinator?
     let viewModel: AnyViewBindableViewModel<NoteEditViewModel.State, NoteEditViewModel.Action>
     private var cancellables = Set<AnyCancellable>()
+
+    // 현재 상태 추적 (EmotionEditViewController에 전달용)
+    private var currentPrimaryEmotion: PrimaryEmotion?
+    private var currentDetailEmotions: [DetailEmotion] = []
     
     init(viewModel: NoteEditViewModel) {
         self.viewModel = AnyViewBindableViewModel(viewModel)
@@ -61,11 +65,20 @@ final class NoteEditViewController: BaseViewController<NoteEditView>, ScreenLogg
             .store(in: &cancellables)
         
         viewModel.statePublisher
-            .map { $0.selectedEmotion }
-            .removeDuplicates()
+            .map { state -> (PrimaryEmotion?, [DetailEmotion]) in
+                (state.selectedPrimaryEmotion, state.selectedDetailEmotions)
+            }
+            .removeDuplicates { (prev: (PrimaryEmotion?, [DetailEmotion]), curr: (PrimaryEmotion?, [DetailEmotion])) in
+                prev.0 == curr.0 && prev.1 == curr.1
+            }
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] emotion in
-                self?.contentView.setInitialEmotion(emotion)
+            .sink { [weak self] emotionTuple in
+                self?.currentPrimaryEmotion = emotionTuple.0
+                self?.currentDetailEmotions = emotionTuple.1
+                self?.contentView.setEmotionInfo(
+                    primaryEmotion: emotionTuple.0,
+                    detailEmotions: emotionTuple.1
+                )
             }
             .store(in: &cancellables)
         
@@ -144,8 +157,8 @@ final class NoteEditViewController: BaseViewController<NoteEditView>, ScreenLogg
                     self.viewModel.send(.pageDidChange(text))
                 case .sentenceDidChange(let text):
                     self.viewModel.send(.sentenceDidChange(text))
-                case .appreciationDidChange(let text):
-                    self.viewModel.send(.appreciationDidChange(text))
+                case .memoDidChange(let text):
+                    self.viewModel.send(.memoDidChange(text))
                 }
             }
             .store(in: &cancellables)
@@ -154,17 +167,22 @@ final class NoteEditViewController: BaseViewController<NoteEditView>, ScreenLogg
 
 private extension NoteEditViewController {
     func presentEmotionEdit() {
+        // 항상 감정 선택 화면으로 이동 (바텀시트는 EmotionEditViewController에서 처리)
         viewModel.send(.presentEmotionEdit)
     }
-    
-    func handlePresentEmotionEdit(emotion: Emotion?) {
-        coordinator?.didTapEmotionEdit(currentEmotion: emotion) { [weak self] selectedEmotion in
-            self?.handleEmotionSelected(selectedEmotion)
+
+    func handlePresentEmotionEdit(emotion: PrimaryEmotion?) {
+        coordinator?.didTapEmotionEdit(
+            currentEmotion: emotion,
+            currentDetailEmotions: currentDetailEmotions
+        ) { [weak self] selectedEmotion, selectedDetailEmotions in
+            self?.handleEmotionEditCompleted(emotion: selectedEmotion, detailEmotions: selectedDetailEmotions)
         }
     }
-    
-    func handleEmotionSelected(_ emotion: Emotion) {
+
+    func handleEmotionEditCompleted(emotion: PrimaryEmotion, detailEmotions: [DetailEmotion]) {
         viewModel.send(.emotionSelected(emotion))
+        viewModel.send(.detailEmotionsSelected(detailEmotions))
     }
     
     func handleSaveButtonTapped() {
